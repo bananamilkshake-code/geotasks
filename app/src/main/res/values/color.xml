@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ui_theme_dark_colour">#561097</color>
+    <color name="ui_theme_dark_text_colour">#ffffff</color>
+</resources>

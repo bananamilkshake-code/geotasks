@@ -1,0 +1,8 @@
+syntax: glob
+.gradle/*
+.idea/*
+app/app.iml
+app/build/*
+GeoTasks.iml
+local.properties
+build/*
