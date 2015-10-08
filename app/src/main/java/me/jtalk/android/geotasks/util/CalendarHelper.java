@@ -14,14 +14,14 @@ public class CalendarHelper {
 	private static final int ESTIMATED_SELECTION_ITEM_SIZE = ESTIMATED_CALENDAR_FIELD_SIZE
 			+ SELECTION_STRING_SEPARATOR.length();
 
-	public static String buildSelection(String ...fields) {
+	public static String buildProjection(String... fields) {
 
 		verifyArgument(fields.length > 0, "Fields must be non-empty");
 
 		StringBuilder builder = new StringBuilder(fields.length * ESTIMATED_SELECTION_ITEM_SIZE);
 		builder.append("((");
-		Joiner.joinIn(builder, fields, SELECTION_STRING_SEPARATOR)
+		return Joiner.joinIn(builder, fields, SELECTION_STRING_SEPARATOR)
 				.append(SELECTION_ARGUMENT_APPENDER)
-				.append("))");
+				.append("))").toString();
 	}
 }

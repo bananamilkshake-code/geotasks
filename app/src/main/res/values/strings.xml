@@ -2,4 +2,9 @@
     <string name="app_name">GeoTasks</string>
 
     <string name="action_settings">Settings</string>
+    <string name="actionAddCalendar">Add calendar...</string>
+    <string name="add_calendar_name_field">Calendar name</string>
+    <string name="calendarAddButton">Add</string>
+    <string name="actionAddEvent">Add event...</string>
+    <string name="title_activity_events">EventsActivity</string>
 </resources>
