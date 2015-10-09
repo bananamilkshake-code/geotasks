@@ -10,9 +10,6 @@ import android.os.Bundle;
 import android.provider.CalendarContract.Events;
 import android.widget.CursorAdapter;
 
-import com.google.common.base.Preconditions;
-
-import java.util.Calendar;
 import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.util.CalendarHelper;
@@ -67,8 +64,8 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
     public void addEvent(String title) throws SecurityException {
         ContentValues values = new ContentValues();
         values.put(Events.CALENDAR_ID, calendarId);
-        values.put(Events.DTSTART, Calendar.getInstance().getTimeInMillis());
-        values.put(Events.DTEND, Calendar.getInstance().getTimeInMillis() + 1000 * 5 * 24 * 60 * 60);
+        values.put(Events.DTSTART, -1);
+        values.put(Events.DTEND, -1);
         values.put(Events.EVENT_TIMEZONE, TimeZone.getAvailableIDs()[0]);
         values.put(Events.TITLE, title);
 
