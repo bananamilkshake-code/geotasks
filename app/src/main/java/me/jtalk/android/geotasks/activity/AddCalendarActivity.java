@@ -10,7 +10,7 @@ import me.jtalk.android.geotasks.R;
 
 public class AddCalendarActivity extends Activity {
 
-    public static final String EXTRA_CALENDAR_NAME = "calendar-name";
+    public static final String EXTRA_NAME = "calendar-name";
 
     TextView calendarNameText;
 
@@ -24,7 +24,7 @@ public class AddCalendarActivity extends Activity {
         Button addCalendarButton = (Button) findViewById(R.id.calendarAddButton);
         addCalendarButton.setOnClickListener(view -> {
             Intent returnIntent = new Intent(AddCalendarActivity.this, MainActivity.class);
-            returnIntent.putExtra(EXTRA_CALENDAR_NAME, AddCalendarActivity.this.calendarNameText.getText().toString());
+            returnIntent.putExtra(EXTRA_NAME, AddCalendarActivity.this.calendarNameText.getText().toString());
             AddCalendarActivity.this.setResult(RESULT_OK, returnIntent);
             AddCalendarActivity.this.finish();
         });

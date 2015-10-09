@@ -10,7 +10,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.calendar.CalendarSource;
+import me.jtalk.android.geotasks.source.CalendarSource;
 
 public class MainActivity extends Activity {
 
@@ -37,11 +37,7 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 
 		menu.findItem(R.id.actionAddCalendar).setOnMenuItemClickListener(item -> {
-			//startActivityForResult(new Intent(MainActivity.this, AddCalendarActivity.class), INTENT_ADD_CALENDAR);
-			startActivity(new Intent(Intent.ACTION_EDIT)
-					.setData(CalendarContract.Calendars.CONTENT_URI)
-					.putExtra(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
-					.putExtra(CalendarContract.Calendars.VISIBLE, true));
+			startActivityForResult(new Intent(MainActivity.this, AddCalendarActivity.class), INTENT_ADD_CALENDAR);
 			return true;
 		});
 
@@ -62,15 +58,15 @@ public class MainActivity extends Activity {
 	}
 
 	private void onAddCalendarResult(Intent data) {
-		String name = data.getStringExtra(AddCalendarActivity.EXTRA_CALENDAR_NAME);
+		String name = data.getStringExtra(AddCalendarActivity.EXTRA_NAME);
 		calendarSource.addCalendar(name);
 	}
 
 	private SimpleCursorAdapter initCalendarsList() {
 		SimpleCursorAdapter calendarsAdapter = new SimpleCursorAdapter(this,
-				android.R.layout.simple_list_item_1, null,
-				new String[] {CalendarContract.Calendars.CALENDAR_DISPLAY_NAME},
-				new int[] {android.R.id.text1}, 0);
+				android.R.layout.simple_list_item_2, null,
+				new String[] {CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, CalendarContract.Calendars._ID},
+				new int[] {android.R.id.text1, android.R.id.text2}, 0);
 
 		ListView calendarsList = (ListView) findViewById(R.id.calendars_list);
 		calendarsList.setAdapter(calendarsAdapter);

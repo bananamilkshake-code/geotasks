@@ -28,6 +28,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="me.jtalk.android.geotasks.activity.MainActivity" />
         </activity>
+        <activity
+            android:name=".activity.AddEventActivity"
+            android:label="@string/title_activity_add_event" >
+        </activity>
     </application>
 
 </manifest>

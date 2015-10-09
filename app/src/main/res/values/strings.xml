@@ -7,4 +7,7 @@
     <string name="calendarAddButton">Add</string>
     <string name="actionAddEvent">Add event...</string>
     <string name="title_activity_events">EventsActivity</string>
+    <string name="title_activity_add_event">AddEventActivity</string>
+    <string name="eventNameField">Event name</string>
+    <string name="eventAddButton">Add</string>
 </resources>

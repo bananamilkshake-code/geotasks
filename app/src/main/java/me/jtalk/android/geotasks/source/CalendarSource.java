@@ -1,4 +1,4 @@
-package me.jtalk.android.geotasks.calendar;
+package me.jtalk.android.geotasks.source;
 
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -6,23 +6,23 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.widget.CursorAdapter;
 
+import static android.provider.CalendarContract.*;
+
 public class CalendarSource implements LoaderManager.LoaderCallbacks<Cursor> {
-
 	private Context context;
-
 	private CursorAdapter calendarsAdapter;
 
 	private static final String[] PROJECTION_CALENDARS = new String[] {
-			CalendarContract.Calendars._ID,
-			CalendarContract.Calendars.NAME,
-			CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-			CalendarContract.Calendars.ACCOUNT_NAME,
-			CalendarContract.Calendars.ACCOUNT_TYPE,
-			CalendarContract.Calendars.OWNER_ACCOUNT
+			Calendars._ID,
+			Calendars.NAME,
+			Calendars.CALENDAR_DISPLAY_NAME,
+			Calendars.ACCOUNT_NAME,
+			Calendars.ACCOUNT_TYPE,
+			Calendars.OWNER_ACCOUNT
 	};
 
 	public CalendarSource(Context context, CursorAdapter calendarsAdapter) {
@@ -33,7 +33,7 @@ public class CalendarSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		return new CursorLoader(context,
-				CalendarContract.Calendars.CONTENT_URI,
+				Calendars.CONTENT_URI,
 				PROJECTION_CALENDARS, null, null, null);
 	}
 
@@ -49,11 +49,17 @@ public class CalendarSource implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	public void addCalendar(String name) throws SecurityException {
 		ContentValues values = new ContentValues();
-		values.put(CalendarContract.Calendars.NAME, name);
-		values.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, name);
-		values.put(CalendarContract.Calendars.VISIBLE, true);
-		values.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
+		values.put(Calendars.NAME, name);
+		values.put(Calendars.CALENDAR_DISPLAY_NAME, name);
+		values.put(Calendars.VISIBLE, true);
 
-		this.context.getContentResolver().insert(CalendarContract.Calendars.CONTENT_URI, values);
+		this.context.getContentResolver().insert(asSyncAdapter(ACCOUNT_TYPE_LOCAL), values);
+	}
+
+	static Uri asSyncAdapter(String accountType) {
+		return Calendars.CONTENT_URI.buildUpon()
+				.appendQueryParameter(CALLER_IS_SYNCADAPTER, "true")
+				.appendQueryParameter(Calendars.ACCOUNT_NAME, "aa")
+				.appendQueryParameter(Calendars.ACCOUNT_TYPE, accountType).build();
 	}
 }

@@ -9,11 +9,13 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.calendar.EventsSource;
+import me.jtalk.android.geotasks.source.EventsSource;
 
 public class EventsActivity extends Activity {
 
     private static final int LOADER_EVENTS_ID = 0;
+
+    private static final int INTENT_ADD_EVENT = 0;
 
     public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
 
@@ -43,13 +45,29 @@ public class EventsActivity extends Activity {
         getMenuInflater().inflate(R.menu.menu_events, menu);
 
         menu.findItem(R.id.actionAddEvent).setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(Intent.ACTION_INSERT)
-                    .setData(CalendarContract.Events.CONTENT_URI)
-                    .putExtra(CalendarContract.Events.CALENDAR_ID, calendarId));
+            startActivityForResult(new Intent(this, AddEventActivity.class), INTENT_ADD_EVENT);
             return true;
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case INTENT_ADD_EVENT:
+                onAddEventResult(data);
+                return;
+        }
+    }
+
+    private void onAddEventResult(Intent data) {
+        String eventTitle = data.getStringExtra(AddEventActivity.EXTRA_TITLE);
+        eventsSource.addEvent(eventTitle);
     }
 
     private SimpleCursorAdapter initEventsList() {
