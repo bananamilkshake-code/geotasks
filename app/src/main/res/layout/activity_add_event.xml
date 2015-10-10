@@ -6,19 +6,35 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="me.jtalk.android.geotasks.activity.AddEventActivity">
+    tools:context="me.jtalk.android.geotasks.activity.AddEventActivity"
+    android:weightSum="1">
 
     <TextView
         android:id="@+id/calendarNameLabel"
         android:text="@string/eventNameField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="30dp" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
         android:id="@+id/eventNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/addEventDescriptionLabel"
+        android:id="@+id/textView" />
+
+    <EditText
+        android:id="@+id/eventDescriptionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:layout_weight="0.24" />
 
     <Button
         android:id="@+id/eventAddButton"

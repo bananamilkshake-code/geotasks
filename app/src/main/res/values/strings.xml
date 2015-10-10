@@ -5,9 +5,10 @@
     <string name="actionAddCalendar">Add calendar...</string>
     <string name="add_calendar_name_field">Calendar name</string>
     <string name="calendarAddButton">Add</string>
-    <string name="actionAddEvent">Add event...</string>
+    <string name="action_add_event">Add event...</string>
     <string name="title_activity_events">EventsActivity</string>
     <string name="title_activity_add_event">AddEventActivity</string>
-    <string name="eventNameField">Event name</string>
+    <string name="eventNameField">Name</string>
     <string name="eventAddButton">Add</string>
+    <string name="addEventDescriptionLabel">Description</string>
 </resources>

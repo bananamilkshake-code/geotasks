@@ -1,7 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".EventsActivity">
-    <item android:id="@+id/actionAddEvent"
-        android:title="@string/actionAddEvent"
-        android:showAsAction="never"/>
-</menu>

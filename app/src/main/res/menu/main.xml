@@ -4,8 +4,8 @@
     <item android:id="@+id/action_example"
           android:title="Test"
           android:showAsAction="ifRoom"/>
-    <item android:id="@+id/actionAddCalendar"
-        android:title="@string/actionAddCalendar"
+    <item android:id="@+id/action_add_event"
+        android:title="@string/action_add_event"
         android:orderInCategory="100"
         android:showAsAction="never"/>
     <item android:id="@+id/action_settings"

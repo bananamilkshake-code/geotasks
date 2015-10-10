@@ -61,13 +61,15 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
         eventsAdapter.swapCursor(null);
     }
 
-    public void addEvent(String title) throws SecurityException {
+    public void addEvent(String title, String description) throws SecurityException {
         ContentValues values = new ContentValues();
         values.put(Events.CALENDAR_ID, calendarId);
+        values.put(Events.TITLE, title);
+        values.put(Events.DESCRIPTION, description);
+
         values.put(Events.DTSTART, -1);
         values.put(Events.DTEND, -1);
         values.put(Events.EVENT_TIMEZONE, TimeZone.getAvailableIDs()[0]);
-        values.put(Events.TITLE, title);
 
         this.context.getContentResolver().insert(Events.CONTENT_URI, values);
     }
