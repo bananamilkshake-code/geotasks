@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.Settings;
+import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.source.EventsSource;
 
 public class MainActivity extends Activity {
@@ -28,9 +29,13 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		SimpleCursorAdapter eventsAdapter = initEventsList();
+		CursorAdapter eventsAdapter = initEventsList();
 
-		initEventsSource(eventsAdapter);
+		int calendarId = initEventsSource(eventsAdapter);
+
+		Bundle bundle = new Bundle();
+		bundle.putInt(EventsSource.BUNDLE_CALENDAR_ID, calendarId);
+		getLoaderManager().initLoader(LOADER_EVENTS_ID, bundle, eventsSource);
 	}
 
 	@Override
@@ -58,12 +63,8 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private SimpleCursorAdapter initEventsList() {
-		SimpleCursorAdapter eventsAdapter = new SimpleCursorAdapter(this,
-				android.R.layout.simple_list_item_2, null,
-				new String[] {CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION},
-				new int[] {android.R.id.text1, android.R.id.text2},
-				0);
+	private CursorAdapter initEventsList() {
+		CursorAdapter eventsAdapter = new EventElementAdapter(this);
 
 		ListView eventsList = (ListView) findViewById(R.id.events_list);
 		eventsList.setAdapter(eventsAdapter);
@@ -71,7 +72,7 @@ public class MainActivity extends Activity {
 		return eventsAdapter;
 	}
 
-	private void initEventsSource(SimpleCursorAdapter eventsAdapter) {
+	private int initEventsSource(CursorAdapter eventsAdapter) {
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 
 		int calendarId = settings.getInt(Settings.CALENDAR_ID, Settings.DEFAULT_CALENDAR);
@@ -87,10 +88,7 @@ public class MainActivity extends Activity {
 		Log.i(MainActivity.class.getName(), String.format("Application will use calendar %d", calendarId));
 
 		eventsSource = new EventsSource(this, eventsAdapter);
-
-		Bundle bundle = new Bundle();
-		bundle.putInt(EventsSource.BUNDLE_CALENDAR_ID, calendarId);
-		getLoaderManager().initLoader(LOADER_EVENTS_ID, bundle, eventsSource);
+		return calendarId;
 	}
 
 	private int createNewCalendar() {
