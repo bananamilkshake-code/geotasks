@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.Settings;
@@ -71,11 +72,13 @@ public class MainActivity extends Activity {
 		eventsList.setAdapter(eventsAdapter);
 
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
+			long eventId = parent.getAdapter().getItemId(position);
+			String eventTitle = ((TextView) view.findViewById(R.id.event_element_title)).getText().toString();
+
 			new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.dialog_delete_event_title)
-					.setMessage(R.string.dialog_delete_event_text)
+					.setMessage(String.format(getString(R.string.dialog_delete_event_text), eventTitle))
 					.setPositiveButton(R.string.dialog_delete_event_yes, (dialog, which) -> {
-						long eventId = parent.getAdapter().getItemId(position);
 						MainActivity.this.eventsSource.removeEvent(eventId);
 					})
 					.setNegativeButton(R.string.dialog_delete_event_no, null)
