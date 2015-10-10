@@ -1,6 +1,7 @@
 package me.jtalk.android.geotasks.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -68,6 +69,20 @@ public class MainActivity extends Activity {
 
 		ListView eventsList = (ListView) findViewById(R.id.events_list);
 		eventsList.setAdapter(eventsAdapter);
+
+		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
+			new AlertDialog.Builder(MainActivity.this)
+					.setTitle(R.string.dialog_delete_event_title)
+					.setMessage(R.string.dialog_delete_event_text)
+					.setPositiveButton(R.string.dialog_delete_event_yes, (dialog, which) -> {
+						long eventId = parent.getAdapter().getItemId(position);
+						MainActivity.this.eventsSource.removeEvent(eventId);
+					})
+					.setNegativeButton(R.string.dialog_delete_event_no, null)
+					.setCancelable(true)
+					.show();
+			return true;
+		});
 
 		return eventsAdapter;
 	}

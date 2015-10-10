@@ -1,11 +1,14 @@
 package me.jtalk.android.geotasks.source;
 
 import android.app.LoaderManager;
+import android.app.usage.UsageEvents;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
@@ -77,5 +80,10 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
         values.put(Events.EVENT_TIMEZONE, TimeZone.getAvailableIDs()[0]);
 
         this.context.getContentResolver().insert(Events.CONTENT_URI, values);
+    }
+
+    public void removeEvent(long eventId) {
+        Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
+        this.context.getContentResolver().delete(deleteUri, null, null);
     }
 }
