@@ -7,29 +7,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.Settings;
 
 public class EventElementAdapter extends CursorAdapter {
-    public EventElementAdapter(Context context) {
-        super(context, null, true);
-    }
+	private static final DateFormat CALENDAR_FORMAT = new SimpleDateFormat("dd-MM-yyy   hh:mm");
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-        return inflater.inflate(R.layout.item_event, parent, false);
-    }
+	public EventElementAdapter(Context context) {
+		super(context, null, true);
+	}
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
-        TextView timeView = (TextView) view.findViewById(R.id.event_element_time);
-        ImageView alarmState = (ImageView) view.findViewById(R.id.event_element_alarm);
+	@Override
+	public View newView(Context context, Cursor cursor, ViewGroup parent) {
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+		return inflater.inflate(R.layout.item_event, parent, false);
+	}
 
-        titleView.setText(cursor.getString(cursor.getColumnIndex(Events.TITLE)));
-        timeView.setText(cursor.getString(cursor.getColumnIndex(Events.DTSTART)));
-    }
+	@Override
+	public void bindView(View view, Context context, Cursor cursor) {
+		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
+		TextView timeView = (TextView) view.findViewById(R.id.event_element_time);
+
+		titleView.setText(cursor.getString(cursor.getColumnIndex(Events.TITLE)));
+
+		long timeInMillis = cursor.getLong(cursor.getColumnIndex(Events.DTSTART));
+		if (timeInMillis != Settings.DEFAULT_START_TIME) {
+			Calendar time = Calendar.getInstance();
+			time.setTimeInMillis(timeInMillis);
+
+			timeView.setText(CALENDAR_FORMAT.format(time.getTime()));
+		} else {
+			timeView.setText(null);
+		}
+	}
 }

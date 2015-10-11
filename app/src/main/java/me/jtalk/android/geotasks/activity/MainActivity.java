@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +21,8 @@ import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.source.EventsSource;
 
 public class MainActivity extends Activity {
+	private static final String TAG = MainActivity.class.getName();
+
 	private static final int LOADER_EVENTS_ID = 0;
 
 	private static final int INTENT_ADD_EVENT = 0;
@@ -32,23 +35,12 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		CursorAdapter eventsAdapter = initEventsList();
-
-		int calendarId = initEventsSource(eventsAdapter);
-
-		Bundle bundle = new Bundle();
-		bundle.putInt(EventsSource.BUNDLE_CALENDAR_ID, calendarId);
-		getLoaderManager().initLoader(LOADER_EVENTS_ID, bundle, eventsSource);
+		initEventsSource(eventsAdapter);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
-
-		menu.findItem(R.id.action_add_event).setOnMenuItemClickListener(item -> {
-			startActivityForResult(new Intent(this, AddEventActivity.class), INTENT_ADD_EVENT);
-			return true;
-		});
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -63,6 +55,12 @@ public class MainActivity extends Activity {
 				onAddEventResult(data);
 				return;
 		}
+	}
+
+	// This method is called on menu.menu_action_add_event click
+	public boolean openAddEventIntent(MenuItem menuItem) {
+		startActivityForResult(new Intent(this, AddEventActivity.class), INTENT_ADD_EVENT);
+		return true;
 	}
 
 	private CursorAdapter initEventsList() {
@@ -90,26 +88,35 @@ public class MainActivity extends Activity {
 		return eventsAdapter;
 	}
 
-	private int initEventsSource(CursorAdapter eventsAdapter) {
+	private void initEventsSource(CursorAdapter eventsAdapter) {
+		long calendarId = getCalendarId();
+
+		Log.i(TAG, String.format("Application will use calendar %d", calendarId));
+
+		eventsSource = new EventsSource(this, eventsAdapter, calendarId);
+
+		getLoaderManager().initLoader(LOADER_EVENTS_ID, null, eventsSource);
+	}
+
+	private long getCalendarId() {
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 
-		int calendarId = settings.getInt(Settings.CALENDAR_ID, Settings.DEFAULT_CALENDAR);
-		if (calendarId == Settings.DEFAULT_CALENDAR) {
-			Log.i(MainActivity.class.getName(), "No calendar defined in settings. Ceating new calendar.");
-			calendarId = createNewCalendar();
-
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putInt(Settings.CALENDAR_ID, calendarId);
-			editor.commit();
+		long calendarId = settings.getInt(Settings.CALENDAR_ID, Settings.DEFAULT_CALENDAR);
+		if (calendarId != Settings.DEFAULT_CALENDAR) {
+			return calendarId;
 		}
 
-		Log.i(MainActivity.class.getName(), String.format("Application will use calendar %d", calendarId));
+		Log.i(TAG, "No calendar defined in settings. Ceating new calendar.");
+		calendarId = createNewCalendar();
 
-		eventsSource = new EventsSource(this, eventsAdapter);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putLong(Settings.CALENDAR_ID, calendarId);
+		editor.commit();
+
 		return calendarId;
 	}
 
-	private int createNewCalendar() {
+	private long createNewCalendar() {
 		ContentValues values = new ContentValues();
 		values.put(CalendarContract.Calendars.NAME, "GeoTasks calendar");
 		values.put(CalendarContract.Calendars.VISIBLE, true);
@@ -121,15 +128,17 @@ public class MainActivity extends Activity {
 
 		Uri inserted = getContentResolver().insert(uri, values);
 
-		int id = Integer.valueOf(inserted.getLastPathSegment());
+		long id = Integer.valueOf(inserted.getLastPathSegment());
 
-		Log.d(MainActivity.class.getName(), String.format("Calendar with id %d created", id));
+		Log.d(TAG, String.format("Calendar with id %d created", id));
 		return id;
 	}
 
 	private void onAddEventResult(Intent data) {
 		String eventTitle = data.getStringExtra(AddEventActivity.EXTRA_TITLE);
 		String eventDescription = data.getStringExtra(AddEventActivity.EXTRA_DESCRIPTION);
-		eventsSource.addEvent(eventTitle, eventDescription);
+		long startTime = data.getLongExtra(AddEventActivity.EXTRA_START_TIME, Settings.DEFAULT_START_TIME);
+		String timezone = data.getStringExtra(AddEventActivity.EXTRA_TIMEZONE);
+		eventsSource.addEvent(eventTitle, eventDescription, startTime, timezone);
 	}
 }

@@ -8,11 +8,16 @@
     <string name="action_add_event">Add event...</string>
     <string name="title_activity_events">EventsActivity</string>
     <string name="title_activity_add_event">AddEventActivity</string>
-    <string name="eventNameField">Name</string>
+    <string name="eventTitleField">Title</string>
     <string name="eventAddButton">Add</string>
     <string name="addEventDescriptionLabel">Description</string>
-    <string name="dialog_delete_event_text">Remove '%s' event?</string>
+    <string name="dialog_delete_event_text">Remove \'%s\' event?</string>
     <string name="dialog_delete_event_title">Remove event</string>
     <string name="dialog_delete_event_yes">OK</string>
     <string name="dialog_delete_event_no">Cancel</string>
+    <string name="menu_add_event_save">Save</string>
+    <string name="add_event_date_field">Date</string>
+    <string name="add_event_time_field">Time</string>
+    <string name="event_element_reminder_toggler_desc">Reminder toggler</string>
+    <string name="add_event_timezone_spinner">Choose timezone</string>
 </resources>

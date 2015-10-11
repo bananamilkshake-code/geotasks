@@ -1,7 +1,8 @@
 package me.jtalk.android.geotasks;
 
 public interface Settings {
-    static String CALENDAR_ID = "caendar";
+	String CALENDAR_ID = "calendar";
 
-    static int DEFAULT_CALENDAR  = -1;
+	int DEFAULT_CALENDAR = -1;
+	long DEFAULT_START_TIME = 0;
 }

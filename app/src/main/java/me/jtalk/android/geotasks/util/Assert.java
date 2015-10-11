@@ -14,7 +14,7 @@ public class Assert {
 		}
 	}
 
-	public static void verifyArgument(boolean expression, String format, Object ...args) {
+	public static void verifyArgument(boolean expression, String format, Object... args) {
 		if (!expression) {
 			String message = MessageFormat.format(format, args);
 			throw new IllegalArgumentException(message);

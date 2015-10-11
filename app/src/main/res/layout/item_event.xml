@@ -31,6 +31,7 @@
         android:layout_marginTop="14dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ic_alarm_on_black_48dp"/>
+        android:src="@drawable/ic_alarm_on_black_48dp"
+        android:contentDescription="@string/event_element_reminder_toggler_desc"/>
     
 </RelativeLayout>
