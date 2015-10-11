@@ -8,15 +8,12 @@ import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.Settings;
@@ -25,7 +22,6 @@ public class AddEventActivity extends Activity {
 	public static final String EXTRA_TITLE = "event-name";
 	public static final String EXTRA_DESCRIPTION = "event-description";
 	public static final String EXTRA_START_TIME = "event-dtstart";
-	public static final String EXTRA_TIMEZONE = "event-timezone";
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
@@ -34,8 +30,6 @@ public class AddEventActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_event);
-
-		initTimezonesSpinner();
 	}
 
 	@Override
@@ -53,22 +47,9 @@ public class AddEventActivity extends Activity {
 		returnIntent.putExtra(EXTRA_TITLE, nameText.getText().toString());
 		returnIntent.putExtra(EXTRA_DESCRIPTION, descriptionText.getText().toString());
 		returnIntent.putExtra(EXTRA_START_TIME, this.getStartTime());
-		returnIntent.putExtra(EXTRA_TIMEZONE, this.getSelectedTimeZone());
 		setResult(RESULT_OK, returnIntent);
 
 		finish();
-	}
-
-	private void initTimezonesSpinner() {
-		Spinner timezoneSpinner = ((Spinner) findViewById(R.id.timezone_spinner));
-		timezoneSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, TimeZone.getAvailableIDs()));
-		timezoneSpinner.setSelection(0);
-	}
-
-	private String getSelectedTimeZone() {
-		Spinner timezoneSpinner = ((Spinner) findViewById(R.id.timezone_spinner));
-		int itemId = (int) timezoneSpinner.getSelectedItemId();
-		return TimeZone.getAvailableIDs()[itemId];
 	}
 
 	private long getStartTime() throws ParseException {

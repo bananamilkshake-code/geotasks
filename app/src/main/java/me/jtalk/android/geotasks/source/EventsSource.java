@@ -13,6 +13,8 @@ import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.widget.CursorAdapter;
 
+import java.util.TimeZone;
+
 import me.jtalk.android.geotasks.util.CalendarHelper;
 
 public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -61,7 +63,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		eventsAdapter.swapCursor(null);
 	}
 
-	public void addEvent(String title, String description, long startTime, String timezone) throws SecurityException {
+	public void addEvent(String title, String description, long startTime) throws SecurityException {
 		Log.d(TAG, String.format("Inserting new event for calendarId %d", calendarId));
 
 		ContentValues values = new ContentValues();
@@ -69,11 +71,12 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		values.put(Events.TITLE, title);
 		values.put(Events.DESCRIPTION, description);
 		values.put(Events.DTSTART, startTime);
-		values.put(Events.EVENT_TIMEZONE, timezone);
+		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 
-		values.put(Events.DTEND, 0);
+		values.put(Events.DTEND, -1);
 
-		this.context.getContentResolver().insert(Events.CONTENT_URI, values);
+		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
+		Log.d(TAG, created.toString());
 	}
 
 	public void removeEvent(long eventId) {
