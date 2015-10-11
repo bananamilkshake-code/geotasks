@@ -22,6 +22,7 @@ public class AddEventActivity extends Activity {
 	public static final String EXTRA_TITLE = "event-name";
 	public static final String EXTRA_DESCRIPTION = "event-description";
 	public static final String EXTRA_START_TIME = "event-dtstart";
+	public static final String EXTRA_END_TIME = "event-dtend";
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");

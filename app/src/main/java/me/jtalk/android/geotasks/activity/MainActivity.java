@@ -138,6 +138,8 @@ public class MainActivity extends Activity {
 		String eventTitle = data.getStringExtra(AddEventActivity.EXTRA_TITLE);
 		String eventDescription = data.getStringExtra(AddEventActivity.EXTRA_DESCRIPTION);
 		long startTime = data.getLongExtra(AddEventActivity.EXTRA_START_TIME, Settings.DEFAULT_START_TIME);
-		eventsSource.addEvent(eventTitle, eventDescription, startTime);
+		long endTime = data.getLongExtra(AddEventActivity.EXTRA_END_TIME, Settings.DEFAULT_END_TIME);
+
+		eventsSource.addEvent(eventTitle, eventDescription, startTime, endTime);
 	}
 }
