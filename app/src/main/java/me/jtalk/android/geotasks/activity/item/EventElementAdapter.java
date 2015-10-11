@@ -17,7 +17,7 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.Settings;
 
 public class EventElementAdapter extends CursorAdapter {
-	private static final DateFormat CALENDAR_FORMAT = new SimpleDateFormat("dd-MM-yyy   hh:mm");
+	private static final DateFormat CALENDAR_FORMAT = new SimpleDateFormat("dd-MM-yyy hh:mm");
 
 	public EventElementAdapter(Context context) {
 		super(context, null, true);
