@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
 	private long getCalendarId() {
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 
-		long calendarId = settings.getInt(Settings.CALENDAR_ID, Settings.DEFAULT_CALENDAR);
+		long calendarId = settings.getLong(Settings.CALENDAR_ID, Settings.DEFAULT_CALENDAR);
 		if (calendarId != Settings.DEFAULT_CALENDAR) {
 			return calendarId;
 		}
