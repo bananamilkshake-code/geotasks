@@ -1,14 +1,15 @@
 package me.jtalk.android.geotasks.activity;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,16 +17,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.Settings;
+import me.jtalk.android.geotasks.application.Settings;
 
-public class AddEventActivity extends Activity {
-	public static final String EXTRA_TITLE = "event-name";
-	public static final String EXTRA_DESCRIPTION = "event-description";
-	public static final String EXTRA_START_TIME = "event-dtstart";
-	public static final String EXTRA_END_TIME = "event-dtend";
+
+public class AddEventActivity extends BaseActivity {
+	private static final String TAG = AddEventActivity.class.getName();
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
+
+	private static final int PERMISSION_REQUEST_WRITE_CALENDAR = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,21 +40,53 @@ public class AddEventActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
+		if (permissions.length == 0 || values.length == 0) {
+			// interrupted by user
+			Log.d(TAG, "Permission request was interrupted by user");
+			return;
+		}
+
+		switch (requestCode) {
+			case PERMISSION_REQUEST_WRITE_CALENDAR:
+				onWriteCalendarPermissionGranted(permissions, values);
+				return;
+		}
+	}
+
+	private void onWriteCalendarPermissionGranted(String[] permissions, int[] values) {
+		if (checkGranted(Manifest.permission.WRITE_CALENDAR, permissions, values)) {
+			addCalendar();
+		}else {
+			onNoPermissionWarning();
+		}
+	}
+
 	// This method is called on menu_add_event.menu_action_add_event_save click
-	public void onAddCalendarClick(MenuItem menuItem) throws ParseException {
-		TextView nameText = (TextView) findViewById(R.id.add_event_name_text);
+	public void onAddCalendarClick(MenuItem menuItem) {
+		if (!isPermissionGranted(Manifest.permission.WRITE_CALENDAR, PERMISSION_REQUEST_WRITE_CALENDAR)) {
+			return;
+		}
+
+		addCalendar();
+	}
+
+	private void addCalendar() {
+		TextView titleText = (TextView) findViewById(R.id.add_event_name_text);
 		TextView descriptionText = (TextView) findViewById(R.id.add_event_description_text);
 
-		Intent returnIntent = new Intent(this, MainActivity.class);
-		returnIntent.putExtra(EXTRA_TITLE, nameText.getText().toString());
-		returnIntent.putExtra(EXTRA_DESCRIPTION, descriptionText.getText().toString());
-		returnIntent.putExtra(EXTRA_START_TIME, this.getStartTime());
-		setResult(RESULT_OK, returnIntent);
+		String eventTitle = titleText.getText().toString();
+		String eventDescription = descriptionText.getText().toString();
+		long startTime = this.getStartTime();
+		long endTime = Settings.DEFAULT_END_TIME;
+
+		getEventsSource().addEvent(eventTitle, eventDescription, startTime, endTime);
 
 		finish();
 	}
 
-	private long getStartTime() throws ParseException {
+	private long getStartTime() {
 		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, DATE_FORMAT);
 		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, TIME_FORMAT);
 
@@ -70,14 +103,21 @@ public class AddEventActivity extends Activity {
 		return calendar.getTimeInMillis();
 	}
 
-	private Calendar parseFromTextView(int viewId, DateFormat format) throws ParseException {
+	private Calendar parseFromTextView(int viewId, DateFormat format) {
 		String calendarStr = ((TextView) findViewById(viewId)).getText().toString();
 		if (calendarStr.isEmpty()) {
 			return null;
 		}
 
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(format.parse(calendarStr.toString()));
+
+		try {
+			calendar.setTime(format.parse(calendarStr));
+		} catch (ParseException exception) {
+			Log.w(TAG, String.format("Parsing event start time values %s from view %i failed", calendarStr, viewId), exception);
+			return null;
+		}
+
 		return calendar;
 	}
 
@@ -112,5 +152,9 @@ public class AddEventActivity extends Activity {
 			picked.set(year, monthOfYear, dayOfMonth);
 			textView.setText(DATE_FORMAT.format(picked.getTime()));
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+	}
+
+	private void onNoPermissionWarning() {
+		Toast.makeText(this, R.string.toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 	}
 }

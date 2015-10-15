@@ -1,13 +1,11 @@
 package me.jtalk.android.geotasks.activity;
 
-import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,18 +14,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.Settings;
+import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
+import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 	private static final String TAG = MainActivity.class.getName();
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	private static final int INTENT_ADD_EVENT = 0;
-
-	private EventsSource eventsSource;
+	private static final int PERMISSION_REQUEST_CREATE_CALENDAR = 0;
+	private static final int PERMISSION_REQUEST_READ_EVENTS = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,21 +43,44 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode != RESULT_OK) {
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
+		if (values == null) {
+			// interrupted by user
+			Log.d(TAG, "Permission request was interrupted by user");
 			return;
 		}
 
 		switch (requestCode) {
-			case INTENT_ADD_EVENT:
-				onAddEventResult(data);
+			case PERMISSION_REQUEST_CREATE_CALENDAR:
+				onCreateCalendarPermissionGranted(permissions, values);
 				return;
+			case PERMISSION_REQUEST_READ_EVENTS:
+				onReadEventsPermission(permissions, values);
+				return;
+		}
+	}
+
+	private void onCreateCalendarPermissionGranted(String[] permissions, int[] values) {
+		if (checkGranted(Manifest.permission.WRITE_CALENDAR, permissions, values)) {
+			ListView eventsList = (ListView) findViewById(R.id.events_list);
+			initEventsSource((CursorAdapter) eventsList.getAdapter());
+		} else {
+			onNoPermissionError();
+		}
+	}
+
+	private void onReadEventsPermission(String[] permissions, int[] values) {
+		if (checkGranted(Manifest.permission.WRITE_CALENDAR, permissions, values)) {
+			ListView eventsList = (ListView) findViewById(R.id.events_list);
+			setupEventsSource(getCalendarId(), (CursorAdapter) eventsList.getAdapter());
+		} else {
+			onNoPermissionError();
 		}
 	}
 
 	// This method is called on menu.menu_action_add_event click
 	public boolean openAddEventIntent(MenuItem menuItem) {
-		startActivityForResult(new Intent(this, AddEventActivity.class), INTENT_ADD_EVENT);
+		startActivity(new Intent(this, AddEventActivity.class));
 		return true;
 	}
 
@@ -77,7 +98,7 @@ public class MainActivity extends Activity {
 					.setTitle(R.string.dialog_delete_event_title)
 					.setMessage(String.format(getString(R.string.dialog_delete_event_text), eventTitle))
 					.setPositiveButton(R.string.dialog_delete_event_yes, (dialog, which) -> {
-						MainActivity.this.eventsSource.removeEvent(eventId);
+						MainActivity.this.getEventsSource().removeEvent(eventId);
 					})
 					.setNegativeButton(R.string.dialog_delete_event_no, null)
 					.setCancelable(true)
@@ -89,16 +110,41 @@ public class MainActivity extends Activity {
 	}
 
 	private void initEventsSource(CursorAdapter eventsAdapter) {
-		long calendarId = getCalendarId();
+		long calendarId;
+		try {
+			calendarId = getCalendarId();
 
-		Log.i(TAG, String.format("Application will use calendar %d", calendarId));
+			Log.i(TAG, String.format("Application will use calendar %d", calendarId));
+		} catch (SecurityException exception) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.WRITE_CALENDAR}, PERMISSION_REQUEST_CREATE_CALENDAR);
+			} else {
+				onNoPermissionError();
+			}
+			return;
+		}
 
-		eventsSource = new EventsSource(this, eventsAdapter, calendarId);
-
-		getLoaderManager().initLoader(LOADER_EVENTS_ID, null, eventsSource);
+		try {
+			setupEventsSource(calendarId, eventsAdapter);
+		} catch (SecurityException exception) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.WRITE_CALENDAR}, PERMISSION_REQUEST_READ_EVENTS);
+			} else {
+				onNoPermissionError();
+			}
+			return;
+		}
 	}
 
-	private long getCalendarId() {
+	private void setupEventsSource(long calendarId, CursorAdapter eventsAdapter) {
+		EventsSource eventsSource = new EventsSource(this, eventsAdapter, calendarId);
+
+		getLoaderManager().initLoader(LOADER_EVENTS_ID, null, eventsSource);
+
+		setEventsSource(eventsSource);
+	}
+
+	private long getCalendarId() throws SecurityException {
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 
 		long calendarId = settings.getLong(Settings.CALENDAR_ID, Settings.DEFAULT_CALENDAR);
@@ -106,40 +152,13 @@ public class MainActivity extends Activity {
 			return calendarId;
 		}
 
-		Log.i(TAG, "No calendar defined in settings. Ceating new calendar.");
-		calendarId = createNewCalendar();
+		Log.i(TAG, "No calendar defined in settings. Creating new calendar.");
+		calendarId = new CalendarsSource(this).addCalendar();
 
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putLong(Settings.CALENDAR_ID, calendarId);
 		editor.commit();
 
 		return calendarId;
-	}
-
-	private long createNewCalendar() {
-		ContentValues values = new ContentValues();
-		values.put(CalendarContract.Calendars.NAME, "GeoTasks calendar");
-		values.put(CalendarContract.Calendars.VISIBLE, true);
-
-		Uri uri = CalendarContract.Calendars.CONTENT_URI.buildUpon()
-				.appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, Boolean.TRUE.toString())
-				.appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, "GeoTasks account")
-				.appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL).build();
-
-		Uri inserted = getContentResolver().insert(uri, values);
-
-		long id = Integer.valueOf(inserted.getLastPathSegment());
-
-		Log.d(TAG, String.format("Calendar with id %d created", id));
-		return id;
-	}
-
-	private void onAddEventResult(Intent data) {
-		String eventTitle = data.getStringExtra(AddEventActivity.EXTRA_TITLE);
-		String eventDescription = data.getStringExtra(AddEventActivity.EXTRA_DESCRIPTION);
-		long startTime = data.getLongExtra(AddEventActivity.EXTRA_START_TIME, Settings.DEFAULT_START_TIME);
-		long endTime = data.getLongExtra(AddEventActivity.EXTRA_END_TIME, Settings.DEFAULT_END_TIME);
-
-		eventsSource.addEvent(eventTitle, eventDescription, startTime, endTime);
 	}
 }

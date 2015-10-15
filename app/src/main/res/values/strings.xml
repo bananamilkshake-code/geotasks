@@ -20,4 +20,10 @@
     <string name="add_event_time_field">Time</string>
     <string name="event_element_reminder_toggler_desc">Reminder toggler</string>
     <string name="add_event_timezone_spinner">Choose timezone</string>
+    <string name="add_event_locaion_text">Location</string>
+    <string name="toast_calendar_no_write_permission">Cannot add an event. Enable calendar permissions in application settings.</string>
+    <string name="toast_event_creation_no_permission">Event creation is not permitted.</string>
+    <string name="dialog_no_permission_for_calendar_creation_title">No permission</string>
+    <string name="dialog_no_permission_for_calendar_creation_message">Calendar for application cannot be created. Grant this application a permission to write a calendar.</string>
+    <string name="dialog_no_permission_for_calendar_creation_button">Close</string>
 </resources>

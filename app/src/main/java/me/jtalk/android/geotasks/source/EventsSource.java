@@ -1,13 +1,16 @@
 package me.jtalk.android.geotasks.source;
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
@@ -15,10 +18,9 @@ import android.widget.CursorAdapter;
 
 import java.util.TimeZone;
 
-import me.jtalk.android.geotasks.Settings;
 import me.jtalk.android.geotasks.util.CalendarHelper;
 
-public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, EventsInserter {
 	public static final String TAG = EventsSource.class.getName();
 
 	private Context context;
@@ -36,6 +38,12 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	};
 
 	public EventsSource(Context context, CursorAdapter eventsAdapter, long calendarId) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (context.checkSelfPermission(Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+				throw new SecurityException("No permission to write calendar");
+			}
+		}
+
 		this.context = context;
 		this.eventsAdapter = eventsAdapter;
 		this.calendarId = calendarId;
@@ -64,6 +72,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		eventsAdapter.swapCursor(null);
 	}
 
+	@Override
 	public void addEvent(String title, String description, long startTime, long endTime) throws SecurityException {
 		Log.d(TAG, String.format("Inserting new event for calendarId %d", calendarId));
 
