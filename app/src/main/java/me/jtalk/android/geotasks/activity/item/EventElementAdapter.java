@@ -15,6 +15,7 @@ import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Settings;
+import me.jtalk.android.geotasks.source.EventsSource;
 
 public class EventElementAdapter extends CursorAdapter {
 	private static final DateFormat CALENDAR_FORMAT = new SimpleDateFormat("dd-MM-yyy hh:mm");
@@ -37,7 +38,7 @@ public class EventElementAdapter extends CursorAdapter {
 		titleView.setText(cursor.getString(cursor.getColumnIndex(Events.TITLE)));
 
 		long timeInMillis = cursor.getLong(cursor.getColumnIndex(Events.DTSTART));
-		if (timeInMillis != Settings.DEFAULT_START_TIME) {
+		if (timeInMillis != EventsSource.DEFAULT_START_TIME) {
 			Calendar time = Calendar.getInstance();
 			time.setTimeInMillis(timeInMillis);
 

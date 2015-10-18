@@ -80,7 +80,7 @@ public class AddEventActivity extends BaseActivity {
 		String eventTitle = titleText.getText().toString();
 		String eventDescription = descriptionText.getText().toString();
 		long startTime = this.getStartTime();
-		long endTime = Settings.DEFAULT_END_TIME;
+		long endTime = EventsSource.DEFAULT_END_TIME;
 
 		getEventsSource().addEvent(eventTitle, eventDescription, startTime, endTime);
 
@@ -92,7 +92,7 @@ public class AddEventActivity extends BaseActivity {
 		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, TIME_FORMAT);
 
 		if (dateCalendar == null || timeCalendar == null) {
-			return Settings.DEFAULT_START_TIME;
+			return EventsSource.DEFAULT_START_TIME;
 		}
 
 		Calendar calendar = Calendar.getInstance();
