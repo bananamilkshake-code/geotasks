@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.util.Log;
 
+import java.text.MessageFormat;
+
 public class CalendarsSource {
 	private static final String TAG = CalendarsSource.class.getName();
 
@@ -29,7 +31,7 @@ public class CalendarsSource {
 
 		long id = Long.valueOf(inserted.getLastPathSegment());
 
-		Log.d(TAG, String.format("Calendar with id %d created", id));
+		Log.d(TAG, MessageFormat.format("Calendar with id {0} created", id));
 		
 		return id;
 	}

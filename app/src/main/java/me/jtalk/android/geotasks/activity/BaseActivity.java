@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
-import java.util.Arrays;
+import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.application.GeoTasksApplication;
 import me.jtalk.android.geotasks.R;

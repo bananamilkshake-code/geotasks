@@ -11,7 +11,7 @@
     <string name="eventTitleField">Title</string>
     <string name="eventAddButton">Add</string>
     <string name="addEventDescriptionLabel">Description</string>
-    <string name="dialog_delete_event_text">Remove \'%s\' event?</string>
+    <string name="dialog_delete_event_text">Remove "{0}" event?</string>
     <string name="dialog_delete_event_title">Remove event</string>
     <string name="dialog_delete_event_yes">OK</string>
     <string name="dialog_delete_event_no">Cancel</string>

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -114,7 +115,7 @@ public class AddEventActivity extends BaseActivity {
 		try {
 			calendar.setTime(format.parse(calendarStr));
 		} catch (ParseException exception) {
-			Log.w(TAG, String.format("Parsing event start time values %s from view %i failed", calendarStr, viewId), exception);
+			Log.w(TAG, MessageFormat.format("Parsing event start time values {0} from view {1} failed", calendarStr, viewId), exception);
 			return null;
 		}
 

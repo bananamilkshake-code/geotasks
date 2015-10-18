@@ -16,6 +16,7 @@ import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.widget.CursorAdapter;
 
+import java.text.MessageFormat;
 import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.util.CalendarHelper;
@@ -48,12 +49,12 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, Even
 		this.eventsAdapter = eventsAdapter;
 		this.calendarId = calendarId;
 
-		Log.d(TAG, String.format("EventSource %h is created for context %h", this, context));
+		Log.d(TAG, MessageFormat.format("EventSource {0} is created for context {1}", this, context));
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Log.d(TAG, String.format("EventsSource created loader for %d calendar", calendarId));
+		Log.d(TAG, MessageFormat.format("EventsSource created loader for {0} calendar", calendarId));
 
 		String selection = CalendarHelper.buildProjection(Events.CALENDAR_ID);
 		String[] selectionArgs = new String[]{String.valueOf(calendarId)};
@@ -74,7 +75,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, Even
 
 	@Override
 	public void addEvent(String title, String description, long startTime, long endTime) throws SecurityException {
-		Log.d(TAG, String.format("Inserting new event for calendarId %d", calendarId));
+		Log.d(TAG, MessageFormat.format("Inserting new event for calendarId {0}", calendarId));
 
 		ContentValues values = new ContentValues();
 		values.put(Events.CALENDAR_ID, calendarId);
