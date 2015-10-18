@@ -6,7 +6,7 @@ import java.util.List;
 public class TasksChain <T extends TasksChain.Task> {
 	private boolean pause;
 
-	public abstract class Task {
+	public static abstract class Task {
 		public abstract void process() throws Exception;
 	}
 
@@ -18,7 +18,7 @@ public class TasksChain <T extends TasksChain.Task> {
 		tasks = new ArrayList<>();
 	}
 
-	public TasksChain addTask(T task) {
+	public TasksChain<T> addTask(T task) {
 		tasks.add(task);
 		return this;
 	}

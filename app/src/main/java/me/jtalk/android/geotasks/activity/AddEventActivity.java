@@ -19,7 +19,8 @@ import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.PermissionDependantTasksChain;
+import me.jtalk.android.geotasks.util.PermissionDependantTask;
+import me.jtalk.android.geotasks.util.TasksChain;
 
 
 public class AddEventActivity extends BaseActivity {
@@ -28,19 +29,14 @@ public class AddEventActivity extends BaseActivity {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
-	PermissionDependantTasksChain addEventChain = new PermissionDependantTasksChain();
+	TasksChain<PermissionDependantTask> addEventChain = new TasksChain<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_event);
 
-		addEventChain.addTask(addEventChain.new PermissionDependantTask(new String[]{Manifest.permission.WRITE_CALENDAR}) {
-			@Override
-			public void process() throws Exception {
-				addCalendar();
-			}
-		});
+		addEventChain.addTask(makeTask(() -> addCalendar(), Manifest.permission.WRITE_CALENDAR));
 	}
 
 	@Override

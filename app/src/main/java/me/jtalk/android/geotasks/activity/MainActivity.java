@@ -19,14 +19,15 @@ import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.PermissionDependantTasksChain;
+import me.jtalk.android.geotasks.util.PermissionDependantTask;
+import me.jtalk.android.geotasks.util.TasksChain;
 
 public class MainActivity extends BaseActivity {
 	private static final String TAG = MainActivity.class.getName();
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	PermissionDependantTasksChain initChain = new PermissionDependantTasksChain();
+	TasksChain<PermissionDependantTask> initChain = new TasksChain<>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -34,24 +35,9 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.activity_main);
 
 		initChain
-				.addTask(initChain.new PermissionDependantTask(new String[]{Manifest.permission.WRITE_CALENDAR}) {
-					@Override
-					public void process() throws Exception {
-						getCalendarId();
-					}
-				})
-				.addTask(initChain.new PermissionDependantTask(new String[]{Manifest.permission.READ_CALENDAR}) {
-					@Override
-					public void process() throws Exception {
-						initEventsList();
-					}
-				})
-				.addTask(initChain.new PermissionDependantTask(new String[]{Manifest.permission.READ_CALENDAR}) {
-					@Override
-					public void process() throws Exception {
-						initEventsSource();
-					}
-				});
+				.addTask(makeTask(() -> getCalendarId(), Manifest.permission.WRITE_CALENDAR))
+				.addTask(makeTask(() -> initEventsList(), Manifest.permission.READ_CALENDAR))
+				.addTask(makeTask(() -> initEventsSource(), Manifest.permission.READ_CALENDAR));
 
 		processChain(initChain);
 	}
