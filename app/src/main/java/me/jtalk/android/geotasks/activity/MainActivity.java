@@ -27,14 +27,14 @@ public class MainActivity extends BaseActivity {
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	TasksChain<PermissionDependantTask> initChain = new TasksChain<>();
+	TasksChain<PermissionDependantTask> initChain;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		initChain
+		initChain = new TasksChain<PermissionDependantTask>()
 				.addTask(makeTask(() -> getCalendarId(), Manifest.permission.WRITE_CALENDAR))
 				.addTask(makeTask(() -> initEventsList(), Manifest.permission.READ_CALENDAR))
 				.addTask(makeTask(() -> initEventsSource(), Manifest.permission.READ_CALENDAR));

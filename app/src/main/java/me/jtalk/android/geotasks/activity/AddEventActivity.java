@@ -3,6 +3,7 @@ package me.jtalk.android.geotasks.activity;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -10,6 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -19,6 +23,7 @@ import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.GeoPointFormat;
 import me.jtalk.android.geotasks.util.PermissionDependantTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
@@ -29,20 +34,53 @@ public class AddEventActivity extends BaseActivity {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
-	TasksChain<PermissionDependantTask> addEventChain = new TasksChain<>();
+	private TasksChain<PermissionDependantTask> addEventChain;
+	private TasksChain<PermissionDependantTask> openLocationPickActivityChain;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_event);
 
-		addEventChain.addTask(makeTask(() -> addCalendar(), Manifest.permission.WRITE_CALENDAR));
+		addEventChain = new TasksChain<PermissionDependantTask>()
+				.addTask(makeTask(() -> addEvent(), Manifest.permission.WRITE_CALENDAR));
+
+		openLocationPickActivityChain = new TasksChain<PermissionDependantTask>()
+				.addTask(makeTask(() -> {
+							Intent intent = new Intent(this, LocationPickActivity.class);
+							TextView locationText = (TextView) findViewById(R.id.add_event_location_pick_button);
+							String locationString = locationText.getText().toString();
+							if (!locationString.isEmpty()) {
+								IGeoPoint geoPoint = GeoPointFormat.parse(locationString);
+								intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
+								intent.putExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, geoPoint.getLatitude());
+								intent.putExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, geoPoint.getLongitude());
+							}
+
+							startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);
+						},
+						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
+						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
+						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE));
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_add_event, menu);
 		return true;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != RESULT_OK) {
+			return;
+		}
+
+		switch (requestCode) {
+			case LocationPickActivity.INTENT_LOCATION_PICK:
+				onLocationResult(data);
+				break;
+		}
 	}
 
 	@Override
@@ -58,6 +96,11 @@ public class AddEventActivity extends BaseActivity {
 	// This method is called on menu_add_event.menu_action_add_event_save click
 	public void onAddCalendarClick(MenuItem menuItem) {
 		processChain(addEventChain);
+	}
+
+	// This method is called on activity_add_event.add_event_location_pick_button
+	public void showLocationActivity(View view) {
+		processChain(openLocationPickActivityChain);
 	}
 
 	// This method is called on activity_add_event.add_event_time_text click
@@ -95,16 +138,27 @@ public class AddEventActivity extends BaseActivity {
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
 	}
 
-	private void addCalendar() {
+	private void onLocationResult(Intent data) {
+		TextView locationText = (TextView) findViewById(R.id.add_event_location_pick_button);
+		double longitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, 0.0d);
+		double latitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, 0.0d);
+
+		IGeoPoint geoPoint = new GeoPoint(latitude, longitude);
+		locationText.setText(GeoPointFormat.formatSimple(geoPoint));
+	}
+
+	private void addEvent() {
 		TextView titleText = (TextView) findViewById(R.id.add_event_name_text);
 		TextView descriptionText = (TextView) findViewById(R.id.add_event_description_text);
+		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 
 		String eventTitle = titleText.getText().toString();
 		String eventDescription = descriptionText.getText().toString();
+		String location = locationText.getText().toString();
 		long startTime = this.getStartTime();
 		long endTime = EventsSource.DEFAULT_END_TIME;
 
-		getEventsSource().addEvent(eventTitle, eventDescription, startTime, endTime);
+		getEventsSource().addEvent(eventTitle, eventDescription, location, startTime, endTime);
 
 		finish();
 	}

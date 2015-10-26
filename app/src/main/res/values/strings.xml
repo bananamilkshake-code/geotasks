@@ -6,8 +6,8 @@
     <string name="add_calendar_name_field">Calendar name</string>
     <string name="calendarAddButton">Add</string>
     <string name="action_add_event">Add event…</string>
-    <string name="title_activity_events">EventsActivity</string>
-    <string name="title_activity_add_event">AddEventActivity</string>
+    <string name="title_activity_events">Events</string>
+    <string name="title_activity_add_event">New event</string>
     <string name="eventTitleField">Title</string>
     <string name="eventAddButton">Add</string>
     <string name="addEventDescriptionLabel">Description</string>
@@ -26,4 +26,6 @@
     <string name="dialog_no_permission_for_calendar_creation_title">No permission</string>
     <string name="dialog_no_permission_for_calendar_creation_message">Calendar for application cannot be created. Grant this application a permission to write a calendar.</string>
     <string name="dialog_no_permission_for_calendar_creation_button">Close</string>
+    <string name="title_activity_location_pick">Choose location...</string>
+    <string name="menu_location_pick_save">Pick</string>
 </resources>

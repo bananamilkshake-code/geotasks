@@ -79,13 +79,14 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, Even
 	}
 
 	@Override
-	public void addEvent(String title, String description, long startTime, long endTime) throws SecurityException {
+	public void addEvent(String title, String description, String location, long startTime, long endTime) throws SecurityException {
 		Log.d(TAG, MessageFormat.format("Inserting new event for calendarId {0}", calendarId));
 
 		ContentValues values = new ContentValues();
 		values.put(Events.CALENDAR_ID, calendarId);
 		values.put(Events.TITLE, title);
 		values.put(Events.DESCRIPTION, description);
+		values.put(Events.EVENT_LOCATION, location);
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 
 		values.put(Events.DTSTART, startTime);
