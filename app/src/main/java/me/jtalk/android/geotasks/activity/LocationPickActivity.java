@@ -38,7 +38,6 @@ public class LocationPickActivity extends Activity {
 
 	private MapView mapView;
 	private IGeoPoint pickedLocation;
-	private Drawable marker;
 
 	private TextView textLocationName;
 	private TextView textLocationCoordinates;
@@ -107,9 +106,6 @@ public class LocationPickActivity extends Activity {
 		IMapController mapController = mapView.getController();
 		mapController.setZoom(9);
 		mapController.setCenter(startPoint);
-
-		marker = getDrawable(R.drawable.ic_place_black_48dp);
-		marker.setBounds(0, marker.getIntrinsicHeight(), 0, marker.getIntrinsicWidth());
 	}
 
 	private void onLocationPick(int x, int y) {
@@ -122,17 +118,12 @@ public class LocationPickActivity extends Activity {
 		textLocationCoordinates.setText(GeoPointFormat.format(pickedLocation));
 		textLocationCoordinates.setVisibility(View.VISIBLE);
 
-		OverlayItem overlayItem = new OverlayItem(null, null, pickedLocation);
-		overlayItem.setMarker(marker);
-
 		ArrayList<OverlayItem> items = new ArrayList<>();
-		items.add(overlayItem);
-
-		ItemizedOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(this, items, null);
+		items.add(new OverlayItem(null, null, pickedLocation));
 
 		List<Overlay> overlays = mapView.getOverlays();
 		overlays.clear();
-		overlays.add(overlay);
+		overlays.add(new ItemizedIconOverlay<>(this, items, null));
 
 		mapView.invalidate();
 	}
