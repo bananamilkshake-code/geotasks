@@ -23,25 +23,25 @@ import java.util.Calendar;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.GeoPointFormat;
-import me.jtalk.android.geotasks.util.PermissionDependantTask;
+import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 
 public class AddEventActivity extends BaseActivity {
 	private static final String TAG = AddEventActivity.class.getName();
 
-	private TasksChain<PermissionDependantTask> addEventChain;
-	private TasksChain<PermissionDependantTask> openLocationPickActivityChain;
+	private TasksChain<PermissionDependentTask> addEventChain;
+	private TasksChain<PermissionDependentTask> openLocationPickActivityChain;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_event);
 
-		addEventChain = new TasksChain<PermissionDependantTask>()
+		addEventChain = new TasksChain<PermissionDependentTask>()
 				.addTask(makeTask(() -> addEvent(), Manifest.permission.WRITE_CALENDAR));
 
-		openLocationPickActivityChain = new TasksChain<PermissionDependantTask>()
+		openLocationPickActivityChain = new TasksChain<PermissionDependentTask>()
 				.addTask(makeTask(() -> {
 							Intent intent = new Intent(this, LocationPickActivity.class);
 							TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);

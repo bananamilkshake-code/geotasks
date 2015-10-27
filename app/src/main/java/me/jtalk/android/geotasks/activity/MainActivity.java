@@ -19,7 +19,7 @@ import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.PermissionDependantTask;
+import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 public class MainActivity extends BaseActivity {
@@ -27,14 +27,14 @@ public class MainActivity extends BaseActivity {
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	TasksChain<PermissionDependantTask> initChain;
+	TasksChain<PermissionDependentTask> initChain;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		initChain = new TasksChain<PermissionDependantTask>()
+		initChain = new TasksChain<PermissionDependentTask>()
 				.addTask(makeTask(() -> getCalendarId(), Manifest.permission.WRITE_CALENDAR))
 				.addTask(makeTask(() -> initEventsList(), Manifest.permission.READ_CALENDAR))
 				.addTask(makeTask(() -> initEventsSource(), Manifest.permission.READ_CALENDAR));

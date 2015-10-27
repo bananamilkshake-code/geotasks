@@ -8,7 +8,7 @@ import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.application.GeoTasksApplication;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.PermissionDependantTask;
+import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 public abstract class BaseActivity extends Activity {
@@ -25,8 +25,8 @@ public abstract class BaseActivity extends Activity {
 	protected void onNeededPermissionDenied() {
 	}
 
-	protected PermissionDependantTask makeTask(Runnable r, String... permissions) {
-		return new PermissionDependantTask(permissions) {
+	protected PermissionDependentTask makeTask(Runnable r, String... permissions) {
+		return new PermissionDependentTask(permissions) {
 			@Override
 			public void process() throws Exception {
 				r.run();
@@ -34,18 +34,18 @@ public abstract class BaseActivity extends Activity {
 		};
 	}
 
-	protected void processChain(TasksChain<PermissionDependantTask> toProceed) {
+	protected void processChain(TasksChain<PermissionDependentTask> toProceed) {
 		processChain(toProceed, toProceed.getCurrentTaskId());
 	}
 
-	protected void processChain(TasksChain<PermissionDependantTask> toProceed, int firstTask) {
+	protected void processChain(TasksChain<PermissionDependentTask> toProceed, int firstTask) {
 		try {
 			toProceed.startProcessingFrom(firstTask);
 		} catch (SecurityException exception) {
 			int currentTaskId = toProceed.getCurrentTaskId();
 			Log.d(TAG, MessageFormat.format("No permissions for processing step {0}", currentTaskId));
 
-			PermissionDependantTask currentTask = toProceed.getCurrentTask();
+			PermissionDependentTask currentTask = toProceed.getCurrentTask();
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				requestPermissions(currentTask.getNeededPermissions(), currentTaskId);
 			} else {
@@ -57,7 +57,7 @@ public abstract class BaseActivity extends Activity {
 		}
 	}
 
-	protected void processPermissionRequestResult(TasksChain<PermissionDependantTask> addEventChain, int requestCode,
+	protected void processPermissionRequestResult(TasksChain<PermissionDependentTask> addEventChain, int requestCode,
 												  String[] permissions, int[] values) {
 		if (permissions.length == 0 || values.length == 0) {
 			// interrupted by user
@@ -65,7 +65,7 @@ public abstract class BaseActivity extends Activity {
 			return;
 		}
 
-		PermissionDependantTask interrupted = addEventChain.getTask(requestCode);
+		PermissionDependentTask interrupted = addEventChain.getTask(requestCode);
 		if (interrupted.checkGranted(permissions, values)) {
 			processChain(addEventChain, requestCode);
 		} else {

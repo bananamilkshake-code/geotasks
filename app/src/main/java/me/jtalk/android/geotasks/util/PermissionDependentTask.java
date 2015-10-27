@@ -6,11 +6,11 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class PermissionDependantTask extends TasksChain.Task {
-	private static final String TAG = PermissionDependantTask.class.getName();
+public abstract class PermissionDependentTask extends TasksChain.Task {
+	private static final String TAG = PermissionDependentTask.class.getName();
 	private String[] neededPermissions;
 
-	public PermissionDependantTask(String[] neededPermissions) {
+	public PermissionDependentTask(String[] neededPermissions) {
 		this.neededPermissions = neededPermissions;
 	}
 
