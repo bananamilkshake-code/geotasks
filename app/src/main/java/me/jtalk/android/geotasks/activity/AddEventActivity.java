@@ -89,25 +89,41 @@ public class AddEventActivity extends BaseActivity {
 		Toast.makeText(this, R.string.toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 	}
 
-	// This method is called on menu_add_event.menu_action_add_event_save click
+	/**
+	 * This method is called on menu_add_event.menu_action_add_event_save click.
+	 *
+	 * @param menuItem
+	 */
 	public void onAddCalendarClick(MenuItem menuItem) {
 		processChain(addEventChain);
 	}
 
-	// This method is called on activity_add_event.add_event_location_pick_button
+	/**
+	 * This method is called on activity_add_event.add_event_location_pick_button.
+	 *
+	 * @param view
+	 */
 	public void showLocationActivity(View view) {
 		openLocationPickActivityChain.reset();
 		processChain(openLocationPickActivityChain);
 	}
 
-	// This method is called on activity_add_event.add_event_time_text click
-	public void showTimePickerDialog(View view) throws ParseException {
+	/**
+	 * This method is called on activity_add_event.add_event_time_text click.
+	 *
+	 * @param view
+	 */
+	public void showTimePickerDialog(View view) {
 		TextView textView = (TextView) view;
 		Calendar calendar = Calendar.getInstance();
 
-		String timeText = textView.getText().toString();
-		if (!timeText.isEmpty()) {
-			calendar.setTime(DateFormat.getTimeInstance().parse(timeText));
+		try {
+			String timeText = textView.getText().toString();
+			if (!timeText.isEmpty()) {
+				calendar.setTime(DateFormat.getTimeInstance().parse(timeText));
+			}
+		} catch (ParseException exception) {
+			Log.w(TAG, "Time value from time text field cannot be parsed", exception);
 		}
 
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
@@ -118,14 +134,22 @@ public class AddEventActivity extends BaseActivity {
 		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
 	}
 
-	// This method is called on activity_add_event.add_event_date_text click
-	public void showDatePickerDialog(View view) throws ParseException {
+	/**
+	 * This method is called on activity_add_event.add_event_date_text click.
+	 *
+	 * @param view
+	 */
+	public void showDatePickerDialog(View view) {
 		TextView textView = (TextView) view;
 		Calendar calendar = Calendar.getInstance();
 
-		String dateText = textView.getText().toString();
-		if (!dateText.isEmpty()) {
-			calendar.setTime(DateFormat.getDateInstance().parse(dateText));
+		try {
+			String dateText = textView.getText().toString();
+			if (!dateText.isEmpty()) {
+				calendar.setTime(DateFormat.getDateInstance().parse(dateText));
+			}
+		} catch (ParseException exception) {
+			Log.w(TAG, "Date value from date text field cannot be parsed", exception);
 		}
 
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
