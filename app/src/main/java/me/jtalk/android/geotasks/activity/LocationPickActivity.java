@@ -134,7 +134,7 @@ public class LocationPickActivity extends Activity {
 
 	private class MapGestureDetector extends GestureDetector.SimpleOnGestureListener {
 		@Override
-		public boolean onSingleTapUp(MotionEvent event) {
+		public boolean onSingleTapConfirmed(MotionEvent event) {
 			IGeoPoint pickedPoint = mapView.getProjection().fromPixels((int) event.getX(), (int) event.getY());
 			onLocationPick(pickedPoint);
 			return true;
