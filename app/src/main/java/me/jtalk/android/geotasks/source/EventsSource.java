@@ -93,7 +93,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, Even
 		values.put(Events.DTEND, endTime);
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
-		Log.d(TAG, created.toString());
+		Log.d(TAG, MessageFormat.format("New event was created. Uri: {0}", created.toString()));
 	}
 
 	public void removeEvent(long eventId) {
