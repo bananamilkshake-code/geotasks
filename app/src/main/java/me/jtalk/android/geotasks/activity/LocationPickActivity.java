@@ -57,7 +57,11 @@ public class LocationPickActivity extends Activity {
 		return true;
 	}
 
-	// This method is called on menu_location_pick.menu_action_location_pick_save
+	/**
+	 * This method is called on menu_location_pick.menu_action_location_pick_save.
+	 *
+	 * @param item
+	 */
 	public void onPickClick(MenuItem item) {
 		Intent result = new Intent();
 		if (pickedLocation != null) {
@@ -69,10 +73,20 @@ public class LocationPickActivity extends Activity {
 		finish();
 	}
 
+	/**
+	 * This method is called on activity_location_pick.zoom_in click.
+	 *
+	 * @param view
+	 */
 	public void onZoomInClick(View view) {
 		mapView.getController().zoomIn();
 	}
 
+	/**
+	 * This method is called on activity_location_pick.zoom_out click.
+	 *
+	 * @param view
+	 */
 	public void onZoomOutClick(View view) {
 		mapView.getController().zoomOut();
 	}
@@ -132,6 +146,12 @@ public class LocationPickActivity extends Activity {
 		mapView.invalidate();
 	}
 
+	/**
+	 * Mark on the map must be placed if only single tap has occurred. OnTouchEvent doesn't provide
+	 * convenient way to detect if touch was single, that's why implementation of GestureListener is
+	 * needed: GestureDetector can identify click type more precisely and single tap can be catched
+	 * easily.
+	 */
 	private class MapGestureDetector extends GestureDetector.SimpleOnGestureListener {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent event) {
