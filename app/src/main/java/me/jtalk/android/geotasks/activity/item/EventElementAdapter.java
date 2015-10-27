@@ -10,16 +10,12 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.source.EventsSource;
 
 public class EventElementAdapter extends CursorAdapter {
-	private static final DateFormat CALENDAR_FORMAT = new SimpleDateFormat("dd-MM-yyy hh:mm");
-
 	public EventElementAdapter(Context context) {
 		super(context, null, true);
 	}
@@ -42,7 +38,7 @@ public class EventElementAdapter extends CursorAdapter {
 			Calendar time = Calendar.getInstance();
 			time.setTimeInMillis(timeInMillis);
 
-			timeView.setText(CALENDAR_FORMAT.format(time.getTime()));
+			timeView.setText(DateFormat.getDateTimeInstance().format(time.getTime()));
 		} else {
 			timeView.setText(null);
 		}

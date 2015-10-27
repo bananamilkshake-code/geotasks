@@ -18,7 +18,6 @@ import org.osmdroid.util.GeoPoint;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
@@ -30,9 +29,6 @@ import me.jtalk.android.geotasks.util.TasksChain;
 
 public class AddEventActivity extends BaseActivity {
 	private static final String TAG = AddEventActivity.class.getName();
-
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
 	private TasksChain<PermissionDependantTask> addEventChain;
 	private TasksChain<PermissionDependantTask> openLocationPickActivityChain;
@@ -111,14 +107,14 @@ public class AddEventActivity extends BaseActivity {
 
 		String timeText = textView.getText().toString();
 		if (!timeText.isEmpty()) {
-			calendar.setTime(TIME_FORMAT.parse(timeText));
+			calendar.setTime(DateFormat.getTimeInstance().parse(timeText));
 		}
 
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
 			Calendar picked = Calendar.getInstance();
 			picked.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			picked.set(Calendar.MINUTE, minute);
-			textView.setText(TIME_FORMAT.format(picked.getTime()));
+			textView.setText(DateFormat.getTimeInstance().format(picked.getTime()));
 		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
 	}
 
@@ -129,13 +125,13 @@ public class AddEventActivity extends BaseActivity {
 
 		String dateText = textView.getText().toString();
 		if (!dateText.isEmpty()) {
-			calendar.setTime(DATE_FORMAT.parse(dateText));
+			calendar.setTime(DateFormat.getDateInstance().parse(dateText));
 		}
 
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
 			Calendar picked = Calendar.getInstance();
 			picked.set(year, monthOfYear, dayOfMonth);
-			textView.setText(DATE_FORMAT.format(picked.getTime()));
+			textView.setText(DateFormat.getDateInstance().format(picked.getTime()));
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
 	}
 
@@ -165,8 +161,8 @@ public class AddEventActivity extends BaseActivity {
 	}
 
 	private long getStartTime() {
-		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, DATE_FORMAT);
-		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, TIME_FORMAT);
+		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, DateFormat.getDateInstance());
+		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, DateFormat.getDateTimeInstance());
 
 		if (dateCalendar == null || timeCalendar == null) {
 			return EventsSource.DEFAULT_START_TIME;
