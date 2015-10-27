@@ -6,15 +6,15 @@ import org.osmdroid.util.GeoPoint;
 import java.text.MessageFormat;
 
 public class GeoPointFormat {
-	private static final String FORMAT_GEOPINT = "lat: {0} lon: {1}";
-	private static final String FORMAT_GEOPINT_SIMPLE = "{0} {1}";
+	private static final String FORMAT_GEOPOINT = "lat: {0} lon: {1}";
+	private static final String FORMAT_GEOPOINT_SIMPLE = "{0} {1}";
 
 	public static String format(IGeoPoint geoPoint) {
-		return MessageFormat.format(FORMAT_GEOPINT, geoPoint.getLatitude(), geoPoint.getLongitude());
+		return MessageFormat.format(FORMAT_GEOPOINT, geoPoint.getLatitude(), geoPoint.getLongitude());
 	}
 
 	public static String formatSimple(IGeoPoint geoPoint) {
-		return MessageFormat.format(FORMAT_GEOPINT_SIMPLE, geoPoint.getLatitude(), geoPoint.getLongitude());
+		return MessageFormat.format(FORMAT_GEOPOINT_SIMPLE, geoPoint.getLatitude(), geoPoint.getLongitude());
 	}
 
 	public static IGeoPoint parse(String str) {
