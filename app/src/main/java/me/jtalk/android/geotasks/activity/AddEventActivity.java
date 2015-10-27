@@ -48,7 +48,7 @@ public class AddEventActivity extends BaseActivity {
 		openLocationPickActivityChain = new TasksChain<PermissionDependantTask>()
 				.addTask(makeTask(() -> {
 							Intent intent = new Intent(this, LocationPickActivity.class);
-							TextView locationText = (TextView) findViewById(R.id.add_event_location_pick_button);
+							TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 							String locationString = locationText.getText().toString();
 							if (!locationString.isEmpty()) {
 								IGeoPoint geoPoint = GeoPointFormat.parse(locationString);
@@ -139,7 +139,7 @@ public class AddEventActivity extends BaseActivity {
 	}
 
 	private void onLocationResult(Intent data) {
-		TextView locationText = (TextView) findViewById(R.id.add_event_location_pick_button);
+		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		double longitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, 0.0d);
 		double latitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, 0.0d);
 
