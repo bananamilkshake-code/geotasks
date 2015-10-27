@@ -10,7 +10,7 @@ public abstract class PermissionDependentTask extends TasksChain.Task {
 	private static final String TAG = PermissionDependentTask.class.getName();
 	private String[] neededPermissions;
 
-	public PermissionDependentTask(String[] neededPermissions) {
+	public PermissionDependentTask(String... neededPermissions) {
 		this.neededPermissions = neededPermissions;
 	}
 
