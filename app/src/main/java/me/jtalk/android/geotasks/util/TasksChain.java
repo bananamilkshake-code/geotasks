@@ -18,7 +18,7 @@ public class TasksChain <T extends TasksChain.Task> {
 		tasks = new ArrayList<>();
 	}
 
-	public TasksChain<T> addTask(T task) {
+	public TasksChain<T> add(T task) {
 		tasks.add(task);
 		return this;
 	}

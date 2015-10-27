@@ -35,9 +35,9 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.activity_main);
 
 		initChain = new TasksChain<PermissionDependentTask>()
-				.addTask(makeTask(() -> getCalendarId(), Manifest.permission.WRITE_CALENDAR))
-				.addTask(makeTask(() -> initEventsList(), Manifest.permission.READ_CALENDAR))
-				.addTask(makeTask(() -> initEventsSource(), Manifest.permission.READ_CALENDAR));
+				.add(makeTask(() -> getCalendarId(), Manifest.permission.WRITE_CALENDAR))
+				.add(makeTask(() -> initEventsList(), Manifest.permission.READ_CALENDAR))
+				.add(makeTask(() -> initEventsSource(), Manifest.permission.READ_CALENDAR));
 
 		processChain(initChain);
 	}

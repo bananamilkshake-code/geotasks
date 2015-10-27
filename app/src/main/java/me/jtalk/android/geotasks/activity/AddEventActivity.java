@@ -39,10 +39,10 @@ public class AddEventActivity extends BaseActivity {
 		setContentView(R.layout.activity_add_event);
 
 		addEventChain = new TasksChain<PermissionDependentTask>()
-				.addTask(makeTask(() -> addEvent(), Manifest.permission.WRITE_CALENDAR));
+				.add(makeTask(() -> addEvent(), Manifest.permission.WRITE_CALENDAR));
 
 		openLocationPickActivityChain = new TasksChain<PermissionDependentTask>()
-				.addTask(makeTask(() -> {
+				.add(makeTask(() -> {
 							Intent intent = new Intent(this, LocationPickActivity.class);
 							TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 							String locationString = locationText.getText().toString();
