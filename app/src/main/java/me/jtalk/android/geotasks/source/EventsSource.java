@@ -25,7 +25,6 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, Even
 	public static final String TAG = EventsSource.class.getName();
 
 	public static final long DEFAULT_CALENDAR = -1;
-
 	public static final long DEFAULT_START_TIME = -1;
 	public static final long DEFAULT_END_TIME = -1;
 
