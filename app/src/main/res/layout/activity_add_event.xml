@@ -41,8 +41,8 @@
             android:onClick="showTimePickerDialog"/>
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/add_event_location_pick_button"
+    <TextView
+        android:id="@+id/add_event_location_coordinates_text"
         style="?android:attr/spinnerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
