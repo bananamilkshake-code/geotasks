@@ -91,16 +91,12 @@ public class LocationPickActivity extends Activity {
 		Intent intent = getIntent();
 
 		GeoPoint startPoint;
+		double latitude = intent.getDoubleExtra(INTENT_EXTRA_LATITUDE, DEFAULT_GEOPOINT.getLatitude());
+		double longitude = intent.getDoubleExtra(INTENT_EXTRA_LONGITUDE, DEFAULT_GEOPOINT.getLongitude());
+		startPoint = new GeoPoint(latitude, longitude);
+
 		if (intent.hasExtra(INTENT_EXTRA_EDIT)) {
-			double latitude = intent.getDoubleExtra(INTENT_EXTRA_LATITUDE, DEFAULT_GEOPOINT.getLatitude());
-			double longtitude = intent.getDoubleExtra(INTENT_EXTRA_LONGITUDE, DEFAULT_GEOPOINT.getLongitude());
-			startPoint = new GeoPoint(latitude, longtitude);
-
-			pickedLocation = startPoint;
-
-			updateCurrentLocation(startPoint);
-		} else {
-			startPoint = DEFAULT_GEOPOINT;
+			onLocationPick(startPoint);
 		}
 
 		IMapController mapController = mapView.getController();
@@ -108,9 +104,8 @@ public class LocationPickActivity extends Activity {
 		mapController.setCenter(startPoint);
 	}
 
-	private void onLocationPick(int x, int y) {
-		pickedLocation = mapView.getProjection().fromPixels(x, y);
-
+	private void onLocationPick(IGeoPoint geoPoint) {
+		pickedLocation = geoPoint;
 		updateCurrentLocation(pickedLocation);
 	}
 
@@ -131,8 +126,9 @@ public class LocationPickActivity extends Activity {
 	private class MapGestureDetector extends GestureDetector.SimpleOnGestureListener {
 		@Override
 		public boolean onSingleTapUp(MotionEvent event) {
-			onLocationPick((int) event.getX(), (int) event.getY());
-			return false;
+			IGeoPoint pickedPoint = mapView.getProjection().fromPixels((int) event.getX(), (int) event.getY());
+			onLocationPick(pickedPoint);
+			return true;
 		}
 
 		@Override
