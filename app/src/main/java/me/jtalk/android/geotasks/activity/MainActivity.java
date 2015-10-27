@@ -65,7 +65,12 @@ public class MainActivity extends BaseActivity {
 				.show();
 	}
 
-	// This method is called on menu.menu_action_add_event click
+	/**
+	 * This method is called on menu.menu_action_add_event click.
+	 *
+	 * @param menuItem
+	 * @return
+	 */
 	public boolean openAddEventIntent(MenuItem menuItem) {
 		startActivity(new Intent(this, AddEventActivity.class));
 		return true;
