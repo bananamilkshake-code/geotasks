@@ -100,6 +100,7 @@ public class AddEventActivity extends BaseActivity {
 
 	// This method is called on activity_add_event.add_event_location_pick_button
 	public void showLocationActivity(View view) {
+		openLocationPickActivityChain.reset();
 		processChain(openLocationPickActivityChain);
 	}
 

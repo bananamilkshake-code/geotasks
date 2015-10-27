@@ -56,4 +56,8 @@ public class TasksChain <T extends TasksChain.Task> {
 	public T getTask(int taskId) {
 		return tasks.get(taskId);
 	}
+
+	public void reset() {
+		currentTask = 0;
+	}
 }
