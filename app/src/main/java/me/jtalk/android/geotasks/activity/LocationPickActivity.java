@@ -1,7 +1,6 @@
 package me.jtalk.android.geotasks.activity;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.GestureDetector;
@@ -17,7 +16,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
@@ -46,6 +44,9 @@ public class LocationPickActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location_pick);
+
+		textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
+		textLocationName = (TextView) findViewById(R.id.location_name);
 
 		initMapView();
 	}
@@ -81,27 +82,35 @@ public class LocationPickActivity extends Activity {
 
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.setTileSource(TileSourceFactory.MAPNIK);
-
 		mapView.setMultiTouchControls(true);
 		mapView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
 
-		textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
-		textLocationName = (TextView) findViewById(R.id.location_name);
+		IGeoPoint startPoint = extractStartGeoPoint(getIntent());
+		IMapController mapController = mapView.getController();
+		mapController.setZoom(9);
+		mapController.setCenter(startPoint);
+	}
 
-		Intent intent = getIntent();
-
-		GeoPoint startPoint;
+	/**
+	 * Retrieves and returns start geopoint from provided intent ({@INTENT_EXTRA_LATITUDE}
+	 * and {@INTENT_EXTRA_LONGITUDE} will be checked). If no data was provided
+	 * {@DEFAULT_GEOPOINT} values will be used.
+	 * If intent has {@INTENT_EXTRA_EDIT} extra retrieved geopoint will be set up
+	 * as picked location.
+	 *
+	 * @param intent Intent, that can contain start geopoint data.
+	 * @return retrieved geopoint
+	 */
+	private IGeoPoint extractStartGeoPoint(Intent intent) {
 		double latitude = intent.getDoubleExtra(INTENT_EXTRA_LATITUDE, DEFAULT_GEOPOINT.getLatitude());
 		double longitude = intent.getDoubleExtra(INTENT_EXTRA_LONGITUDE, DEFAULT_GEOPOINT.getLongitude());
-		startPoint = new GeoPoint(latitude, longitude);
+		GeoPoint startPoint = new GeoPoint(latitude, longitude);
 
 		if (intent.hasExtra(INTENT_EXTRA_EDIT)) {
 			onLocationPick(startPoint);
 		}
 
-		IMapController mapController = mapView.getController();
-		mapController.setZoom(9);
-		mapController.setCenter(startPoint);
+		return  startPoint;
 	}
 
 	private void onLocationPick(IGeoPoint geoPoint) {
