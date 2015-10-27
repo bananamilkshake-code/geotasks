@@ -6,3 +6,4 @@ app/build/*
 GeoTasks.iml
 local.properties
 build/*
+*.iml

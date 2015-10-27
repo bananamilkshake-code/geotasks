@@ -12,7 +12,9 @@ public class Assert {
 		if (!expression) {
 			throw new IllegalArgumentException(message);
 		}
-	}	public static void verifyArgument(boolean expression, String format, Object ...args) {
+	}
+
+	public static void verifyArgument(boolean expression, String format, Object... args) {
 		if (!expression) {
 			String message = MessageFormat.format(format, args);
 			throw new IllegalArgumentException(message);
