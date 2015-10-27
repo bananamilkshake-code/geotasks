@@ -3,6 +3,8 @@ package me.jtalk.android.geotasks.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
+
 public class TasksChain <T extends TasksChain.Task> {
 	private boolean pause;
 
@@ -18,7 +20,15 @@ public class TasksChain <T extends TasksChain.Task> {
 		tasks = new ArrayList<>();
 	}
 
+	/**
+	 * Adds new task to be proceeded at the end of the chain.
+	 *
+	 * @param task Task to add. Cannot be null.
+	 * @return
+	 */
 	public TasksChain<T> add(T task) {
+		verifyArgument(task != null, "Task cannot be null");
+
 		tasks.add(task);
 		return this;
 	}
