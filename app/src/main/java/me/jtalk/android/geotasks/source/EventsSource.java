@@ -21,7 +21,7 @@ import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.util.CalendarHelper;
 
-public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, EventsInserter {
+public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	public static final String TAG = EventsSource.class.getName();
 
 	public static final long DEFAULT_CALENDAR = -1;
@@ -77,8 +77,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor>, Even
 		eventsAdapter.swapCursor(null);
 	}
 
-	@Override
-	public void addEvent(String title, String description, String location, long startTime, long endTime) throws SecurityException {
+	public void addEvent(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
 		Log.d(TAG, MessageFormat.format("Inserting new event for calendarId {0}", calendarId));
 
 		ContentValues values = new ContentValues();
