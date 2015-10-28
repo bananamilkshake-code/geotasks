@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.CursorAdapter;
 
 import java.text.MessageFormat;
+import java.util.Calendar;
 import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.util.CalendarHelper;
@@ -25,8 +26,9 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	public static final String TAG = EventsSource.class.getName();
 
 	public static final long DEFAULT_CALENDAR = -1;
-	public static final long DEFAULT_START_TIME = -1;
-	public static final long DEFAULT_END_TIME = -1;
+	public static final long DEFAULT_TIME_VALUE = -1;
+
+	public static final Calendar EMPTY_TIME = null;
 
 	private Context context;
 	private CursorAdapter eventsAdapter;
@@ -87,8 +89,8 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		values.put(Events.EVENT_LOCATION, location);
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 
-		values.put(Events.DTSTART, startTime);
-		values.put(Events.DTEND, endTime);
+		values.put(Events.DTSTART, getMillis(startTime));
+		values.put(Events.DTEND, getMillis(endTime));
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
 		Log.d(TAG, MessageFormat.format("New event was created. Uri: {0}", created.toString()));
@@ -97,5 +99,16 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	public void removeEvent(long eventId) {
 		Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
 		this.context.getContentResolver().delete(deleteUri, null, null);
+	}
+
+	/**
+	 * Safety retrieves millis from calendar: null calendar means that no time is set
+	 * and {@DEFAULT_TIME_VALUE} must be returned.
+	 *
+	 * @param time
+	 * @return time in milliseconds or @{DEFAULT_TIME_VALUE} if time is null
+	 */
+	private static long getMillis(Calendar time) {
+		return (time != EMPTY_TIME) ? time.getTimeInMillis() : DEFAULT_TIME_VALUE;
 	}
 }

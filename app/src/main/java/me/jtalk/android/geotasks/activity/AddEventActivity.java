@@ -164,8 +164,8 @@ public class AddEventActivity extends BaseActivity {
 		String eventTitle = titleText.getText().toString();
 		String eventDescription = descriptionText.getText().toString();
 		String location = locationText.getText().toString();
-		long startTime = this.getStartTime();
-		long endTime = EventsSource.DEFAULT_END_TIME;
+		Calendar startTime = this.getStartTime();
+		Calendar endTime = EventsSource.EMPTY_TIME;
 
 		getEventsSource().addEvent(eventTitle, eventDescription, location, startTime, endTime);
 
@@ -191,7 +191,7 @@ public class AddEventActivity extends BaseActivity {
 		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, DateFormat.getDateTimeInstance());
 
 		if (dateCalendar == null || timeCalendar == null) {
-			return EventsSource.DEFAULT_START_TIME;
+			return EventsSource.EMPTY_TIME;
 		}
 
 		Calendar calendar = Calendar.getInstance();
@@ -200,7 +200,7 @@ public class AddEventActivity extends BaseActivity {
 				dateCalendar.get(Calendar.DAY_OF_MONTH),
 				timeCalendar.get(Calendar.HOUR_OF_DAY),
 				timeCalendar.get(Calendar.MINUTE));
-		return calendar.getTimeInMillis();
+		return calendar;
 	}
 
 	private Calendar parseFromTextView(int viewId, DateFormat format) {
