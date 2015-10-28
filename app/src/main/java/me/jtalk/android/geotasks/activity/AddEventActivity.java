@@ -42,19 +42,7 @@ public class AddEventActivity extends BaseActivity {
 				.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR));
 
 		openLocationPickActivityChain = new TasksChain<PermissionDependentTask>()
-				.add(makeTask(() -> {
-							Intent intent = new Intent(this, LocationPickActivity.class);
-							TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
-							String locationString = locationText.getText().toString();
-							if (!locationString.isEmpty()) {
-								IGeoPoint geoPoint = GeoPointFormat.parse(locationString);
-								intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
-								intent.putExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, geoPoint.getLatitude());
-								intent.putExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, geoPoint.getLongitude());
-							}
-
-							startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);
-						},
+				.add(makeTask(this::openLocationPickActivity,
 						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
 						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
 						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE));
@@ -184,7 +172,21 @@ public class AddEventActivity extends BaseActivity {
 		finish();
 	}
 
-	private long getStartTime() {
+	private void openLocationPickActivity() {
+		Intent intent = new Intent(this, LocationPickActivity.class);
+		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
+		String locationString = locationText.getText().toString();
+		if (!locationString.isEmpty()) {
+			IGeoPoint geoPoint = GeoPointFormat.parse(locationString);
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, geoPoint.getLatitude());
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, geoPoint.getLongitude());
+		}
+
+		startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);
+	}
+
+	private Calendar getStartTime() {
 		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, DateFormat.getDateInstance());
 		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, DateFormat.getDateTimeInstance());
 
