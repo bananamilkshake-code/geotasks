@@ -39,7 +39,7 @@ public class AddEventActivity extends BaseActivity {
 		setContentView(R.layout.activity_add_event);
 
 		addEventChain = new TasksChain<PermissionDependentTask>()
-				.add(makeTask(() -> addEvent(), Manifest.permission.WRITE_CALENDAR));
+				.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR));
 
 		openLocationPickActivityChain = new TasksChain<PermissionDependentTask>()
 				.add(makeTask(() -> {
