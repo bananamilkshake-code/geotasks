@@ -207,15 +207,13 @@ public class AddEventActivity extends BaseActivity {
 			return null;
 		}
 
-		Calendar calendar = Calendar.getInstance();
-
 		try {
+			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(format.parse(calendarStr));
+			return calendar;
 		} catch (ParseException exception) {
 			Log.w(TAG, MessageFormat.format("Parsing event start time values {0} from view {1} failed", calendarStr, viewId), exception);
 			return null;
 		}
-
-		return calendar;
 	}
 }
