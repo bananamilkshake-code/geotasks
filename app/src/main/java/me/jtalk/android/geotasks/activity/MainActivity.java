@@ -79,6 +79,15 @@ public class MainActivity extends BaseActivity {
 		return true;
 	}
 
+	/**
+	 * Retrieve calendar id in Calendar Provider that contains information about events.
+	 * Calendar id is kept in Settings storage. In no calendar had been used (application
+	 * started for the first time) new calendar will be created and used (it's id will be returned).
+	 *
+	 * @return calendar id that contains events.
+	 * @throws SecurityException occurs if no calendar is set and
+	 * permission to create calendars is not granted.
+	 */
 	private long getCalendarId() throws SecurityException {
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 
@@ -88,7 +97,7 @@ public class MainActivity extends BaseActivity {
 		}
 
 		LOG.info("No calendar defined in settings. Creating new calendar.");
-		
+
 		calendarId = new CalendarsSource(this).addCalendar();
 
 		SharedPreferences.Editor editor = settings.edit();

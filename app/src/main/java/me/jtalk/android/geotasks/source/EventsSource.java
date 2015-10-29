@@ -106,6 +106,16 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		eventsAdapter.swapCursor(null);
 	}
 
+	/**
+	 * Creates new event in Android Calendar Provider.
+	 *
+	 * @param title
+	 * @param description
+	 * @param location
+	 * @param startTime event start time. This value can be null if start time is not set.
+	 * @param endTime event end time. This value can be null if start time is not set.
+	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
+	 */
 	public void addEvent(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
 		LOG.debug("Inserting new event for calendarId {}", calendarId);
 
@@ -123,8 +133,13 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		LOG.debug("New event was created. Uri: {}", created.toString());
 	}
 
-	public void removeEvent(long eventId) {
-		Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
+	/**
+	 * Remove event with {@id} from Calendars Provider.
+	 *
+	 * @param id event id to remove
+	 */
+	public void removeEvent(long id) {
+		Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
 		this.context.getContentResolver().delete(deleteUri, null, null);
 	}
 
