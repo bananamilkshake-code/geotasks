@@ -29,7 +29,7 @@ public class MainActivity extends BaseActivity {
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	TasksChain<PermissionDependentTask> initChain;
+	private TasksChain<PermissionDependentTask> initChain;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
