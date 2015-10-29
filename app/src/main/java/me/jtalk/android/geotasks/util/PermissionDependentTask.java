@@ -9,14 +9,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public abstract class PermissionDependentTask extends TasksChain.Task {
 	private static final Logger LOG = LoggerFactory.getLogger(PermissionDependentTask.class);
 
 	private String[] neededPermissions;
-
-	public PermissionDependentTask(String... neededPermissions) {
-		this.neededPermissions = neededPermissions;
-	}
 
 	public boolean checkGranted(String[] permissions, int[] values) {
 		if (permissions.length == 0 || values.length == 0) {

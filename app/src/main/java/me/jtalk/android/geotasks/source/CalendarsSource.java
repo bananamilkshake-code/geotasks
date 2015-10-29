@@ -11,15 +11,19 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class CalendarsSource {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarsSource.class);
 
 	private Context context;
 
-	public CalendarsSource(Context context) {
-		this.context = context;
-	}
-
+	/**
+	 * Creates new calendar in Android Calendar provider.
+	 *
+	 * @return id of created calendar
+	 */
 	public long addCalendar() {
 		ContentValues values = new ContentValues();
 		values.put(CalendarContract.Calendars.NAME, "GeoTasks calendar");
