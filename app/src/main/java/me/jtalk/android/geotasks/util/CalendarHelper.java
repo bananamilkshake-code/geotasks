@@ -1,9 +1,15 @@
 package me.jtalk.android.geotasks.util;
 
+import android.database.Cursor;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+
 import static me.jtalk.android.geotasks.util.Assert.*;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.jtalk.android.geotasks.source.EventsSource;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CalendarHelper {
@@ -23,5 +29,21 @@ public class CalendarHelper {
 		return Joiner.joinIn(builder, fields, SELECTION_STRING_SEPARATOR)
 				.append(SELECTION_ARGUMENT_APPENDER)
 				.append("))").toString();
+	}
+
+	/**
+	 * Wrapper method to get field value from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field field to retrieve value from
+	 * @return value of the field in cursor
+	 * @see Cursor.getLong()
+	 */
+	public static Long getLong(Cursor cursor, String field) {
+		return cursor.getLong(cursor.getColumnIndex(field));
+	}
+
+	public static String getString(Cursor cursor, String field) {
+		return cursor.getString(cursor.getColumnIndex(field));
 	}
 }

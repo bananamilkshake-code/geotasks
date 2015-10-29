@@ -16,6 +16,7 @@ import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.widget.CursorAdapter;
 
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -43,6 +44,31 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 			Events.EVENT_LOCATION,
 			Events.DTSTART
 	};
+
+	public static Event extractEvent(Cursor cursor) {
+		return new Event(
+				CalendarHelper.getString(cursor, Events.TITLE),
+				getTimeText(cursor, Events.DTSTART));
+	}
+
+	/**
+	 * Retrieves column value from cursor and converts it to calendar.
+	 * If start time value is not been set for that event null will be returned.
+	 *
+	 * @param cursor
+	 * @param timeField field name that contains time value (long)
+	 * @return calendar with start time value or null if time hadn't been set
+	 */
+	public static String getTimeText(Cursor cursor, String timeField) {
+		long timeInMillis = CalendarHelper.getLong(cursor, timeField);
+		if (timeInMillis == DEFAULT_TIME_VALUE) {
+			return null;
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(timeInMillis);
+		return DateFormat.getDateTimeInstance().format(calendar.getTime());
+	}
 
 	public EventsSource(Context context, CursorAdapter eventsAdapter, long calendarId) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

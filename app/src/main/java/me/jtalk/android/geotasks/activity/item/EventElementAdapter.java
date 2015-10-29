@@ -2,17 +2,14 @@ package me.jtalk.android.geotasks.activity.item;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.CalendarContract.Events;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 
 public class EventElementAdapter extends CursorAdapter {
@@ -31,16 +28,9 @@ public class EventElementAdapter extends CursorAdapter {
 		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
 		TextView timeView = (TextView) view.findViewById(R.id.event_element_time);
 
-		titleView.setText(cursor.getString(cursor.getColumnIndex(Events.TITLE)));
+		Event event = EventsSource.extractEvent(cursor);
 
-		long timeInMillis = cursor.getLong(cursor.getColumnIndex(Events.DTSTART));
-		if (timeInMillis != EventsSource.DEFAULT_START_TIME) {
-			Calendar time = Calendar.getInstance();
-			time.setTimeInMillis(timeInMillis);
-
-			timeView.setText(DateFormat.getDateTimeInstance().format(time.getTime()));
-		} else {
-			timeView.setText(null);
-		}
+		titleView.setText(event.getTitle());
+		timeView.setText(event.getStartTimeText());
 	}
 }
