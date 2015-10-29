@@ -13,14 +13,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract.Events;
-import android.util.Log;
 import android.widget.CursorAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
-import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
