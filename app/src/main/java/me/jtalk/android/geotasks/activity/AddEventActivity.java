@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,9 +13,10 @@ import android.widget.Toast;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
-import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -28,7 +28,7 @@ import me.jtalk.android.geotasks.util.TasksChain;
 
 
 public class AddEventActivity extends BaseActivity {
-	private static final String TAG = AddEventActivity.class.getName();
+	private static final Logger LOG = LoggerFactory.getLogger(AddEventActivity.class);
 
 	private TasksChain<PermissionDependentTask> addEventChain;
 	private TasksChain<PermissionDependentTask> openLocationPickActivityChain;
@@ -111,7 +111,7 @@ public class AddEventActivity extends BaseActivity {
 				calendar.setTime(DateFormat.getTimeInstance().parse(timeText));
 			}
 		} catch (ParseException exception) {
-			Log.w(TAG, "Time value from time text field cannot be parsed", exception);
+			LOG.warn("Time value from time text field cannot be parsed", exception);
 		}
 
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
@@ -137,7 +137,7 @@ public class AddEventActivity extends BaseActivity {
 				calendar.setTime(DateFormat.getDateInstance().parse(dateText));
 			}
 		} catch (ParseException exception) {
-			Log.w(TAG, "Date value from date text field cannot be parsed", exception);
+			LOG.warn("Date value from date text field cannot be parsed", exception);
 		}
 
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
@@ -214,7 +214,8 @@ public class AddEventActivity extends BaseActivity {
 			calendar.setTime(format.parse(calendarStr));
 			return calendar;
 		} catch (ParseException exception) {
-			Log.w(TAG, MessageFormat.format("Parsing event start time values {0} from view {1} failed", calendarStr, viewId), exception);
+			LOG.warn("Parsing event start time values {} from view {} failed", calendarStr, viewId);
+			LOG.trace("Exception", exception);
 			return null;
 		}
 	}

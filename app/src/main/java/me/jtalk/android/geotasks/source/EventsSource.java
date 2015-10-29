@@ -16,6 +16,9 @@ import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.widget.CursorAdapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Calendar;
@@ -24,7 +27,7 @@ import java.util.TimeZone;
 import me.jtalk.android.geotasks.util.CalendarHelper;
 
 public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
-	public static final String TAG = EventsSource.class.getName();
+	public static final Logger LOG = LoggerFactory.getLogger(EventsSource.class);
 
 	public static final long DEFAULT_CALENDAR = -1;
 	public static final long DEFAULT_TIME_VALUE = -1;
@@ -81,12 +84,12 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		this.eventsAdapter = eventsAdapter;
 		this.calendarId = calendarId;
 
-		Log.d(TAG, MessageFormat.format("EventSource {0} is created for context {1}", this, context));
+		LOG.debug("EventSource {} is created for context {}", this, context);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Log.d(TAG, MessageFormat.format("EventsSource created loader for {0} calendar", calendarId));
+		LOG.debug("EventsSource created loader for {} calendar", calendarId);
 
 		String selection = CalendarHelper.buildProjection(Events.CALENDAR_ID);
 		String[] selectionArgs = new String[]{String.valueOf(calendarId)};
@@ -106,7 +109,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	}
 
 	public void addEvent(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
-		Log.d(TAG, MessageFormat.format("Inserting new event for calendarId {0}", calendarId));
+		LOG.debug("Inserting new event for calendarId {}", calendarId);
 
 		ContentValues values = new ContentValues();
 		values.put(Events.CALENDAR_ID, calendarId);
@@ -119,7 +122,7 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		values.put(Events.DTEND, getMillis(endTime));
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
-		Log.d(TAG, MessageFormat.format("New event was created. Uri: {0}", created.toString()));
+		LOG.debug("New event was created. Uri: {}", created.toString());
 	}
 
 	public void removeEvent(long eventId) {

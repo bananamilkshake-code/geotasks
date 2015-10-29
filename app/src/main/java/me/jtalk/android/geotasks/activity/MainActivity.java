@@ -12,6 +12,9 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
@@ -23,7 +26,7 @@ import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 public class MainActivity extends BaseActivity {
-	private static final String TAG = MainActivity.class.getName();
+	private static final Logger LOG = LoggerFactory.getLogger(MainActivity.class);
 
 	private static final int LOADER_EVENTS_ID = 0;
 
@@ -84,7 +87,8 @@ public class MainActivity extends BaseActivity {
 			return calendarId;
 		}
 
-		Log.i(TAG, "No calendar defined in settings. Creating new calendar.");
+		LOG.info("No calendar defined in settings. Creating new calendar.");
+		
 		calendarId = new CalendarsSource(this).addCalendar();
 
 		SharedPreferences.Editor editor = settings.edit();

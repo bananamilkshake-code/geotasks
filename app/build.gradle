@@ -32,5 +32,6 @@ dependencies {
     apt "org.projectlombok:lombok:1.16.6"
 
     compile 'org.osmdroid:osmdroid-android:4.3'
-    compile 'org.slf4j:slf4j-simple:1.6.1'
+    compile 'org.slf4j:slf4j-android:1.7.12'
+
 }

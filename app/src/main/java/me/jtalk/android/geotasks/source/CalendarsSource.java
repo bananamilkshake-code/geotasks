@@ -6,10 +6,13 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.util.Log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.MessageFormat;
 
 public class CalendarsSource {
-	private static final String TAG = CalendarsSource.class.getName();
+	private static final Logger LOG = LoggerFactory.getLogger(CalendarsSource.class);
 
 	private Context context;
 
@@ -31,7 +34,7 @@ public class CalendarsSource {
 
 		long id = Long.valueOf(inserted.getLastPathSegment());
 
-		Log.d(TAG, MessageFormat.format("Calendar with id {0} created", id));
+		LOG.info("Calendar with id {} created", id);
 		
 		return id;
 	}

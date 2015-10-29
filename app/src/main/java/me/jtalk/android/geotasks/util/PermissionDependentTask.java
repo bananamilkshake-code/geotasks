@@ -3,11 +3,15 @@ package me.jtalk.android.geotasks.util;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class PermissionDependentTask extends TasksChain.Task {
-	private static final String TAG = PermissionDependentTask.class.getName();
+	private static final Logger LOG = LoggerFactory.getLogger(PermissionDependentTask.class);
+
 	private String[] neededPermissions;
 
 	public PermissionDependentTask(String... neededPermissions) {
@@ -16,7 +20,7 @@ public abstract class PermissionDependentTask extends TasksChain.Task {
 
 	public boolean checkGranted(String[] permissions, int[] values) {
 		if (permissions.length == 0 || values.length == 0) {
-			Log.w(TAG, "Permissions request was interrupted by user");
+			LOG.debug("Permissions request was interrupted by user");
 			return false;
 		}
 

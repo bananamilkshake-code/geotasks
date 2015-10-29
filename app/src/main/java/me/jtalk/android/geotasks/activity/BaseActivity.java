@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.os.Build;
 import android.util.Log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.application.GeoTasksApplication;
@@ -12,7 +15,7 @@ import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 public abstract class BaseActivity extends Activity {
-	private static final String TAG = BaseActivity.class.getName();
+	private static final Logger LOG = LoggerFactory.getLogger(BaseActivity.class);
 
 	protected EventsSource getEventsSource() {
 		return ((GeoTasksApplication) getApplication()).getEventsSource();
@@ -43,7 +46,7 @@ public abstract class BaseActivity extends Activity {
 			toProceed.startProcessingFrom(firstTask);
 		} catch (SecurityException exception) {
 			int currentTaskId = toProceed.getCurrentTaskId();
-			Log.d(TAG, MessageFormat.format("No permissions for processing step {0}", currentTaskId));
+			LOG.debug("No permissions for processing step {}", currentTaskId);
 
 			PermissionDependentTask currentTask = toProceed.getCurrentTask();
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -52,7 +55,7 @@ public abstract class BaseActivity extends Activity {
 				onNeededPermissionDenied();
 			}
 		} catch (Exception exception) {
-			Log.w(TAG, MessageFormat.format("Unexpected exception during chain procession on task {0}", toProceed.getCurrentTaskId()));
+			LOG.warn("Unexpected exception during chain procession on task {}", toProceed.getCurrentTaskId());
 			throw new RuntimeException(exception);
 		}
 	}
@@ -61,7 +64,7 @@ public abstract class BaseActivity extends Activity {
 												  String[] permissions, int[] values) {
 		if (permissions.length == 0 || values.length == 0) {
 			// interrupted by user
-			Log.d(TAG, "Permission request was interrupted by user");
+			LOG.debug("Permission request was interrupted by user");
 			return;
 		}
 
