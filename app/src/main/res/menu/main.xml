@@ -6,6 +6,13 @@
         android:showAsAction="ifRoom"
         android:title="Test"/>
     <item
+        android:id="@+id/menu_action_enable_geolistening"
+        android:showAsAction="ifRoom"
+        android:checkable="true"
+        android:icon="@drawable/ic_gps_fixed_black_48dp"
+        android:title="@string/action_enable_geo_listening"
+        android:onClick="toggleGeoListeningClick"/>
+    <item
         android:id="@+id/action_add_event"
         android:onClick="openAddEventIntent"
         android:orderInCategory="100"

@@ -28,4 +28,7 @@
     <string name="dialog_no_permission_for_calendar_creation_button">Close</string>
     <string name="title_activity_location_pick">Choose location...</string>
     <string name="menu_location_pick_save">Pick</string>
+    <string name="action_enable_geo_listening">Enable geolistening</string>
+    <string name="toast_geolistening_disnabled">Geo listening disabled</string>
+    <string name="toast_geolistening_enabled">Geo listening enabled</string>
 </resources>

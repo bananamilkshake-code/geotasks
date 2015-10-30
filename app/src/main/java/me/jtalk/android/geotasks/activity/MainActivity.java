@@ -2,14 +2,18 @@ package me.jtalk.android.geotasks.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,7 @@ import java.text.MessageFormat;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
+import me.jtalk.android.geotasks.location.EventsLocationListener;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
@@ -30,6 +35,8 @@ public class MainActivity extends BaseActivity {
 	private static final int LOADER_EVENTS_ID = 0;
 
 	private TasksChain<PermissionDependentTask> initChain;
+
+	private LocationListener locationListener;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +54,11 @@ public class MainActivity extends BaseActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
+
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		boolean isGeoListeningEnabled = settings.getBoolean(Settings.GEO_LISTENING, Settings.DEFAULT_GEO_LISTENING);
+		toggleGeoListening(menu.findItem(R.id.menu_action_enable_geolistening), isGeoListeningEnabled);
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -68,13 +80,31 @@ public class MainActivity extends BaseActivity {
 	}
 
 	/**
-	 * This method is called on menu.menu_action_add_event click.
+	 * This method is called on menu.menu_action_enable_geolistening click.
 	 *
 	 * @param menuItem
 	 * @return
 	 */
 	public boolean openAddEventIntent(MenuItem menuItem) {
 		startActivity(new Intent(this, AddEventActivity.class));
+		return true;
+	}
+
+	/**
+	 * This method is called on menu.menu_action_add_event click.
+	 *
+	 * @param menuItem
+	 * @return
+	 */
+	public boolean toggleGeoListeningClick(MenuItem menuItem) {
+		boolean isChecked = !menuItem.isChecked();
+
+		toggleGeoListening(menuItem, isChecked);
+
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean(Settings.GEO_LISTENING, isChecked);
+		editor.commit();
 		return true;
 	}
 
@@ -140,5 +170,31 @@ public class MainActivity extends BaseActivity {
 		getLoaderManager().initLoader(LOADER_EVENTS_ID, null, eventsSource);
 
 		setEventsSource(eventsSource);
+
+		locationListener = new EventsLocationListener(eventsSource);
+	}
+
+	private void toggleGeoListening(MenuItem menuItem, boolean isChecked) throws SecurityException {
+		menuItem.setChecked(isChecked);
+
+		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		if (isChecked) {
+			locationManager.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER,
+					EventsLocationListener.MIN_TIME,
+					EventsLocationListener.MIN_DISTANCE,
+					locationListener);
+
+			menuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
+
+			Toast.makeText(this, R.string.toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
+		} else {
+			locationManager.removeUpdates(locationListener);
+
+			menuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
+
+			Toast.makeText(this, R.string.toast_geolistening_disnabled, Toast.LENGTH_SHORT).show();
+		}
 	}
 }
