@@ -1,11 +1,12 @@
 package me.jtalk.android.geotasks.application;
 
-/**
- * Keeps name of fields in application Settings storage.
- */
-public interface Settings {
-	String CALENDAR_ID = "calendar";
-	String GEO_LISTENING = "geo-listening";
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-	boolean DEFAULT_GEO_LISTENING = false;
+/**
+ * Keeps name of fields and default values in application Settings storage.
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class Settings {
+	public static final boolean DEFAULT_GEO_LISTENING = false;
 }

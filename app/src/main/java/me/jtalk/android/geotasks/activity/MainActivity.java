@@ -2,18 +2,14 @@ package me.jtalk.android.geotasks.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +33,9 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private static final int LOADER_EVENTS_ID = 0;
 
 	private TasksChain<PermissionDependentTask> initChain;
+	private TasksChain<PermissionDependentTask> toggleGeoListenChain;
 
-	private LocationListener locationListener;
+	private EventsLocationListener locationListener = new EventsLocationListener();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,16 +47,22 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR))
 				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR));
 
+		toggleGeoListenChain = new TasksChain<PermissionDependentTask>()
+				.add(makeTask(this::toggleGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION));
+
 		processChain(initChain);
+
+		SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 
-		SharedPreferences settings = getPreferences(MODE_PRIVATE);
-		boolean isGeoListeningEnabled = settings.getBoolean(Settings.GEO_LISTENING, Settings.DEFAULT_GEO_LISTENING);
-		toggleGeoListening(menu.findItem(R.id.menu_action_enable_geolistening), isGeoListeningEnabled);
+		locationListener.setMenuItem(menu.findItem(R.id.menu_action_enable_geolistening));
+
+		processChain(toggleGeoListenChain);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -108,11 +111,9 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean toggleGeoListeningClick(MenuItem menuItem) {
 		boolean isChecked = !menuItem.isChecked();
 
-		toggleGeoListening(menuItem, isChecked);
-
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putBoolean(Settings.GEO_LISTENING, isChecked);
+		editor.putBoolean(getString(pref_is_geolistening_enabled), isChecked);
 		editor.commit();
 		return true;
 	}
@@ -191,30 +192,15 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		setEventsSource(eventsSource);
 
-		locationListener = new EventsLocationListener(eventsSource);
+		locationListener.setEventsSource(eventsSource);
 	}
 
-	private void toggleGeoListening(MenuItem menuItem, boolean isChecked) throws SecurityException {
-		menuItem.setChecked(isChecked);
+	private void toggleGeoListening() throws SecurityException {
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		boolean isEnabled = settings.getBoolean(getString(R.string.pref_is_geolistening_enabled), Settings.DEFAULT_GEO_LISTENING);
 
-		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-		if (isChecked) {
-			locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER,
-					EventsLocationListener.MIN_TIME,
-					EventsLocationListener.MIN_DISTANCE,
-					locationListener);
-
-			menuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
-
-			Toast.makeText(this, R.string.toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
-		} else {
-			locationManager.removeUpdates(locationListener);
-
-			menuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
-
-			Toast.makeText(this, R.string.toast_geolistening_disnabled, Toast.LENGTH_SHORT).show();
+		if (locationListener.tryToggle(isEnabled)) {
+			locationListener.toggleGeoListening(this);
 		}
 	}
 }
