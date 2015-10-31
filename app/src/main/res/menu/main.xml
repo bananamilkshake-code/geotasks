@@ -9,7 +9,7 @@
         android:id="@+id/menu_action_enable_geolistening"
         android:showAsAction="ifRoom"
         android:checkable="true"
-        android:icon="@drawable/ic_gps_fixed_black_48dp"
+        android:icon="@drawable/ic_gps_off_black_48dp"
         android:title="@string/action_enable_geo_listening"
         android:onClick="toggleGeoListeningClick"/>
     <item
