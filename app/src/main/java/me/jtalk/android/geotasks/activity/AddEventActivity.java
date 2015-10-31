@@ -92,7 +92,6 @@ public class AddEventActivity extends BaseActivity {
 	 * @param view
 	 */
 	public void showLocationActivity(View view) {
-		openLocationPickActivityChain.reset();
 		processChain(openLocationPickActivityChain);
 	}
 

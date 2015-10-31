@@ -44,6 +44,10 @@ public class TasksChain <T extends TasksChain.Task> {
 				throw exception;
 			}
 		}
+
+		if (!pause) {
+			reset();
+		}
 	}
 
 	public void startProcessingFrom(int taskId) throws Exception {
