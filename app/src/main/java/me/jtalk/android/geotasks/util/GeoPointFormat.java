@@ -6,8 +6,10 @@ import org.osmdroid.util.GeoPoint;
 import java.text.MessageFormat;
 
 public class GeoPointFormat {
+	private static final String POINT_ACCURACY = "#.########";
+
 	private static final String FORMAT_GEOPOINT = "lat: {0} lon: {1}";
-	private static final String FORMAT_GEOPOINT_SIMPLE = "{0} {1}";
+	private static final String FORMAT_GEOPOINT_SIMPLE = "{0, number, " + POINT_ACCURACY + "} {1, number, " + POINT_ACCURACY + "}";
 
 	public static String format(IGeoPoint geoPoint) {
 		return MessageFormat.format(FORMAT_GEOPOINT, geoPoint.getLatitude(), geoPoint.getLongitude());
