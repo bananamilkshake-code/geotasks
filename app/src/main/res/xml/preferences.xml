@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="@string/pref_is_geolistening_enabled"
+        android:title="@string/pref_title_geo_listening"
+        android:summary="@string/pref_hint_geo_listening"
+        android:defaultValue="false" />
+
+</PreferenceScreen>

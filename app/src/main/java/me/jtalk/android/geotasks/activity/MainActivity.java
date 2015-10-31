@@ -29,7 +29,9 @@ import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
-public class MainActivity extends BaseActivity {
+import static me.jtalk.android.geotasks.R.string.pref_is_geolistening_enabled;
+
+public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 	private static final Logger LOG = LoggerFactory.getLogger(MainActivity.class);
 
 	private static final int LOADER_EVENTS_ID = 0;
@@ -79,6 +81,13 @@ public class MainActivity extends BaseActivity {
 				.show();
 	}
 
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if (key == getString(R.string.pref_is_geolistening_enabled)) {
+			processChain(toggleGeoListenChain);
+		}
+	}
+
 	/**
 	 * This method is called on menu.menu_action_enable_geolistening click.
 	 *
@@ -109,6 +118,17 @@ public class MainActivity extends BaseActivity {
 	}
 
 	/**
+	 * This method is called on menu.menu_action_settings click.
+	 *
+	 * @param menuItem
+	 * @return
+	 */
+	public boolean openSettingsActivity(MenuItem menuItem) {
+		startActivity(new Intent(this, SettingsActivity.class));
+		return true;
+	}
+
+	/**
 	 * Retrieve calendar id in Calendar Provider that contains information about events.
 	 * Calendar id is kept in Settings storage. In no calendar had been used (application
 	 * started for the first time) new calendar will be created and used (it's id will be returned).
@@ -120,7 +140,7 @@ public class MainActivity extends BaseActivity {
 	private long getCalendarId() throws SecurityException {
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
 
-		long calendarId = settings.getLong(Settings.CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
+		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		if (calendarId != EventsSource.DEFAULT_CALENDAR) {
 			return calendarId;
 		}
@@ -130,7 +150,7 @@ public class MainActivity extends BaseActivity {
 		calendarId = new CalendarsSource(this).addCalendar();
 
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putLong(Settings.CALENDAR_ID, calendarId);
+		editor.putLong(getString(R.string.pref_calendar_id), calendarId);
 		editor.commit();
 
 		return calendarId;

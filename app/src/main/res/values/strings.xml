@@ -31,4 +31,7 @@
     <string name="action_enable_geo_listening">Enable geolistening</string>
     <string name="toast_geolistening_disnabled">Geo listening disabled</string>
     <string name="toast_geolistening_enabled">Geo listening enabled</string>
+    <string name="pref_title_geo_listening">Enable geo listening</string>
+    <string name="pref_hint_geo_listening">Track current location to check events occurence</string>
+    <string name="title_activity_label_settings">Settings</string>
 </resources>
