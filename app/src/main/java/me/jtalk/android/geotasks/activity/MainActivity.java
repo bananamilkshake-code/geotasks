@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CursorAdapter;
@@ -52,8 +53,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		processChain(initChain);
 
-		SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+		PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean toggleGeoListeningClick(MenuItem menuItem) {
 		boolean isChecked = !menuItem.isChecked();
 
-		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putBoolean(getString(pref_is_geolistening_enabled), isChecked);
 		editor.commit();
@@ -139,7 +139,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * permission to create calendars is not granted.
 	 */
 	private long getCalendarId() throws SecurityException {
-		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		if (calendarId != EventsSource.DEFAULT_CALENDAR) {
@@ -196,7 +196,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	}
 
 	private void toggleGeoListening() throws SecurityException {
-		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean isEnabled = settings.getBoolean(getString(R.string.pref_is_geolistening_enabled), Settings.DEFAULT_GEO_LISTENING);
 
 		if (locationListener.tryToggle(isEnabled)) {
