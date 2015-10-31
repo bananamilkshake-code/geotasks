@@ -8,8 +8,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
@@ -19,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.List;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.EventsSource;
@@ -27,8 +33,13 @@ import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 
-public class AddEventActivity extends BaseActivity {
+public class AddEventActivity extends BaseActivity implements Validator.ValidationListener {
 	private static final Logger LOG = LoggerFactory.getLogger(AddEventActivity.class);
+
+	private Validator validator;
+
+	@NotEmpty
+	private EditText titleText;
 
 	private TasksChain<PermissionDependentTask> addEventChain;
 	private TasksChain<PermissionDependentTask> openLocationPickActivityChain;
@@ -37,6 +48,11 @@ public class AddEventActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_event);
+
+		titleText = (EditText) findViewById(R.id.add_event_name_text);
+
+		validator = new Validator(this);
+		validator.setValidationListener(this);
 
 		addEventChain = new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR));
@@ -77,13 +93,29 @@ public class AddEventActivity extends BaseActivity {
 		Toast.makeText(this, R.string.toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 	}
 
+	@Override
+	public void onValidationSucceeded() {
+		processChain(addEventChain);
+	}
+
+	@Override
+	public void onValidationFailed(List<ValidationError> errors) {
+		for (ValidationError validationError : errors) {
+			View view = validationError.getView();
+
+			if (view == titleText) {
+				titleText.setError(getString(R.string.add_event_title_text_error));
+			}
+		}
+	}
+
 	/**
 	 * This method is called on menu_add_event.menu_action_add_event_save click.
 	 *
 	 * @param menuItem
 	 */
 	public void onAddCalendarClick(MenuItem menuItem) {
-		processChain(addEventChain);
+		validator.validate();
 	}
 
 	/**
@@ -156,7 +188,6 @@ public class AddEventActivity extends BaseActivity {
 	}
 
 	private void addEvent() {
-		TextView titleText = (TextView) findViewById(R.id.add_event_name_text);
 		TextView descriptionText = (TextView) findViewById(R.id.add_event_description_text);
 		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 
