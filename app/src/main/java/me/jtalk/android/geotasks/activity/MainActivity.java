@@ -195,6 +195,13 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		locationListener.setEventsSource(eventsSource);
 	}
 
+	/**
+	 * Enables or disables geo listening based on value stored in shared preferences
+	 * (pref_is_geolistening_enabled).
+	 *
+	 * @throws SecurityException if geolistening cannot be enabled because permission
+	 * is denied.
+	 */
 	private void toggleGeoListening() throws SecurityException {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean isEnabled = settings.getBoolean(getString(R.string.pref_is_geolistening_enabled), Settings.DEFAULT_GEO_LISTENING);
