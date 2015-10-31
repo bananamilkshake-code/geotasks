@@ -8,12 +8,17 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lombok.NoArgsConstructor;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.EventsSource;
 
 @NoArgsConstructor
 public class EventsLocationListener implements LocationListener {
+	private static final Logger LOG = LoggerFactory.getLogger(EventsLocationListener.class);
+
 	public static final long MIN_TIME = 0;
 	public static final float MIN_DISTANCE = 0;
 
@@ -67,6 +72,8 @@ public class EventsLocationListener implements LocationListener {
 		menuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
 
 		Toast.makeText(context, R.string.toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
+
+		LOG.debug("Geo listening enabled");
 	}
 
 	private void onDisabled(Context context)  throws SecurityException {
@@ -76,6 +83,8 @@ public class EventsLocationListener implements LocationListener {
 		menuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
 
 		Toast.makeText(context, R.string.toast_geolistening_disnabled, Toast.LENGTH_SHORT).show();
+
+		LOG.debug("Geo listening disabled");
 	}
 
 	public void setEventsSource(EventsSource eventsSource) {
