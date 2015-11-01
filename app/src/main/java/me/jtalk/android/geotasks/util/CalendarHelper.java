@@ -32,17 +32,25 @@ public class CalendarHelper {
 	}
 
 	/**
-	 * Wrapper method to get field value from cursor.
+	 * Wrapper method to get long field value from cursor.
 	 *
 	 * @param cursor cursor to retrieve value from
 	 * @param field field to retrieve value from
 	 * @return value of the field in cursor
-	 * @see Cursor.getLong()
+	 * @see Cursor#getLong
 	 */
 	public static Long getLong(Cursor cursor, String field) {
 		return cursor.getLong(cursor.getColumnIndex(field));
 	}
 
+	/**
+	 * Wrapper method to get string field value from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field field to retrieve value from
+	 * @return value of the field in cursor
+	 * @see Cursor#getString
+	 */
 	public static String getString(Cursor cursor, String field) {
 		return cursor.getString(cursor.getColumnIndex(field));
 	}
