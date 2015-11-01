@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.provider.CalendarContract.Events;
 import android.widget.CursorAdapter;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,9 @@ import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.util.CalendarHelper;
 
+import static java.lang.String.format;
+import static me.jtalk.android.geotasks.util.GeoPointFormat.POINT_ACCURACY;
+
 public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	public static final Logger LOG = LoggerFactory.getLogger(EventsSource.class);
 
@@ -32,24 +37,51 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	public static final Calendar EMPTY_TIME = null;
 
+	/**
+	 * First argument - value range in location string value
+	 * Second argument - column name
+	 */
+	private static final String QUERY_COORDINATES_FORMAT =
+			"(CASE WHEN " + Events.EVENT_LOCATION + " IS NOT NULL " +
+					"OR length(" + Events.EVENT_LOCATION + ") = 0 " +
+			"THEN CAST(substr(" + Events.EVENT_LOCATION + ", %s) AS REAL) " +
+			"ELSE NULL END)" +
+			"AS %s";
+
+	private static final String EVENT_LATITUDE = "latitude";
+	private static final String EVENT_LONGITUDE = "longitude";
+
 	private Context context;
 	private CursorAdapter eventsAdapter;
 
 	private long calendarId;
 
-	private static final String[] PROJECTION_EVENTS = new String[]{
+	private static final String[] PROJECTION_EVENTS = new String[] {
 			Events._ID,
 			Events.CALENDAR_ID,
 			Events.TITLE,
 			Events.DESCRIPTION,
 			Events.EVENT_LOCATION,
-			Events.DTSTART
+			Events.DTSTART,
+			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY.length()), EVENT_LATITUDE),
+			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY.length()), EVENT_LONGITUDE)
 	};
 
+	/**
+	 * Exracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
+	 * and creates Event object from it.
+	 *
+	 * @param cursor
+	 * @return Event object that was created from retrieved data.
+	 */
 	public static Event extractEvent(Cursor cursor) {
+		String title = CalendarHelper.getString(cursor, Events.TITLE);
+		String startTimeText = getTimeText(cursor, Events.DTSTART);
+		IGeoPoint geoPoint = getGeoPoint(cursor);
 		return new Event(
-				CalendarHelper.getString(cursor, Events.TITLE),
-				getTimeText(cursor, Events.DTSTART));
+				title,
+				startTimeText,
+				geoPoint);
 	}
 
 	/**
@@ -69,6 +101,24 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeInMillis);
 		return DateFormat.getDateTimeInstance().format(calendar.getTime());
+	}
+
+	/**
+	 * Retrieves location coordinates where event, which data is stored in current cursor,
+	 * must occur. If no location coordinates had been set null will be returned.
+	 *
+	 * @param cursor
+	 * @return IGeoPoint object that contains information about longitude and latitude. Returns
+	 * null if location for event has not been set.
+	 */
+	private static IGeoPoint getGeoPoint(Cursor cursor) {
+		if (CalendarHelper.getString(cursor, Events.EVENT_LOCATION).isEmpty()) {
+			return null;
+		}
+
+		double lat = CalendarHelper.getDouble(cursor, EVENT_LATITUDE);
+		double lon = CalendarHelper.getDouble(cursor, EVENT_LONGITUDE);
+		return new GeoPoint(lat, lon);
 	}
 
 	public EventsSource(Context context, CursorAdapter eventsAdapter, long calendarId) {

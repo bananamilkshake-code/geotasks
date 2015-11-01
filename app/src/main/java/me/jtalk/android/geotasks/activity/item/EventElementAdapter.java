@@ -8,9 +8,13 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
+
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.GeoPointFormat;
 
 public class EventElementAdapter extends CursorAdapter {
 	public EventElementAdapter(Context context) {
@@ -19,7 +23,7 @@ public class EventElementAdapter extends CursorAdapter {
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		return inflater.inflate(R.layout.item_event, parent, false);
 	}
 
@@ -27,10 +31,11 @@ public class EventElementAdapter extends CursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
 		TextView timeView = (TextView) view.findViewById(R.id.event_element_time);
+		TextView locationView = (TextView) view.findViewById(R.id.event_element_location);
 
 		Event event = EventsSource.extractEvent(cursor);
-
 		titleView.setText(event.getTitle());
 		timeView.setText(event.getStartTimeText());
+		locationView.setText(event.getLocationText());
 	}
 }

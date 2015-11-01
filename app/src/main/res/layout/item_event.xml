@@ -15,6 +15,15 @@
         android:text="Event title" />
 
     <TextView
+        android:id="@+id/event_element_location"
+        android:textColor="@android:color/secondary_text_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/event_element_title"
+        android:layout_alignLeft="@+id/event_element_title"
+        android:text="lon: 34.234 lat: 45.00" />
+
+    <TextView
         android:id="@+id/event_element_time"
         android:textColor="@android:color/secondary_text_light"
         android:layout_width="wrap_content"
@@ -33,5 +42,5 @@
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_alarm_on_black_48dp"
         android:contentDescription="@string/event_element_reminder_toggler_desc"/>
-    
+
 </RelativeLayout>
