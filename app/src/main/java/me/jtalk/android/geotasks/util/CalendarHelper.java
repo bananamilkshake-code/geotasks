@@ -39,7 +39,7 @@ public class CalendarHelper {
 	 * @return value of the field in cursor
 	 * @see Cursor#getLong
 	 */
-	public static Long getLong(Cursor cursor, String field) {
+	public static long getLong(Cursor cursor, String field) {
 		return cursor.getLong(cursor.getColumnIndex(field));
 	}
 
