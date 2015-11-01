@@ -1,17 +1,18 @@
 package me.jtalk.android.geotasks.source;
 
+import org.osmdroid.api.IGeoPoint;
+
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
 public class Event {
+	@Getter
 	private String title;
-	private String startTime;
 
-	public String getTitle() {
-		return title;
-	}
+	@Getter
+	private String startTimeText;
 
-	public String getStartTimeText() {
-		return startTime;
-	}
+	@Getter
+	private IGeoPoint geoPoint;
 }
