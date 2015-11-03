@@ -30,6 +30,7 @@ public class EventsLocationListener implements LocationListener {
 	public static final long MIN_TIME = 0;
 	public static final float MIN_DISTANCE = 0;
 
+	@Setter(onParam = @__(@NonNull))
 	private EventsSource eventsSource;
 
 	@Setter(onParam = @__(@NonNull))
@@ -44,6 +45,7 @@ public class EventsLocationListener implements LocationListener {
 	/**
 	 * MenuItem that toggles geo location listening.
 	 */
+	@Setter(onParam = @__(@NonNull))
 	private MenuItem menuItem;
 
 	private boolean isEnabled = false;
@@ -77,10 +79,6 @@ public class EventsLocationListener implements LocationListener {
 
 	@Override
 	public void onProviderDisabled(String provider) {
-	}
-
-	public void setMenuItem(MenuItem menuItem) {
-		this.menuItem = menuItem;
 	}
 
 	public void toggleGeoListening(Context context) throws SecurityException {
@@ -117,10 +115,6 @@ public class EventsLocationListener implements LocationListener {
 		Toast.makeText(context, R.string.toast_geolistening_disnabled, Toast.LENGTH_SHORT).show();
 
 		LOG.debug("Geo listening disabled");
-	}
-
-	public void setEventsSource(EventsSource eventsSource) {
-		this.eventsSource = eventsSource;
 	}
 
 	public boolean tryToggle(boolean enabled) {
