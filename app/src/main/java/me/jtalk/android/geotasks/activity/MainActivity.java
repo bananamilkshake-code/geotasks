@@ -21,6 +21,7 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.location.EventsLocationListener;
+import me.jtalk.android.geotasks.location.Notifier;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
@@ -36,7 +37,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private TasksChain<PermissionDependentTask> initChain;
 	private TasksChain<PermissionDependentTask> toggleGeoListenChain;
 
-	private EventsLocationListener locationListener = new EventsLocationListener();
+	private EventsLocationListener locationListener;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		setContentView(R.layout.activity_main);
 
 		initChain = new TasksChain<PermissionDependentTask>()
+				.add(makeTask(this::createLocationListener))
 				.add(makeTask(this::getCalendarId, Manifest.permission.WRITE_CALENDAR))
 				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR))
 				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR));
@@ -127,6 +129,12 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean openSettingsActivity(MenuItem menuItem) {
 		startActivity(new Intent(this, SettingsActivity.class));
 		return true;
+	}
+
+	private void createLocationListener() {
+		locationListener = new EventsLocationListener();
+		locationListener.setDistanceToAlarm(Settings.DEFAULT_DISTANCE_TO_ALARM);
+		locationListener.setNotifier(new Notifier(this));
 	}
 
 	/**

@@ -9,4 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Settings {
 	public static final boolean DEFAULT_GEO_LISTENING = false;
+
+	/**
+	 * Default value of distance to event location when reminder must be enabled.
+	 */
+	public static final float DEFAULT_DISTANCE_TO_ALARM = 100;
 }

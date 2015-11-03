@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.util.CalendarHelper;
@@ -160,8 +162,8 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	 * @param title
 	 * @param description
 	 * @param location
-	 * @param startTime event start time. This value can be null if start time is not set.
-	 * @param endTime event end time. This value can be null if start time is not set.
+	 * @param startTime   event start time. This value can be null if start time is not set.
+	 * @param endTime     event end time. This value can be null if start time is not set.
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
 	public void addEvent(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
@@ -200,5 +202,46 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	 */
 	private static long getMillis(Calendar time) {
 		return (time != EMPTY_TIME) ? time.getTimeInMillis() : DEFAULT_TIME_VALUE;
+	}
+
+	private final String NEAR_EVENTS_SELECTION = Events.CALENDAR_ID + " = ? AND " +
+			Events.EVENT_LOCATION + " IS NOT NULL AND " +
+			"length(" + Events.EVENT_LOCATION + ") <> 0 AND " +
+			Events.DTSTART + " >= ? AND " +
+			Events.DTEND + " < ?";
+
+	public static String[] buildSelectionArgsForNearEvents(long calendarId, Calendar currentTime) {
+		return new String[]{
+				String.valueOf(calendarId),
+				String.valueOf(currentTime.getTimeInMillis()),
+				String.valueOf(currentTime.getTimeInMillis())
+		};
+	}
+
+	/**
+	 * Selects events that must happen around current time or which time
+	 * is not set.
+	 *
+	 * @param currentTime time to check events occurance
+	 * @return list of selected events
+	 * @throws SecurityException
+	 */
+	public List<Event> getActive(Calendar currentTime) throws SecurityException {
+		String[] selectionArgs = buildSelectionArgsForNearEvents(calendarId, currentTime);
+
+		Cursor cursor = context.getContentResolver().query(
+				Events.CONTENT_URI,
+				PROJECTION_EVENTS,
+				NEAR_EVENTS_SELECTION,
+				selectionArgs,
+				null);
+
+		List<Event> events = new ArrayList<>();
+		while (!cursor.isAfterLast()) {
+			events.add(extractEvent(cursor));
+			cursor.moveToNext();
+		}
+
+		return events;
 	}
 }

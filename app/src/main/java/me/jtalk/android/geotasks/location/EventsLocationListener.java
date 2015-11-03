@@ -5,14 +5,22 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.osmdroid.api.IGeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
+import java.util.List;
+
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.application.Settings;
+import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 
 @NoArgsConstructor
@@ -24,6 +32,15 @@ public class EventsLocationListener implements LocationListener {
 
 	private EventsSource eventsSource;
 
+	@Setter(onParam = @__(@NonNull))
+	private Notifier notifier;
+
+	/**
+	 * Distance between to event location when reminder must be enabled.
+	 */
+	@Setter
+	private float distanceToAlarm = Settings.DEFAULT_DISTANCE_TO_ALARM;
+
 	/**
 	 * MenuItem that toggles geo location listening.
 	 */
@@ -33,6 +50,21 @@ public class EventsLocationListener implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
+		Calendar currentTime = Calendar.getInstance();
+		List<Event> events = eventsSource.getActive(currentTime);
+
+		for (Event event : events) {
+			IGeoPoint eventLocation = event.getGeoPoint();
+			float[] result = new float[]{};
+			Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+					eventLocation.getLatitude(), eventLocation.getLongitude(),
+					result);
+
+			double distance = result[0];
+			if (distance <= distanceToAlarm) {
+				notifier.onEventIsNear(event);
+			}
+		}
 	}
 
 	@Override
