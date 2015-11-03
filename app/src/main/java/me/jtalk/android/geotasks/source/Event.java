@@ -1,14 +1,16 @@
 package me.jtalk.android.geotasks.source;
 
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.util.GeoPoint;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.util.GeoPointFormat;
 
-@AllArgsConstructor
+@AllArgsConstructor()
 public class Event {
+	@Getter
+	private long id;
+
 	@Getter
 	private String title;
 
@@ -24,5 +26,18 @@ public class Event {
 		}
 
 		return GeoPointFormat.format(geoPoint);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		if (obj instanceof Event) {
+			return this.id == ((Event) obj).getId();
+		}
+
+		return false;
 	}
 }

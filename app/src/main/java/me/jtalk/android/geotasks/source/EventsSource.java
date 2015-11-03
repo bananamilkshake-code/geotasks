@@ -75,13 +75,11 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	 * @return Event object that was created from retrieved data.
 	 */
 	public static Event extractEvent(Cursor cursor) {
+		long id = CalendarHelper.getLong(cursor, Events._ID);
 		String title = CalendarHelper.getString(cursor, Events.TITLE);
 		String startTimeText = getTimeText(cursor, Events.DTSTART);
 		IGeoPoint geoPoint = getGeoPoint(cursor);
-		return new Event(
-				title,
-				startTimeText,
-				geoPoint);
+		return new Event(id, title, startTimeText, geoPoint);
 	}
 
 	/**

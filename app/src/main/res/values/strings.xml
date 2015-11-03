@@ -20,7 +20,7 @@
     <string name="add_event_time_field">Time</string>
     <string name="event_element_reminder_toggler_desc">Reminder toggler</string>
     <string name="add_event_timezone_spinner">Choose timezone</string>
-    <string name="add_event_locaion_text">Location</string>
+    <string name="add_event_location_text">Location</string>
     <string name="toast_calendar_no_write_permission">Cannot add an event. Enable calendar permissions in application settings.</string>
     <string name="toast_event_creation_no_permission">Event creation is not permitted.</string>
     <string name="dialog_no_permission_for_calendar_creation_title">No permission</string>
@@ -35,4 +35,6 @@
     <string name="pref_hint_geo_listening">Track current location to check events occurrence</string>
     <string name="title_activity_label_settings">Settings</string>
     <string name="add_event_title_text_error">Title required</string>
+    <string name="notification_event_is_near_title_arg_1">{} is near</string>
+    <string name="notification_event_is_near_text_arg_1">Event location: {}</string>
 </resources>
