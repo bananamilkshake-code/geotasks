@@ -59,8 +59,8 @@ public class EventsSource {
 			Events.DESCRIPTION,
 			Events.EVENT_LOCATION,
 			Events.DTSTART,
-			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY.length()), EVENT_LATITUDE),
-			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY.length()), EVENT_LONGITUDE)
+			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), EVENT_LATITUDE),
+			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), EVENT_LONGITUDE)
 	};
 
 	/**
