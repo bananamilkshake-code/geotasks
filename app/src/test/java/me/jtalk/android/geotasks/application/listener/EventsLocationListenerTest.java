@@ -1,4 +1,4 @@
-package me.jtalk.android.geotasks.me.jtalk.android.application.listener;
+package me.jtalk.android.geotasks.application.listener;
 
 import android.location.Location;
 
