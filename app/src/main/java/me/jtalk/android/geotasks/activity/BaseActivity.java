@@ -2,12 +2,9 @@ package me.jtalk.android.geotasks.activity;
 
 import android.app.Activity;
 import android.os.Build;
-import android.util.Log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.application.GeoTasksApplication;
 import me.jtalk.android.geotasks.source.EventsSource;

@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract.Events;
 
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

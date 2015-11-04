@@ -1,6 +1,5 @@
 package me.jtalk.android.geotasks;
 
-import android.app.Application;
 import android.test.ApplicationTestCase;
 
 import me.jtalk.android.geotasks.application.GeoTasksApplication;

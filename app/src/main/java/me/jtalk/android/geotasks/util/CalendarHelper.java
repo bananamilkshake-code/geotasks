@@ -2,14 +2,10 @@ package me.jtalk.android.geotasks.util;
 
 import android.database.Cursor;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-
 import static me.jtalk.android.geotasks.util.Assert.*;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import me.jtalk.android.geotasks.source.EventsSource;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CalendarHelper {

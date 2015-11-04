@@ -1,6 +1,5 @@
 package me.jtalk.android.geotasks.source;
 
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 
 import lombok.AllArgsConstructor;

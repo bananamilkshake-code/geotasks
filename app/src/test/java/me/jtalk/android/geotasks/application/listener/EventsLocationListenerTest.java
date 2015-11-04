@@ -3,10 +3,8 @@ package me.jtalk.android.geotasks.application.listener;
 import android.location.Location;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.osmdroid.util.GeoPoint;
-import org.robolectric.RobolectricGradleTestRunner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
