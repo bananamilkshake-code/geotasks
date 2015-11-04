@@ -1,10 +1,12 @@
 package me.jtalk.android.geotasks.me.jtalk.android.application.listener;
 
 import android.location.Location;
-import android.test.InstrumentationTestCase;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.osmdroid.util.GeoPoint;
+import org.robolectric.RobolectricGradleTestRunner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,12 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public class EventsLocationListenerTest extends InstrumentationTestCase {
-	@Override
-	public void setUp() throws Exception {
-		System.setProperty("dexmaker.dexcache", getInstrumentation().getTargetContext().getCacheDir().getPath());
-	}
+public class EventsLocationListenerTest {
 
+	@Test
 	public void testNearLocationChoose() {
 		Event event1 = new Event(1, "Event1", "Time1", new GeoPoint(0.0, 0.0));
 		Event event2 = new Event(2, "Event2", "Time2", new GeoPoint(55.63947, 27.03267));

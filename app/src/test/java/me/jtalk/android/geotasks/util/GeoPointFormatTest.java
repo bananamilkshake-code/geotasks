@@ -1,11 +1,12 @@
 package me.jtalk.android.geotasks.util;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.osmdroid.util.GeoPoint;
 
-public class GeoPointFormatTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class GeoPointFormatTest {
+
 	@Test
 	public void testFormat() {
 		double lat = 42.345678345345;
