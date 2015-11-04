@@ -1,4 +1,4 @@
-package me.jtalk.android.geotasks.location;
+package me.jtalk.android.geotasks.application;
 
 import android.annotation.TargetApi;
 import android.app.Notification;

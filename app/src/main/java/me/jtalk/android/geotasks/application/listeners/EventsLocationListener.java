@@ -1,4 +1,4 @@
-package me.jtalk.android.geotasks.location;
+package me.jtalk.android.geotasks.application.listeners;
 
 import android.content.Context;
 import android.location.Location;
@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Settings;
+import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 
