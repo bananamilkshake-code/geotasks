@@ -27,6 +27,7 @@ import me.jtalk.android.geotasks.util.GeoPointFormat;
 
 public class LocationPickActivity extends Activity {
 	private static final GeoPoint DEFAULT_GEOPOINT = new GeoPoint(48.8583, 2, 2944);
+	private static final int DEFAULT_ZOOM = 9;
 
 	public static final int INTENT_LOCATION_PICK = 0;
 
@@ -101,7 +102,7 @@ public class LocationPickActivity extends Activity {
 
 		IGeoPoint startPoint = extractStartGeoPoint(getIntent());
 		IMapController mapController = mapView.getController();
-		mapController.setZoom(9);
+		mapController.setZoom(DEFAULT_ZOOM);
 		mapController.setCenter(startPoint);
 	}
 
