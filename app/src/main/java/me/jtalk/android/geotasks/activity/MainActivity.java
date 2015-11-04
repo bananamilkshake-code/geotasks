@@ -22,6 +22,7 @@ import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.location.EventsLocationListener;
 import me.jtalk.android.geotasks.location.Notifier;
+import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
@@ -196,11 +197,12 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		EventsSource eventsSource = new EventsSource(this, eventsAdapter, calendarId);
 
-		getLoaderManager().initLoader(LOADER_EVENTS_ID, null, eventsSource);
-
 		setEventsSource(eventsSource);
 
 		locationListener.setEventsSource(eventsSource);
+
+		getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
+				new TasksLoaderCallbacks(this, eventsAdapter, calendarId));
 	}
 
 	/**

@@ -1,17 +1,13 @@
 package me.jtalk.android.geotasks.source;
 
 import android.Manifest;
-import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.provider.CalendarContract.Events;
 import android.widget.CursorAdapter;
 
@@ -31,7 +27,7 @@ import me.jtalk.android.geotasks.util.CalendarHelper;
 import static java.lang.String.format;
 import static me.jtalk.android.geotasks.util.GeoPointFormat.POINT_ACCURACY;
 
-public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EventsSource {
 	public static final Logger LOG = LoggerFactory.getLogger(EventsSource.class);
 
 	public static final long DEFAULT_CALENDAR = -1;
@@ -54,11 +50,10 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 	private static final String EVENT_LONGITUDE = "longitude";
 
 	private Context context;
-	private CursorAdapter eventsAdapter;
 
 	private long calendarId;
 
-	private static final String[] PROJECTION_EVENTS = new String[] {
+	public static final String[] PROJECTION_EVENTS = new String[] {
 			Events._ID,
 			Events.CALENDAR_ID,
 			Events.TITLE,
@@ -129,31 +124,9 @@ public class EventsSource implements LoaderManager.LoaderCallbacks<Cursor> {
 		}
 
 		this.context = context;
-		this.eventsAdapter = eventsAdapter;
 		this.calendarId = calendarId;
 
 		LOG.debug("EventSource {} is created for context {}", this, context);
-	}
-
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		LOG.debug("EventsSource created loader for {} calendar", calendarId);
-
-		String selection = CalendarHelper.buildProjection(Events.CALENDAR_ID);
-		String[] selectionArgs = new String[]{String.valueOf(calendarId)};
-
-		return new CursorLoader(context, Events.CONTENT_URI,
-				PROJECTION_EVENTS, selection, selectionArgs, null);
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		eventsAdapter.swapCursor(data);
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
-		eventsAdapter.swapCursor(null);
 	}
 
 	/**
