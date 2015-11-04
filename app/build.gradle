@@ -26,15 +26,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.google.guava:guava:18.0"
-    compile 'com.android.support:support-annotations:23.0.0'
-
-    provided "org.projectlombok:lombok:1.16.6"
-    apt "org.projectlombok:lombok:1.16.6"
-
-    compile 'org.osmdroid:osmdroid-android:4.3'
-    compile 'org.slf4j:slf4j-android:1.7.12'
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.android.support:support-annotations:23.0.1'
     compile 'com.mobsandgeeks:android-saripaar:2.0.3'
+    compile 'org.osmdroid:osmdroid-android:4.3'
+    compile 'org.slf4j:slf4j-simple:1.7.12'
 
+    provided 'org.projectlombok:lombok:1.16.6'
+    apt 'org.projectlombok:lombok:1.16.6'
 }
