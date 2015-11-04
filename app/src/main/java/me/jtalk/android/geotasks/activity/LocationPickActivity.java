@@ -131,12 +131,12 @@ public class LocationPickActivity extends Activity {
 		updateCurrentLocation(pickedLocation);
 	}
 
-	private void updateCurrentLocation(IGeoPoint pickedLocation) {
-		textLocationCoordinates.setText(GeoPointFormat.format(pickedLocation));
+	private void updateCurrentLocation(IGeoPoint location) {
+		textLocationCoordinates.setText(GeoPointFormat.format(location));
 		textLocationCoordinates.setVisibility(View.VISIBLE);
 
 		ArrayList<OverlayItem> items = new ArrayList<>();
-		items.add(new OverlayItem(null, null, pickedLocation));
+		items.add(new OverlayItem(null, null, location));
 
 		List<Overlay> overlays = mapView.getOverlays();
 		overlays.clear();
