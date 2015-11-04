@@ -116,7 +116,7 @@ public class EventsSource {
 		return new GeoPoint(lat, lon);
 	}
 
-	public EventsSource(Context context, CursorAdapter eventsAdapter, long calendarId) {
+	public EventsSource(Context context, long calendarId) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (context.checkSelfPermission(Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
 				throw new SecurityException("No permission to write calendar");

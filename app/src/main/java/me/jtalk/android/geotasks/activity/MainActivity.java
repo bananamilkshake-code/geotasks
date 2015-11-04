@@ -192,15 +192,14 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private void initEventsSource() {
 		long calendarId = getCalendarId();
 
-		ListView eventsList = (ListView) findViewById(R.id.events_list);
-		CursorAdapter eventsAdapter = (CursorAdapter) eventsList.getAdapter();
-
-		EventsSource eventsSource = new EventsSource(this, eventsAdapter, calendarId);
+		EventsSource eventsSource = new EventsSource(this, calendarId);
 
 		setEventsSource(eventsSource);
 
 		locationListener.setEventsSource(eventsSource);
 
+		ListView eventsList = (ListView) findViewById(R.id.events_list);
+		CursorAdapter eventsAdapter = (CursorAdapter) eventsList.getAdapter();
 		getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
 				new TasksLoaderCallbacks(this, eventsAdapter, calendarId));
 	}
