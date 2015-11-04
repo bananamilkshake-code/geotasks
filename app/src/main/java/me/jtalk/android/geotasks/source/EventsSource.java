@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract.Events;
-import android.widget.CursorAdapter;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
