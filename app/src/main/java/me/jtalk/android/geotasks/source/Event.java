@@ -1,6 +1,7 @@
 package me.jtalk.android.geotasks.source;
 
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class Event {
 	private String startTimeText;
 
 	@Getter
-	private IGeoPoint geoPoint;
+	private GeoPoint geoPoint;
 
 	public String getLocationText() {
 		if (geoPoint == null) {

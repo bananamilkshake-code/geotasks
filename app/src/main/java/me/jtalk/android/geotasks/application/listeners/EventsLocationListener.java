@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.GeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,16 +54,11 @@ public class EventsLocationListener implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		Calendar currentTime = Calendar.getInstance();
+		GeoPoint currentGeoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
 		List<Event> events = eventsSource.getActive(currentTime);
 
 		for (Event event : events) {
-			IGeoPoint eventLocation = event.getGeoPoint();
-			float[] result = new float[]{0};
-			Location.distanceBetween(location.getLatitude(), location.getLongitude(),
-					eventLocation.getLatitude(), eventLocation.getLongitude(),
-					result);
-
-			double distance = result[0];
+			double distance = event.getGeoPoint().distanceTo(currentGeoPoint);
 			if (distance <= distanceToAlarm) {
 				notifier.onEventIsNear(event);
 			}

@@ -74,7 +74,7 @@ public class EventsSource {
 		long id = CalendarHelper.getLong(cursor, Events._ID);
 		String title = CalendarHelper.getString(cursor, Events.TITLE);
 		String startTimeText = getTimeText(cursor, Events.DTSTART);
-		IGeoPoint geoPoint = getGeoPoint(cursor);
+		GeoPoint geoPoint = getGeoPoint(cursor);
 		return new Event(id, title, startTimeText, geoPoint);
 	}
 
@@ -105,7 +105,7 @@ public class EventsSource {
 	 * @return IGeoPoint object that contains information about longitude and latitude. Returns
 	 * null if location for event has not been set.
 	 */
-	private static IGeoPoint getGeoPoint(Cursor cursor) {
+	private static GeoPoint getGeoPoint(Cursor cursor) {
 		if (CalendarHelper.getString(cursor, Events.EVENT_LOCATION).isEmpty()) {
 			return null;
 		}
