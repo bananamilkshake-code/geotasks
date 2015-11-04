@@ -38,7 +38,6 @@ public class LocationPickActivity extends Activity {
 	private MapView mapView;
 	private IGeoPoint pickedLocation;
 
-	private TextView textLocationName;
 	private TextView textLocationCoordinates;
 
 	@Override
@@ -47,7 +46,6 @@ public class LocationPickActivity extends Activity {
 		setContentView(R.layout.activity_location_pick);
 
 		textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
-		textLocationName = (TextView) findViewById(R.id.location_name);
 
 		initMapView();
 	}
