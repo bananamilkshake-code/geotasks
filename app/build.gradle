@@ -34,4 +34,9 @@ dependencies {
 
     provided 'org.projectlombok:lombok:1.16.6'
     apt 'org.projectlombok:lombok:1.16.6'
+
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
