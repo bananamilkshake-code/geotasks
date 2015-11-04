@@ -1,19 +1,18 @@
 package me.jtalk.android.geotasks.util;
 
-import android.test.suitebuilder.annotation.SmallTest;
+import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.osmdroid.util.GeoPoint;
 
-import static junit.framework.Assert.assertEquals;
-
-public class GeoPointFormatTest {
-	@SmallTest
+public class GeoPointFormatTest extends TestCase {
+	@Test
 	public void testFormat() {
-		double lat = 2.345678;
-		double lon = 1.234567;
+		double lat = 42.345678345345;
+		double lon = 41.234;
 
-		String result = GeoPointFormat.formatSimple(new GeoPoint(lat,lon));
+		String result = GeoPointFormat.formatSimple(new GeoPoint(lat, lon));
 
-		assertEquals("2.345678 1.234567", result);
+		assertEquals("042.345678 041.234000", result);
 	}
 }
