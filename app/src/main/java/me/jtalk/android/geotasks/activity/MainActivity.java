@@ -180,7 +180,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 					.setTitle(R.string.dialog_delete_event_title)
 					.setMessage(MessageFormat.format(getString(R.string.dialog_delete_event_text), eventTitle))
 					.setPositiveButton(R.string.dialog_delete_event_yes, (dialog, which) -> {
-						MainActivity.this.getEventsSource().removeEvent(eventId);
+						MainActivity.this.getEventsSource().remove(eventId);
 					})
 					.setNegativeButton(R.string.dialog_delete_event_no, null)
 					.setCancelable(true)

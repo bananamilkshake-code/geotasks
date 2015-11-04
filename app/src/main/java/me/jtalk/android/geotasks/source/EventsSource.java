@@ -40,9 +40,9 @@ public class EventsSource {
 	private static final String QUERY_COORDINATES_FORMAT =
 			"(CASE WHEN " + Events.EVENT_LOCATION + " IS NOT NULL " +
 					"OR length(" + Events.EVENT_LOCATION + ") = 0 " +
-			"THEN CAST(substr(" + Events.EVENT_LOCATION + ", %s) AS REAL) " +
-			"ELSE NULL END)" +
-			"AS %s";
+					"THEN CAST(substr(" + Events.EVENT_LOCATION + ", %s) AS REAL) " +
+					"ELSE NULL END)" +
+					"AS %s";
 
 	private static final String EVENT_LATITUDE = "latitude";
 	private static final String EVENT_LONGITUDE = "longitude";
@@ -51,7 +51,7 @@ public class EventsSource {
 
 	private long calendarId;
 
-	public static final String[] PROJECTION_EVENTS = new String[] {
+	public static final String[] PROJECTION_EVENTS = new String[]{
 			Events._ID,
 			Events.CALENDAR_ID,
 			Events.TITLE,
@@ -97,6 +97,17 @@ public class EventsSource {
 	}
 
 	/**
+	 * Safety retrieves millis from calendar: null calendar means that no time is set
+	 * and {@DEFAULT_TIME_VALUE} must be returned.
+	 *
+	 * @param time
+	 * @return time in milliseconds or @{DEFAULT_TIME_VALUE} if time is null
+	 */
+	private static long getMillis(Calendar time) {
+		return (time != EMPTY_TIME) ? time.getTimeInMillis() : DEFAULT_TIME_VALUE;
+	}
+
+	/**
 	 * Retrieves location coordinates where event, which data is stored in current cursor,
 	 * must occur. If no location coordinates had been set null will be returned.
 	 *
@@ -137,7 +148,7 @@ public class EventsSource {
 	 * @param endTime     event end time. This value can be null if start time is not set.
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
-	public void addEvent(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
+	public void add(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
 		LOG.debug("Inserting new event for calendarId {}", calendarId);
 
 		ContentValues values = new ContentValues();
@@ -159,34 +170,9 @@ public class EventsSource {
 	 *
 	 * @param id event id to remove
 	 */
-	public void removeEvent(long id) {
+	public void remove(long id) {
 		Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
 		this.context.getContentResolver().delete(deleteUri, null, null);
-	}
-
-	/**
-	 * Safety retrieves millis from calendar: null calendar means that no time is set
-	 * and {@DEFAULT_TIME_VALUE} must be returned.
-	 *
-	 * @param time
-	 * @return time in milliseconds or @{DEFAULT_TIME_VALUE} if time is null
-	 */
-	private static long getMillis(Calendar time) {
-		return (time != EMPTY_TIME) ? time.getTimeInMillis() : DEFAULT_TIME_VALUE;
-	}
-
-	private final String NEAR_EVENTS_SELECTION = Events.CALENDAR_ID + " = ? AND " +
-			Events.EVENT_LOCATION + " IS NOT NULL AND " +
-			"length(" + Events.EVENT_LOCATION + ") <> 0 AND " +
-			Events.DTSTART + " >= ? AND " +
-			Events.DTEND + " < ?";
-
-	public static String[] buildSelectionArgsForNearEvents(long calendarId, Calendar currentTime) {
-		return new String[]{
-				String.valueOf(calendarId),
-				String.valueOf(currentTime.getTimeInMillis()),
-				String.valueOf(currentTime.getTimeInMillis())
-		};
 	}
 
 	/**
@@ -214,5 +200,19 @@ public class EventsSource {
 		}
 
 		return events;
+	}
+
+	private final String NEAR_EVENTS_SELECTION = Events.CALENDAR_ID + " = ? AND " +
+			Events.EVENT_LOCATION + " IS NOT NULL AND " +
+			"length(" + Events.EVENT_LOCATION + ") <> 0 AND " +
+			Events.DTSTART + " >= ? AND " +
+			Events.DTEND + " < ?";
+
+	private static String[] buildSelectionArgsForNearEvents(long calendarId, Calendar currentTime) {
+		return new String[]{
+				String.valueOf(calendarId),
+				String.valueOf(currentTime.getTimeInMillis()),
+				String.valueOf(currentTime.getTimeInMillis())
+		};
 	}
 }

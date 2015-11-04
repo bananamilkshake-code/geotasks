@@ -197,7 +197,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		Calendar startTime = this.getStartTime();
 		Calendar endTime = EventsSource.EMPTY_TIME;
 
-		getEventsSource().addEvent(eventTitle, eventDescription, location, startTime, endTime);
+		getEventsSource().add(eventTitle, eventDescription, location, startTime, endTime);
 
 		finish();
 	}
