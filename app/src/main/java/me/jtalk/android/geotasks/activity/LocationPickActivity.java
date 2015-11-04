@@ -128,6 +128,7 @@ public class LocationPickActivity extends Activity {
 
 	private void onLocationPick(IGeoPoint geoPoint) {
 		pickedLocation = geoPoint;
+
 		updateCurrentLocation(pickedLocation);
 	}
 
