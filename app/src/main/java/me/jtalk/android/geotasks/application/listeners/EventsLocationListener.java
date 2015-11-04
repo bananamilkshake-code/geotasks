@@ -58,7 +58,7 @@ public class EventsLocationListener implements LocationListener {
 
 		for (Event event : events) {
 			IGeoPoint eventLocation = event.getGeoPoint();
-			float[] result = new float[]{};
+			float[] result = new float[]{0};
 			Location.distanceBetween(location.getLatitude(), location.getLongitude(),
 					eventLocation.getLatitude(), eventLocation.getLongitude(),
 					result);
