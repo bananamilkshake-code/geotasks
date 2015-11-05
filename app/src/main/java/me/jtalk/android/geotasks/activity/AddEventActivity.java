@@ -16,8 +16,6 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.util.GeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +25,9 @@ import java.util.Calendar;
 import java.util.List;
 
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.GeoPointFormat;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
@@ -183,8 +182,8 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		double longitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, 0.0d);
 		double latitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, 0.0d);
 
-		IGeoPoint geoPoint = new GeoPoint(latitude, longitude);
-		locationText.setText(GeoPointFormat.formatSimple(geoPoint));
+		TaskCoordinates taskCoordinates = new TaskCoordinates(latitude, longitude);
+		locationText.setText(CoordinatesFormat.formatSimple(taskCoordinates));
 	}
 
 	private void addEvent() {
@@ -207,10 +206,10 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		String locationString = locationText.getText().toString();
 		if (!locationString.isEmpty()) {
-			IGeoPoint geoPoint = GeoPointFormat.parse(locationString);
+			TaskCoordinates coordinates = CoordinatesFormat.parse(locationString);
 			intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, geoPoint.getLatitude());
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, geoPoint.getLongitude());
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, coordinates.getLatitude());
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, coordinates.getLongitude());
 		}
 
 		startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);

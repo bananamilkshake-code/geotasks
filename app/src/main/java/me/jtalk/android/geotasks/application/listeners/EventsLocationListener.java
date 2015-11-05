@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import org.osmdroid.util.GeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +20,7 @@ import lombok.Setter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.application.Notifier;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 
@@ -54,11 +54,11 @@ public class EventsLocationListener implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		Calendar currentTime = Calendar.getInstance();
-		GeoPoint currentGeoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+		TaskCoordinates currentCoordinates = new TaskCoordinates(location);
 		List<Event> events = eventsSource.getActive(currentTime);
 
 		for (Event event : events) {
-			double distance = event.getGeoPoint().distanceTo(currentGeoPoint);
+			double distance = event.getCoordinates().distanceTo(currentCoordinates);
 			if (distance <= distanceToAlarm) {
 				notifier.onEventIsNear(event);
 			}

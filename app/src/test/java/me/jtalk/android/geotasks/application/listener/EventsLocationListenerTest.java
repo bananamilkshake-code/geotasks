@@ -4,7 +4,6 @@ import android.location.Location;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,6 +11,7 @@ import java.util.List;
 
 import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 
@@ -25,9 +25,9 @@ public class EventsLocationListenerTest {
 
 	@Test
 	public void testNearLocationChoose() {
-		Event event1 = new Event(1, "Event1", "Time1", new GeoPoint(0.0, 0.0));
-		Event event2 = new Event(2, "Event2", "Time2", new GeoPoint(55.63947, 27.03267));
-		Event event3 = new Event(3, "Event3", "Time3", new GeoPoint(55.63847, 27.03257));
+		Event event1 = new Event(1, "Event1", "Time1", new TaskCoordinates(0.0, 0.0));
+		Event event2 = new Event(2, "Event2", "Time2", new TaskCoordinates(55.63947, 27.03267));
+		Event event3 = new Event(3, "Event3", "Time3", new TaskCoordinates(55.63847, 27.03257));
 
 		List<Event> activeEvents = new ArrayList<>();
 		activeEvents.add(event1);

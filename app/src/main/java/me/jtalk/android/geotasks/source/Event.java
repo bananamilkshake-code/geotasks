@@ -1,10 +1,9 @@
 package me.jtalk.android.geotasks.source;
 
-import org.osmdroid.util.GeoPoint;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.jtalk.android.geotasks.util.GeoPointFormat;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 @AllArgsConstructor()
 public class Event {
@@ -18,14 +17,14 @@ public class Event {
 	private String startTimeText;
 
 	@Getter
-	private GeoPoint geoPoint;
+	private TaskCoordinates coordinates;
 
 	public String getLocationText() {
-		if (geoPoint == null) {
+		if (coordinates == null) {
 			return null;
 		}
 
-		return GeoPointFormat.format(geoPoint);
+		return CoordinatesFormat.format(coordinates);
 	}
 
 	@Override

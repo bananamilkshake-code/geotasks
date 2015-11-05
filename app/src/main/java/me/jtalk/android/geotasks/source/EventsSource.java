@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract.Events;
 
-import org.osmdroid.util.GeoPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +19,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CalendarHelper;
 
 import static java.lang.String.format;
-import static me.jtalk.android.geotasks.util.GeoPointFormat.POINT_ACCURACY;
+import static me.jtalk.android.geotasks.util.CoordinatesFormat.POINT_ACCURACY;
 
 public class EventsSource {
 	public static final Logger LOG = LoggerFactory.getLogger(EventsSource.class);
@@ -73,7 +73,7 @@ public class EventsSource {
 		long id = CalendarHelper.getLong(cursor, Events._ID);
 		String title = CalendarHelper.getString(cursor, Events.TITLE);
 		String startTimeText = getTimeText(cursor, Events.DTSTART);
-		GeoPoint geoPoint = getGeoPoint(cursor);
+		TaskCoordinates geoPoint = getCoordinates(cursor);
 		return new Event(id, title, startTimeText, geoPoint);
 	}
 
@@ -112,17 +112,17 @@ public class EventsSource {
 	 * must occur. If no location coordinates had been set null will be returned.
 	 *
 	 * @param cursor
-	 * @return IGeoPoint object that contains information about longitude and latitude. Returns
-	 * null if location for event has not been set.
+	 * @return TaskCoordinates object that contains information about longitude and latitude.
+	 * Returns null if location for event has not been set.
 	 */
-	private static GeoPoint getGeoPoint(Cursor cursor) {
+	private static TaskCoordinates getCoordinates(Cursor cursor) {
 		if (CalendarHelper.getString(cursor, Events.EVENT_LOCATION).isEmpty()) {
 			return null;
 		}
 
 		double lat = CalendarHelper.getDouble(cursor, EVENT_LATITUDE);
 		double lon = CalendarHelper.getDouble(cursor, EVENT_LONGITUDE);
-		return new GeoPoint(lat, lon);
+		return new TaskCoordinates(lat, lon);
 	}
 
 	public EventsSource(Context context, long calendarId) {

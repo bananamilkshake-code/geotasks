@@ -13,7 +13,6 @@ import android.widget.TextView;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
@@ -23,10 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.util.GeoPointFormat;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 public class LocationPickActivity extends Activity {
-	private static final GeoPoint DEFAULT_GEOPOINT = new GeoPoint(48.8583, 2, 2944);
+	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(48.8583, 2.2944);
 	private static final int DEFAULT_ZOOM = 9;
 
 	public static final int INTENT_LOCATION_PICK = 0;
@@ -36,7 +36,7 @@ public class LocationPickActivity extends Activity {
 	public static final String INTENT_EXTRA_LATITUDE = "extra-latitude";
 
 	private MapView mapView;
-	private IGeoPoint pickedLocation;
+	private TaskCoordinates pickedLocation;
 
 	private TextView textLocationCoordinates;
 
@@ -98,46 +98,46 @@ public class LocationPickActivity extends Activity {
 		mapView.setMultiTouchControls(true);
 		mapView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
 
-		IGeoPoint startPoint = extractStartGeoPoint(getIntent());
+		TaskCoordinates startPoint = extractStartCoordinates(getIntent());
 		IMapController mapController = mapView.getController();
 		mapController.setZoom(DEFAULT_ZOOM);
-		mapController.setCenter(startPoint);
+		mapController.setCenter(startPoint.toGeoPoint());
 	}
 
 	/**
-	 * Retrieves and returns start geopoint from provided intent ({@INTENT_EXTRA_LATITUDE}
+	 * Retrieves and returns start coordinates from provided intent ({@INTENT_EXTRA_LATITUDE}
 	 * and {@INTENT_EXTRA_LONGITUDE} will be checked). If no data was provided
-	 * {@DEFAULT_GEOPOINT} values will be used.
+	 * {@DEFAULT_COORDINATES} values will be used.
 	 * If intent has {@INTENT_EXTRA_EDIT} extra retrieved geopoint will be set up
 	 * as picked location.
 	 *
 	 * @param intent Intent, that can contain start geopoint data.
 	 * @return retrieved geopoint
 	 */
-	private IGeoPoint extractStartGeoPoint(Intent intent) {
-		double latitude = intent.getDoubleExtra(INTENT_EXTRA_LATITUDE, DEFAULT_GEOPOINT.getLatitude());
-		double longitude = intent.getDoubleExtra(INTENT_EXTRA_LONGITUDE, DEFAULT_GEOPOINT.getLongitude());
-		GeoPoint startPoint = new GeoPoint(latitude, longitude);
+	private TaskCoordinates extractStartCoordinates(Intent intent) {
+		double latitude = intent.getDoubleExtra(INTENT_EXTRA_LATITUDE, DEFAULT_COORDINATES.getLatitude());
+		double longitude = intent.getDoubleExtra(INTENT_EXTRA_LONGITUDE, DEFAULT_COORDINATES.getLongitude());
+		TaskCoordinates startPoint = new TaskCoordinates(latitude, longitude);
 
 		if (intent.hasExtra(INTENT_EXTRA_EDIT)) {
 			onLocationPick(startPoint);
 		}
 
-		return  startPoint;
+		return startPoint;
 	}
 
-	private void onLocationPick(IGeoPoint geoPoint) {
-		pickedLocation = geoPoint;
+	private void onLocationPick(TaskCoordinates coordinates) {
+		pickedLocation = coordinates;
 
 		updateCurrentLocation(pickedLocation);
 	}
 
-	private void updateCurrentLocation(IGeoPoint location) {
-		textLocationCoordinates.setText(GeoPointFormat.format(location));
+	private void updateCurrentLocation(TaskCoordinates coordinates) {
+		textLocationCoordinates.setText(CoordinatesFormat.format(coordinates));
 		textLocationCoordinates.setVisibility(View.VISIBLE);
 
 		ArrayList<OverlayItem> items = new ArrayList<>();
-		items.add(new OverlayItem(null, null, location));
+		items.add(new OverlayItem(null, null, coordinates.toGeoPoint()));
 
 		List<Overlay> overlays = mapView.getOverlays();
 		overlays.clear();
@@ -155,8 +155,8 @@ public class LocationPickActivity extends Activity {
 	private class MapGestureDetector extends GestureDetector.SimpleOnGestureListener {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent event) {
-			IGeoPoint pickedPoint = mapView.getProjection().fromPixels((int) event.getX(), (int) event.getY());
-			onLocationPick(pickedPoint);
+			IGeoPoint pickedGeoPoint = mapView.getProjection().fromPixels((int) event.getX(), (int) event.getY());
+			onLocationPick(new TaskCoordinates(pickedGeoPoint));
 			return true;
 		}
 
