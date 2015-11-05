@@ -47,7 +47,7 @@ public class CoordinatesFormat {
 	public static TaskCoordinates parse(String str) {
 		String[] values = str.split(SPLITTER);
 
-		double lat = Double.valueOf(values[2]);
+		double lat = Double.valueOf(values[0]);
 		double lon = Double.valueOf(values[1]);
 
 		return new TaskCoordinates(lat, lon);
