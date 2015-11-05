@@ -178,11 +178,8 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private void onLocationResult(Intent data) {
+		TaskCoordinates taskCoordinates = data.getParcelableExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES);
 		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
-		double longitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, 0.0d);
-		double latitude = data.getDoubleExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, 0.0d);
-
-		TaskCoordinates taskCoordinates = new TaskCoordinates(latitude, longitude);
 		locationText.setText(CoordinatesFormat.formatSimple(taskCoordinates));
 	}
 
@@ -206,10 +203,8 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		String locationString = locationText.getText().toString();
 		if (!locationString.isEmpty()) {
-			TaskCoordinates coordinates = CoordinatesFormat.parse(locationString);
 			intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LATITUDE, coordinates.getLatitude());
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_LONGITUDE, coordinates.getLongitude());
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, CoordinatesFormat.parse(locationString));
 		}
 
 		startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);

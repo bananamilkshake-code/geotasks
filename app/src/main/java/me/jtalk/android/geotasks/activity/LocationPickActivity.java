@@ -32,10 +32,10 @@ public class LocationPickActivity extends Activity {
 	public static final int INTENT_LOCATION_PICK = 0;
 
 	public static final String INTENT_EXTRA_EDIT = "extra-is-edit";
-	public static final String INTENT_EXTRA_LONGITUDE = "extra-longtitude";
-	public static final String INTENT_EXTRA_LATITUDE = "extra-latitude";
+	public static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
 
 	private MapView mapView;
+
 	private TaskCoordinates pickedLocation;
 
 	private TextView textLocationCoordinates;
@@ -64,8 +64,7 @@ public class LocationPickActivity extends Activity {
 	public void onPickClick(MenuItem item) {
 		Intent result = new Intent();
 		if (pickedLocation != null) {
-			result.putExtra(INTENT_EXTRA_LATITUDE, pickedLocation.getLatitude());
-			result.putExtra(INTENT_EXTRA_LONGITUDE, pickedLocation.getLongitude());
+			result.putExtra(INTENT_EXTRA_COORDINATES, pickedLocation);
 		}
 
 		setResult(RESULT_OK, result);
@@ -105,25 +104,25 @@ public class LocationPickActivity extends Activity {
 	}
 
 	/**
-	 * Retrieves and returns start coordinates from provided intent ({@INTENT_EXTRA_LATITUDE}
-	 * and {@INTENT_EXTRA_LONGITUDE} will be checked). If no data was provided
-	 * {@DEFAULT_COORDINATES} values will be used.
-	 * If intent has {@INTENT_EXTRA_EDIT} extra retrieved geopoint will be set up
+	 * Retrieves and returns start coordinates from provided intent ({@INTENT_EXTRA_COORDINATES}.
+	 * If no data was provided {@DEFAULT_COORDINATES} values will be used.
+	 * If intent has {@INTENT_EXTRA_EDIT} extra retrieved coordinates will be set up
 	 * as picked location.
 	 *
-	 * @param intent Intent, that can contain start geopoint data.
-	 * @return retrieved geopoint
+	 * @param intent Intent, that can contain start coordinates data.
+	 * @return retrieved coordinates
 	 */
 	private TaskCoordinates extractStartCoordinates(Intent intent) {
-		double latitude = intent.getDoubleExtra(INTENT_EXTRA_LATITUDE, DEFAULT_COORDINATES.getLatitude());
-		double longitude = intent.getDoubleExtra(INTENT_EXTRA_LONGITUDE, DEFAULT_COORDINATES.getLongitude());
-		TaskCoordinates startPoint = new TaskCoordinates(latitude, longitude);
-
-		if (intent.hasExtra(INTENT_EXTRA_EDIT)) {
-			onLocationPick(startPoint);
+		TaskCoordinates startCoordinates = intent.getParcelableExtra(INTENT_EXTRA_COORDINATES);
+		if (startCoordinates == null) {
+			return DEFAULT_COORDINATES;
 		}
 
-		return startPoint;
+		if (intent.hasExtra(INTENT_EXTRA_EDIT)) {
+			onLocationPick(startCoordinates);
+		}
+
+		return startCoordinates;
 	}
 
 	private void onLocationPick(TaskCoordinates coordinates) {
