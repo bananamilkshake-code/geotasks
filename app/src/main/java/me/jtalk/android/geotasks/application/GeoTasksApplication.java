@@ -1,8 +1,8 @@
 package me.jtalk.android.geotasks.application;
 
 import android.app.Application;
-import android.util.Log;
 
+import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +12,12 @@ public class GeoTasksApplication extends Application {
 	private static final Logger LOG = LoggerFactory.getLogger(GeoTasksApplication.class);
 
 	private EventsSource eventsSource;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		AndroidGraphicFactory.createInstance(this);
+	}
 
 	public EventsSource getEventsSource() {
 		return eventsSource;

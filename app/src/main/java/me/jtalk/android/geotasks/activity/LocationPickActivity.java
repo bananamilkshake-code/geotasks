@@ -3,6 +3,7 @@ package me.jtalk.android.geotasks.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Environment;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,16 +11,24 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayItem;
+import org.mapsforge.core.graphics.Bitmap;
+import org.mapsforge.core.model.LatLong;
+import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
+import org.mapsforge.map.android.util.AndroidUtil;
+import org.mapsforge.map.android.view.MapView;
+import org.mapsforge.map.layer.Layer;
+import org.mapsforge.map.layer.cache.TileCache;
+import org.mapsforge.map.layer.download.TileDownloadLayer;
+import org.mapsforge.map.layer.download.tilesource.OpenStreetMapMapnik;
+import org.mapsforge.map.layer.overlay.Marker;
+import org.mapsforge.map.layer.renderer.TileRendererLayer;
+import org.mapsforge.map.model.Model;
+import org.mapsforge.map.reader.MapDataStore;
+import org.mapsforge.map.reader.MapFile;
+import org.mapsforge.map.rendertheme.InternalRenderTheme;
+import org.mapsforge.map.util.MapViewProjection;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
@@ -27,27 +36,64 @@ import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 public class LocationPickActivity extends Activity {
 	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(48.8583, 2.2944);
-	private static final int DEFAULT_ZOOM = 9;
+
+	private static final byte DEFAULT_ZOOM = 9;
+	private static final byte MIN_ZOOM = 0;
+	private static final byte MAX_ZOOM = 18;
 
 	public static final int INTENT_LOCATION_PICK = 0;
 
 	public static final String INTENT_EXTRA_EDIT = "extra-is-edit";
 	public static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
 
+	private static final String MAPSFORGE_CACHE_NAME = "mapsforge-cache";
+	private static final float MAPSFORGE_SCREEN_RATIO = 1f;
+
 	private MapView mapView;
 
+	/**
+	 * Coordinate that will be returned from this activity.
+	 */
 	private TaskCoordinates pickedLocation;
 
-	private TextView textLocationCoordinates;
+	/**
+	 * This marker is draw at picked location.
+	 */
+	private Marker marker;
+
+	private TileDownloadLayer tileDownloadLayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location_pick);
 
-		textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
+		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
+		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
 
 		initMapView();
+	}
+
+	@Override
+	public void onPause() {
+		if (tileDownloadLayer != null) {
+			tileDownloadLayer.onPause();
+		}
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (tileDownloadLayer != null) {
+			tileDownloadLayer.onResume();
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mapView.destroyAll();
 	}
 
 	@Override
@@ -77,7 +123,7 @@ public class LocationPickActivity extends Activity {
 	 * @param view
 	 */
 	public void onZoomInClick(View view) {
-		mapView.getController().zoomIn();
+		mapView.getModel().mapViewPosition.zoomIn();
 	}
 
 	/**
@@ -86,21 +132,71 @@ public class LocationPickActivity extends Activity {
 	 * @param view
 	 */
 	public void onZoomOutClick(View view) {
-		mapView.getController().zoomOut();
+		mapView.getModel().mapViewPosition.zoomOut();
 	}
 
 	private void initMapView() {
 		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector());
 
-		mapView = (MapView) findViewById(R.id.map);
-		mapView.setTileSource(TileSourceFactory.MAPNIK);
-		mapView.setMultiTouchControls(true);
-		mapView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-
 		TaskCoordinates startPoint = extractStartCoordinates(getIntent());
-		IMapController mapController = mapView.getController();
-		mapController.setZoom(DEFAULT_ZOOM);
-		mapController.setCenter(startPoint.toGeoPoint());
+
+		mapView = (MapView) findViewById(R.id.map);
+		mapView.setClickable(true);
+		mapView.setBuiltInZoomControls(false);
+		mapView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+		mapView.getModel().mapViewPosition.setZoomLevel(DEFAULT_ZOOM);
+		mapView.getModel().mapViewPosition.setZoomLevelMin(MIN_ZOOM);
+		mapView.getModel().mapViewPosition.setZoomLevelMax(MAX_ZOOM);
+		mapView.getModel().mapViewPosition.setCenter(startPoint.toLatLong());
+		mapView.getLayerManager().getLayers().add(createDownloadLayer(createTileCache(mapView.getModel())));
+		mapView.getLayerManager().getLayers().add(marker);
+	}
+
+	private TileCache createTileCache(Model model) {
+		return AndroidUtil.createTileCache(
+				this,
+				MAPSFORGE_CACHE_NAME,
+				model.displayModel.getTileSize(),
+				MAPSFORGE_SCREEN_RATIO,
+				model.frameBufferModel.getOverdrawFactor());
+	}
+
+	/**
+	 * Created layout uses data from file on sdcard
+	 *
+	 * @param tileCache
+	 * @return layout for map view
+	 */
+	private Layer createRenderLayer(TileCache tileCache, String mapFilePath) {
+		MapDataStore mapDataStore = new MapFile(
+				new File(Environment.getExternalStorageDirectory(), mapFilePath));
+
+		TileRendererLayer tileRenderLayer = new TileRendererLayer(
+				tileCache,
+				mapDataStore,
+				mapView.getModel().mapViewPosition,
+				false,
+				true,
+				AndroidGraphicFactory.INSTANCE);
+		tileRenderLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
+
+		return tileRenderLayer;
+	}
+
+	/**
+	 * Created layer will load OSM data from network.
+	 *
+	 * @param tileCache
+	 * @return layout for map view
+	 */
+	private Layer createDownloadLayer(TileCache tileCache) {
+		tileDownloadLayer = new TileDownloadLayer(
+				tileCache,
+				mapView.getModel().mapViewPosition,
+				OpenStreetMapMapnik.INSTANCE,
+				AndroidGraphicFactory.INSTANCE);
+
+		return tileDownloadLayer;
 	}
 
 	/**
@@ -125,24 +221,28 @@ public class LocationPickActivity extends Activity {
 		return startCoordinates;
 	}
 
+	/**
+	 * Remember {@coordiates} as picked location and draw marker on map.
+	 * @param coordinates
+	 */
 	private void onLocationPick(TaskCoordinates coordinates) {
 		pickedLocation = coordinates;
 
 		updateCurrentLocation(pickedLocation);
 	}
 
+	/**
+	 * Draws marker a {@coordinates} position.
+	 *
+	 * @param coordinates where marker must be drawn
+	 */
 	private void updateCurrentLocation(TaskCoordinates coordinates) {
+		TextView textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		textLocationCoordinates.setText(CoordinatesFormat.format(coordinates));
 		textLocationCoordinates.setVisibility(View.VISIBLE);
 
-		ArrayList<OverlayItem> items = new ArrayList<>();
-		items.add(new OverlayItem(null, null, coordinates.toGeoPoint()));
-
-		List<Overlay> overlays = mapView.getOverlays();
-		overlays.clear();
-		overlays.add(new ItemizedIconOverlay<>(this, items, null));
-
-		mapView.invalidate();
+		marker.setLatLong(coordinates.toLatLong());
+		marker.requestRedraw();
 	}
 
 	/**
@@ -154,8 +254,8 @@ public class LocationPickActivity extends Activity {
 	private class MapGestureDetector extends GestureDetector.SimpleOnGestureListener {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent event) {
-			IGeoPoint pickedGeoPoint = mapView.getProjection().fromPixels((int) event.getX(), (int) event.getY());
-			onLocationPick(new TaskCoordinates(pickedGeoPoint));
+			LatLong pickedLatLong = new MapViewProjection(mapView).fromPixels(event.getX(), event.getY());
+			onLocationPick(new TaskCoordinates(pickedLatLong));
 			return true;
 		}
 

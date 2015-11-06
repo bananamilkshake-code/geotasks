@@ -4,8 +4,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.util.GeoPoint;
+import org.mapsforge.core.model.LatLong;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,8 +24,8 @@ public class TaskCoordinates implements Parcelable {
 		this(location.getLatitude(), location.getLongitude());
 	}
 
-	public TaskCoordinates(IGeoPoint geoPoint) {
-		this(geoPoint.getLatitude(), geoPoint.getLongitude());
+	public TaskCoordinates(LatLong latLong) {
+		this(latLong.latitude, latLong.longitude);
 	}
 
 	protected TaskCoordinates(Parcel in) {
@@ -57,11 +56,11 @@ public class TaskCoordinates implements Parcelable {
 		dest.writeDouble(getLongitude());
 	}
 
-	public int distanceTo(TaskCoordinates taskCoordinates) {
-		return toGeoPoint().distanceTo(taskCoordinates.toGeoPoint());
+	public double distanceTo(TaskCoordinates taskCoordinates) {
+		return toLatLong().distance(taskCoordinates.toLatLong());
 	}
 
-	public GeoPoint toGeoPoint() {
-		return new GeoPoint(getLatitude(), getLongitude());
+	public LatLong toLatLong() {
+		return new LatLong(getLatitude(), getLongitude());
 	}
 }
