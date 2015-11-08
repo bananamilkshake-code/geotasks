@@ -2,9 +2,6 @@ package me.jtalk.android.geotasks.util;
 
 import android.content.pm.PackageManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +9,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public abstract class PermissionDependentTask extends TasksChain.Task {
-	private static final Logger LOG = LoggerFactory.getLogger(PermissionDependentTask.class);
+	private static final Logger LOG = new Logger(PermissionDependentTask.class);
 
 	private String[] neededPermissions;
 

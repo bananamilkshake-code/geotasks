@@ -3,16 +3,14 @@ package me.jtalk.android.geotasks.activity;
 import android.app.Activity;
 import android.os.Build;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import me.jtalk.android.geotasks.application.GeoTasksApplication;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 public abstract class BaseActivity extends Activity {
-	private static final Logger LOG = LoggerFactory.getLogger(BaseActivity.class);
+	private static final Logger LOG = new Logger(BaseActivity.class);
 
 	protected EventsSource getEventsSource() {
 		return ((GeoTasksApplication) getApplication()).getEventsSource();

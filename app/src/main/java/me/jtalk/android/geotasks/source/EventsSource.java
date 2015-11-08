@@ -10,9 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract.Events;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,12 +18,13 @@ import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CalendarHelper;
+import me.jtalk.android.geotasks.util.Logger;
 
 import static java.lang.String.format;
 import static me.jtalk.android.geotasks.util.CoordinatesFormat.POINT_ACCURACY;
 
 public class EventsSource {
-	public static final Logger LOG = LoggerFactory.getLogger(EventsSource.class);
+	public static final Logger LOG = new Logger(EventsSource.class);
 
 	public static final long DEFAULT_CALENDAR = -1;
 	public static final long DEFAULT_TIME_VALUE = -1;
