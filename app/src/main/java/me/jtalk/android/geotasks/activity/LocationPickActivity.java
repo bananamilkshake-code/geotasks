@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.os.Environment;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.mapsforge.core.graphics.Bitmap;
@@ -68,10 +70,8 @@ public class LocationPickActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location_pick);
 
-		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
-		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
-
 		initMapView();
+		initSearchEditText();
 	}
 
 	@Override
@@ -136,6 +136,9 @@ public class LocationPickActivity extends Activity {
 	}
 
 	private void initMapView() {
+		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
+		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
+
 		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector());
 
 		TaskCoordinates startPoint = extractStartCoordinates(getIntent());
@@ -159,6 +162,47 @@ public class LocationPickActivity extends Activity {
 				model.displayModel.getTileSize(),
 				MAPSFORGE_SCREEN_RATIO,
 				model.frameBufferModel.getOverdrawFactor());
+	}
+
+	private void initSearchEditText() {
+		EditText searchEditText = (EditText) findViewById(R.id.location_pick_search_text_edit);
+		searchEditText.setOnEditorActionListener((view, actionId, event) -> {
+			if (event.getKeyCode() != KeyEvent.KEYCODE_ENTER) {
+				return false;
+			}
+
+			LocationPickActivity.this.searchLocation(searchEditText.getText().toString());
+			return true;
+		});
+
+		searchEditText.setOnTouchListener((view, event) -> {
+			final int DRAWABLE_RIGHT = 2;
+
+			if (event.getAction() != MotionEvent.ACTION_UP) {
+				return false;
+			}
+
+			if (event.getRawX() < (searchEditText.getRight() - searchEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+				return false;
+			}
+
+			LocationPickActivity.this.searchLocation(searchEditText.getText().toString());
+			return true;
+		});
+	}
+
+	private void searchLocation(String addressText) {
+		if (addressText.isEmpty()) {
+			return;
+		}
+
+		TaskCoordinates searched = TaskCoordinates.search(this, addressText);
+		if (searched == null) {
+			EditText searchEditText = (EditText) findViewById(R.id.location_pick_search_text_edit);
+			searchEditText.setError(getString(R.string.locatio_pick_incorrect_address));
+		} else {
+			mapView.getModel().mapViewPosition.setCenter(searched.toLatLong());
+		}
 	}
 
 	/**

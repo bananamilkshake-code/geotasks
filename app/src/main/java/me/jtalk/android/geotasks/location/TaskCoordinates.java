@@ -1,10 +1,17 @@
 package me.jtalk.android.geotasks.location;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import org.mapsforge.core.model.LatLong;
+
+import java.io.IOException;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -62,5 +69,25 @@ public class TaskCoordinates implements Parcelable {
 
 	public LatLong toLatLong() {
 		return new LatLong(getLatitude(), getLongitude());
+	}
+
+	public static TaskCoordinates search(@NonNull Context context, @NonNull String addressText) {
+		try {
+			Geocoder geocoder = new Geocoder(context);
+			if (!geocoder.isPresent()) {
+				return null;
+			}
+
+			List<Address> searched = geocoder.getFromLocationName(addressText, 1);
+			if (searched.isEmpty()) {
+				return null;
+			} else {
+				Address address = searched.get(0);
+				return new TaskCoordinates(address.getLatitude(), address.getLongitude());
+			}
+		} catch (IOException exception) {
+			LOG.warn("Error on address search");
+			return null;
+		}
 	}
 }

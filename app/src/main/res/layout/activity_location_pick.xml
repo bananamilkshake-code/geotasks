@@ -18,7 +18,22 @@
         android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/location_pick_search_text_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="9sp"
+            android:background="@android:color/white"
+            android:drawableEnd="@drawable/ic_search_black_18dp"
+            android:hint="@string/location_pick_search_text_edit"
+            android:selectAllOnFocus="true"
+            android:nestedScrollingEnabled="false"
+            android:longClickable="false"
+            android:singleLine="true" />
 
         <TextView
             android:id="@+id/add_event_location_coordinates_text"
@@ -28,10 +43,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:padding="9sp"
             android:textSize="20sp"
             android:textColor="@android:color/tertiary_text_light"
             android:background="@color/ui_theme_dark_text_colour"
             android:elevation="5sp"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -47,7 +64,8 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:src="@drawable/ic_zoom_in_black_48dp"
-            android:onClick="onZoomInClick"/>
+            android:onClick="onZoomInClick"
+            />
 
         <ImageView
             android:id="@+id/zoom_out"

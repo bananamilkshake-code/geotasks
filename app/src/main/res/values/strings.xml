@@ -37,4 +37,6 @@
     <string name="add_event_title_text_error">Title required</string>
     <string name="notification_event_is_near_title_arg_1">{} is near</string>
     <string name="notification_event_is_near_text_arg_1">Event location: {}</string>
+    <string name="location_pick_search_text_edit">Search</string>
+    <string name="locatio_pick_incorrect_address">Not found</string>
 </resources>
