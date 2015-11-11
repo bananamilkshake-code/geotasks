@@ -37,5 +37,8 @@
     <string name="add_event_title_text_error">Title required</string>
     <string name="notification_event_is_near_title_arg_1">{} is near</string>
     <string name="notification_event_is_near_text_arg_1">Event location: {}</string>
-    <string name="crash_toast_text">Application crashed. Report has been sent to acralyzer.</string>
+    <string name="crash_toast_text">Application crashed</string>
+    <string name="crash_dialog_text">To help us fix this bug you can send crash report. Information that report will contain: error information, application log, phone model, current application state (if DUMP permission for applications granted), device settings.</string>
+    <string name="crash_dialog_title">Send crash report</string>
+    <string name="crash_dialog_ok_toast">Thank you!</string>
 </resources>

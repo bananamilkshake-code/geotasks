@@ -38,6 +38,13 @@
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_label_settings" >
         </activity>
+        <activity
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:process=":error_report"
+            android:theme="@android:style/Theme.Material.Dialog"/>
     </application>
 
 </manifest>
