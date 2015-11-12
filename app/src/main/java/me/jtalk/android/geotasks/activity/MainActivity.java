@@ -54,7 +54,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		processChain(initChain);
 
-		PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
+		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
