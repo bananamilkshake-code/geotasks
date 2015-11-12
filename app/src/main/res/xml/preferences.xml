@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
-
     <SwitchPreference
+        android:defaultValue="false"
         android:key="@string/pref_is_geolistening_enabled"
-        android:title="@string/pref_title_geo_listening"
         android:summary="@string/pref_hint_geo_listening"
-        android:defaultValue="false" />
+        android:title="@string/pref_title_geo_listening"/>
 
+    <ListPreference
+        android:defaultValue="Ask"
+        android:entries="@array/crash_report_status"
+        android:entryValues="@array/crash_report_status"
+        android:key="@string/pref_crash_report_send_status"
+        android:summary="@string/pref_crash_report_status_summary"
+        android:title="@string/pref_crash_report_status_title"/>
 </PreferenceScreen>
