@@ -37,4 +37,11 @@
     <string name="add_event_title_text_error">Title required</string>
     <string name="notification_event_is_near_title_arg_1">{} is near</string>
     <string name="notification_event_is_near_text_arg_1">Event location: {}</string>
+    <string name="crash_toast_text">Application crashed</string>
+    <string name="crash_dialog_text">To help us fix this bug you can send crash report.\n\n Information that report will contain: error information, application log, phone model, current application state (if DUMP permission for applications granted), device settings.\n\n You can enable/disable crash reports in application settings.</string>
+    <string name="crash_dialog_ok_toast">Thank you!</string>
+    <string name="crash_positive_button">Send</string>
+    <string name="pref_crash_report_status_summary">If error occurres application can send report o developers.</string>
+    <string name="pref_crash_report_status_title">Send report about crash</string>
+    <string name="crash_dialog_title">GeoTasks crashed</string>
 </resources>

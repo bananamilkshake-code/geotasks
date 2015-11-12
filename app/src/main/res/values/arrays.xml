@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="crash_report_status">
+        <item>Ask</item>
+        <item>Enable</item>
+        <item>Disable</item>
+    </string-array>
+</resources>
