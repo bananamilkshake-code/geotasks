@@ -16,9 +16,12 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import me.jtalk.android.geotasks.util.Logger;
 
 @AllArgsConstructor
 public class TaskCoordinates implements Parcelable {
+	private static final Logger LOG = new Logger(TaskCoordinates.class);
+
 	@Getter
 	@Setter
 	private double latitude;

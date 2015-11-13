@@ -12,9 +12,6 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
@@ -25,13 +22,14 @@ import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 import static me.jtalk.android.geotasks.R.string.pref_is_geolistening_enabled;
 
 public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-	private static final Logger LOG = LoggerFactory.getLogger(MainActivity.class);
+	private static final Logger LOG = new Logger(MainActivity.class);
 
 	private static final int LOADER_EVENTS_ID = 0;
 
@@ -145,7 +143,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 *
 	 * @return calendar id that contains events.
 	 * @throws SecurityException occurs if no calendar is set and
-	 * permission to create calendars is not granted.
+	 *                           permission to create calendars is not granted.
 	 */
 	private long getCalendarId() throws SecurityException {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -209,7 +207,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * (pref_is_geolistening_enabled).
 	 *
 	 * @throws SecurityException if geolistening cannot be enabled because permission
-	 * is denied.
+	 *                           is denied.
 	 */
 	private void toggleGeoListening() throws SecurityException {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

@@ -9,19 +9,17 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.widget.CursorAdapter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.AllArgsConstructor;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CalendarHelper;
+import me.jtalk.android.geotasks.util.Logger;
 
 /**
  * Listens for events changes and updates data in events adapter.
  */
 @AllArgsConstructor
 public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-	private static final Logger LOG = LoggerFactory.getLogger(TasksLoaderCallbacks.class);
+	private static final Logger LOG = new Logger(TasksLoaderCallbacks.class);
 
 	private Context context;
 

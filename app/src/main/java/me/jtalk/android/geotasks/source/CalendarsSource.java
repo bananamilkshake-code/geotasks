@@ -4,18 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.util.Log;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.text.MessageFormat;
 
 import lombok.AllArgsConstructor;
+import me.jtalk.android.geotasks.util.Logger;
 
 @AllArgsConstructor
 public class CalendarsSource {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarsSource.class);
+	private static final Logger LOG = new Logger(CalendarsSource.class);
 
 	private Context context;
 
@@ -39,7 +34,7 @@ public class CalendarsSource {
 		long id = Long.valueOf(inserted.getLastPathSegment());
 
 		LOG.info("Calendar with id {} created", id);
-		
+
 		return id;
 	}
 }

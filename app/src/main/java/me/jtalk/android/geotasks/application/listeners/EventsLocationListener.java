@@ -9,9 +9,6 @@ import android.support.annotation.NonNull;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Calendar;
 import java.util.List;
 
@@ -23,10 +20,11 @@ import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.Logger;
 
 @NoArgsConstructor
 public class EventsLocationListener implements LocationListener {
-	private static final Logger LOG = LoggerFactory.getLogger(EventsLocationListener.class);
+	private static final Logger LOG = new Logger(EventsLocationListener.class);
 
 	public static final long MIN_TIME = 0;
 	public static final float MIN_DISTANCE = 0;

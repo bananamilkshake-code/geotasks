@@ -16,9 +16,6 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -28,12 +25,13 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
+import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 
 public class AddEventActivity extends BaseActivity implements Validator.ValidationListener {
-	private static final Logger LOG = LoggerFactory.getLogger(AddEventActivity.class);
+	private static final Logger LOG = new Logger(AddEventActivity.class);
 
 	private Validator validator;
 
@@ -141,7 +139,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 				calendar.setTime(DateFormat.getTimeInstance().parse(timeText));
 			}
 		} catch (ParseException exception) {
-			LOG.warn("Time value from time text field cannot be parsed", exception);
+			LOG.warn(exception, "Time value from time text field cannot be parsed");
 		}
 
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
@@ -167,7 +165,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 				calendar.setTime(DateFormat.getDateInstance().parse(dateText));
 			}
 		} catch (ParseException exception) {
-			LOG.warn("Date value from date text field cannot be parsed", exception);
+			LOG.warn(exception, "Date value from date text field cannot be parsed");
 		}
 
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
@@ -238,8 +236,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 			calendar.setTime(format.parse(calendarStr));
 			return calendar;
 		} catch (ParseException exception) {
-			LOG.warn("Parsing event start time values {} from view {} failed", calendarStr, viewId);
-			LOG.trace("Exception", exception);
+			LOG.warn(exception, "Parsing event start time values {} from view {} failed", calendarStr, viewId);
 			return null;
 		}
 	}
