@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.mapsforge.core.graphics.Bitmap;
-import org.mapsforge.core.model.LatLong;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.util.AndroidUtil;
 import org.mapsforge.map.android.view.MapView;
@@ -28,11 +27,11 @@ import org.mapsforge.map.model.Model;
 import org.mapsforge.map.reader.MapDataStore;
 import org.mapsforge.map.reader.MapFile;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
-import org.mapsforge.map.util.MapViewProjection;
 
 import java.io.File;
 
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
@@ -135,11 +134,21 @@ public class LocationPickActivity extends Activity {
 		mapView.getModel().mapViewPosition.zoomOut();
 	}
 
+	/**
+	 * Remember {@coordiates} as picked location and draw marker on map.
+	 * @param coordinates
+	 */
+	public void onLocationPick(TaskCoordinates coordinates) {
+		pickedLocation = coordinates;
+
+		updateCurrentLocation(pickedLocation);
+	}
+
 	private void initMapView() {
 		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
 		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
 
-		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector());
+		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector(this));
 
 		TaskCoordinates startPoint = extractStartCoordinates(getIntent());
 
@@ -266,16 +275,6 @@ public class LocationPickActivity extends Activity {
 	}
 
 	/**
-	 * Remember {@coordiates} as picked location and draw marker on map.
-	 * @param coordinates
-	 */
-	private void onLocationPick(TaskCoordinates coordinates) {
-		pickedLocation = coordinates;
-
-		updateCurrentLocation(pickedLocation);
-	}
-
-	/**
 	 * Draws marker a {@coordinates} position.
 	 *
 	 * @param coordinates where marker must be drawn
@@ -287,30 +286,5 @@ public class LocationPickActivity extends Activity {
 
 		marker.setLatLong(coordinates.toLatLong());
 		marker.requestRedraw();
-	}
-
-	/**
-	 * Mark on the map must be placed if only single tap has occurred. OnTouchEvent doesn't provide
-	 * convenient way to detect if touch was single, that's why implementation of GestureListener is
-	 * needed: GestureDetector can identify click type more precisely and single tap can be catched
-	 * easily.
-	 */
-	private class MapGestureDetector extends GestureDetector.SimpleOnGestureListener {
-		@Override
-		public boolean onSingleTapConfirmed(MotionEvent event) {
-			LatLong pickedLatLong = new MapViewProjection(mapView).fromPixels(event.getX(), event.getY());
-			onLocationPick(new TaskCoordinates(pickedLatLong));
-			return true;
-		}
-
-		@Override
-		public boolean onScroll(MotionEvent event1, MotionEvent event2, final float distanceX, float distanceY) {
-			return super.onScroll(event1, event2, distanceX, distanceY);
-		}
-
-		@Override
-		public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-			return super.onFling(event1, event2, velocityX, velocityY);
-		}
 	}
 }
