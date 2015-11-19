@@ -25,9 +25,21 @@ public class EventsLocationListenerTest {
 
 	@Test
 	public void testNearLocationChoose() {
-		Event event1 = new Event(1, "Event1", "Time1", new TaskCoordinates(0.0, 0.0));
-		Event event2 = new Event(2, "Event2", "Time2", new TaskCoordinates(55.63947, 27.03267));
-		Event event3 = new Event(3, "Event3", "Time3", new TaskCoordinates(55.63847, 27.03257));
+		Location mockCurrentLocation = Mockito.mock(Location.class);
+
+		TaskCoordinates asTaskCoordinates = new TaskCoordinates(mockCurrentLocation);
+
+		TaskCoordinates coordinates1 = Mockito.mock(TaskCoordinates.class);
+		TaskCoordinates coordinates2 = Mockito.mock(TaskCoordinates.class);
+		TaskCoordinates coordinates3 = Mockito.mock(TaskCoordinates.class);
+
+		when(coordinates1.distanceTo(asTaskCoordinates)).thenReturn(1000.0);
+		when(coordinates2.distanceTo(asTaskCoordinates)).thenReturn(10.0);
+		when(coordinates3.distanceTo(asTaskCoordinates)).thenReturn(10.0);
+
+		Event event1 = new Event(1, "Event1", "Time1", coordinates1);
+		Event event2 = new Event(2, "Event2", "Time2", coordinates2);
+		Event event3 = new Event(3, "Event3", "Time3", coordinates3);
 
 		List<Event> activeEvents = new ArrayList<>();
 		activeEvents.add(event1);
@@ -44,10 +56,6 @@ public class EventsLocationListenerTest {
 		eventLocationListener.setDistanceToAlarm(100);
 		eventLocationListener.setEventsSource(mockEventsSource);
 		eventLocationListener.setNotifier(mockNotifier);
-
-		Location mockCurrentLocation = Mockito.mock(Location.class);
-		when(mockCurrentLocation.getLatitude()).thenReturn(55.63914);
-		when(mockCurrentLocation.getLongitude()).thenReturn(27.03195);
 
 		eventLocationListener.onLocationChanged(mockCurrentLocation);
 

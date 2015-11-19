@@ -67,7 +67,12 @@ public class TaskCoordinates implements Parcelable {
 	}
 
 	public double distanceTo(TaskCoordinates taskCoordinates) {
-		return toLatLong().distance(taskCoordinates.toLatLong());
+		float[] results = new float[1];
+		Location.distanceBetween(
+				latitude, longitude,
+				taskCoordinates.getLatitude(), taskCoordinates.getLongitude(),
+				results);
+		return results[0];
 	}
 
 	public LatLong toLatLong() {
