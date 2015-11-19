@@ -56,8 +56,6 @@ public class LocationPickActivityTest {
 	@Before
 	public void setUp() throws Exception {
 		ExtendedShadowStatsFs.registerStats("/tmp", 10, 10, 10);
-
-		activity = Robolectric.setupActivity(LocationPickActivity.class);
 	}
 
 	@After
@@ -67,6 +65,8 @@ public class LocationPickActivityTest {
 
 	@Test
 	public void testActivityResultNothingWhenNoCoordinatesPicked() {
+		activity = Robolectric.setupActivity(LocationPickActivity.class);
+
 		clickSave();
 
 		ShadowActivity shadowActivity = shadowOf(activity);
@@ -78,6 +78,8 @@ public class LocationPickActivityTest {
 
 	@Test
 	public void testActivityResultCoordinatesWhenCoordinatesPicked() {
+		activity = Robolectric.setupActivity(LocationPickActivity.class);
+
 		AndroidGraphicFactory.createInstance(activity.getApplication());
 
 		TaskCoordinates pickedCoordinates = new TaskCoordinates(12.23123, 32.234);
@@ -93,6 +95,36 @@ public class LocationPickActivityTest {
 		assertEquals(shadowActivity.getResultCode(), Activity.RESULT_OK);
 		assertEquals(1, resultExtras.size());
 		assertEquals(pickedCoordinates, resultExtras.get(LocationPickActivity.INTENT_EXTRA_COORDINATES));
+	}
+
+	@Test
+	public void testPreviouslyPickedCoordinates() {
+		TaskCoordinates previouslyPickedCoordinates = new TaskCoordinates(12.12, 23.23);
+
+		Intent intent = new Intent();
+		intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, previouslyPickedCoordinates);
+		intent.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, previouslyPickedCoordinates);
+
+		activity = Robolectric
+				.buildActivity(LocationPickActivity.class)
+				.withIntent(intent)
+				.setup()
+				.get();
+
+		assertEquals(previouslyPickedCoordinates, activity.getPickedLocation());
+	}
+
+	@Test
+	public void testNoPreviouslyPickedCoordinates() {
+		Intent intent = new Intent();
+
+		activity = Robolectric
+				.buildActivity(LocationPickActivity.class)
+				.withIntent(intent)
+				.setup()
+				.get();
+
+		assertNull(activity.getPickedLocation());
 	}
 
 	private void clickSave() {

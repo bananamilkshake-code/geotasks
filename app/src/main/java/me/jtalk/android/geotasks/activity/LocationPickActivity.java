@@ -57,6 +57,7 @@ public class LocationPickActivity extends Activity {
 	/**
 	 * Coordinate that will be returned from this activity.
 	 */
+	@Getter
 	private TaskCoordinates pickedLocation;
 
 	/**
