@@ -93,4 +93,18 @@ public class TaskCoordinates implements Parcelable {
 			return null;
 		}
 	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (other == null) {
+			return false;
+		}
+
+		if (other instanceof TaskCoordinates) {
+			TaskCoordinates otherCoordinates = (TaskCoordinates) other;
+			return (latitude == otherCoordinates.latitude) && (longitude == otherCoordinates.longitude);
+		} else {
+			return false;
+		}
+	}
 }

@@ -30,6 +30,7 @@ import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
 import java.io.File;
 
+import lombok.Getter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
@@ -50,6 +51,7 @@ public class LocationPickActivity extends Activity {
 	private static final String MAPSFORGE_CACHE_NAME = "mapsforge-cache";
 	private static final float MAPSFORGE_SCREEN_RATIO = 1f;
 
+	@Getter
 	private MapView mapView;
 
 	/**
@@ -98,7 +100,7 @@ public class LocationPickActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_location_pick, menu);
-		return true;
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	/**
