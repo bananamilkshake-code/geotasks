@@ -192,9 +192,8 @@ public class EventsSource {
 				null);
 
 		List<Event> events = new ArrayList<>();
-		while (!cursor.isAfterLast()) {
+		while (cursor.moveToNext()) {
 			events.add(extractEvent(cursor));
-			cursor.moveToNext();
 		}
 
 		return events;
