@@ -236,7 +236,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 			calendar.setTime(format.parse(calendarStr));
 			return calendar;
 		} catch (ParseException exception) {
-			LOG.warn(exception, "Parsing event start time values {} from view {} failed", calendarStr, viewId);
+			LOG.warn(exception, "Parsing event start time values {0} from view {1} failed", calendarStr, viewId);
 			return null;
 		}
 	}

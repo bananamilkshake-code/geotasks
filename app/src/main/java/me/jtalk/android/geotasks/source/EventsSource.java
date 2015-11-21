@@ -132,8 +132,6 @@ public class EventsSource {
 
 		this.context = context;
 		this.calendarId = calendarId;
-
-		LOG.debug("EventSource {} is created for context {}", this, context);
 	}
 
 	/**
@@ -147,7 +145,7 @@ public class EventsSource {
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
 	public void add(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
-		LOG.debug("Inserting new event for calendarId {}", calendarId);
+		LOG.debug("Inserting new event for calendarId {0}", calendarId);
 
 		ContentValues values = new ContentValues();
 		values.put(Events.CALENDAR_ID, calendarId);
@@ -160,7 +158,7 @@ public class EventsSource {
 		values.put(Events.DTEND, getMillis(endTime));
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
-		LOG.debug("New event was created. Uri: {}", created.toString());
+		LOG.debug("New event was created. Uri: {0}", created.toString());
 	}
 
 	/**

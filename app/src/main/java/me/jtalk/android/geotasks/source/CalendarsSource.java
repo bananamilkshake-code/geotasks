@@ -33,7 +33,7 @@ public class CalendarsSource {
 
 		long id = Long.valueOf(inserted.getLastPathSegment());
 
-		LOG.info("Calendar with id {} created", id);
+		LOG.info("Calendar with id {0} created", id);
 
 		return id;
 	}

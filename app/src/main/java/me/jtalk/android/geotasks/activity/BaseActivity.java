@@ -41,7 +41,7 @@ public abstract class BaseActivity extends Activity {
 			toProceed.startProcessingFrom(firstTask);
 		} catch (SecurityException exception) {
 			int currentTaskId = toProceed.getCurrentTaskId();
-			LOG.debug("No permissions for processing step {}", currentTaskId);
+			LOG.debug("No permissions for processing step {0}", currentTaskId);
 
 			PermissionDependentTask currentTask = toProceed.getCurrentTask();
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -50,7 +50,7 @@ public abstract class BaseActivity extends Activity {
 				onNeededPermissionDenied();
 			}
 		} catch (Exception exception) {
-			LOG.warn("Unexpected exception during chain procession on task {}", toProceed.getCurrentTaskId());
+			LOG.warn("Unexpected exception during chain procession on task {0}", toProceed.getCurrentTaskId());
 			throw new RuntimeException(exception);
 		}
 	}

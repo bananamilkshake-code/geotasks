@@ -60,7 +60,7 @@ public class CrashReportsStatusChangeListener implements SharedPreferences.OnSha
 
 		String newStatus = sharedPreferences.getString(key, DEFAULT_STATUS);
 
-		LOG.debug("Crash report status changed to {}", newStatus);
+		LOG.debug("Crash report status changed to {0}", newStatus);
 
 		Map<String, Boolean> mappedPrefs = ACRA_PREFERENCES.get(newStatus);
 

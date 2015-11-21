@@ -29,7 +29,7 @@ public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Curso
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		LOG.debug("TasksLoaderCallbacks creates loader for {} calendar", calendarId);
+		LOG.debug("TasksLoaderCallbacks creates loader for {0} calendar", calendarId);
 
 		String selection = CalendarHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
 		String[] selectionArgs = new String[]{String.valueOf(calendarId)};
