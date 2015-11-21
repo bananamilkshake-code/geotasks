@@ -70,9 +70,9 @@ public class EventsSource {
 	public static Event extractEvent(Cursor cursor) {
 		long id = CalendarHelper.getLong(cursor, Events._ID);
 		String title = CalendarHelper.getString(cursor, Events.TITLE);
-		String startTimeText = getTimeText(cursor, Events.DTSTART);
+		Calendar startTime = getTimeText(cursor, Events.DTSTART);
 		TaskCoordinates geoPoint = getCoordinates(cursor);
-		return new Event(id, title, startTimeText, geoPoint);
+		return new Event(id, title, startTime, geoPoint);
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class EventsSource {
 	 * @param timeField field name that contains time value (long)
 	 * @return calendar with start time value or null if time hadn't been set
 	 */
-	public static String getTimeText(Cursor cursor, String timeField) {
+	public static Calendar getTimeText(Cursor cursor, String timeField) {
 		long timeInMillis = CalendarHelper.getLong(cursor, timeField);
 		if (timeInMillis == DEFAULT_TIME_VALUE) {
 			return null;
@@ -91,7 +91,7 @@ public class EventsSource {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeInMillis);
-		return DateFormat.getDateTimeInstance().format(calendar.getTime());
+		return calendar;
 	}
 
 	/**

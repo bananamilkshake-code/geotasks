@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
@@ -31,7 +33,7 @@ public class EventElementAdapter extends CursorAdapter {
 
 		Event event = EventsSource.extractEvent(cursor);
 		titleView.setText(event.getTitle());
-		timeView.setText(event.getStartTimeText());
+		timeView.setText(DateFormat.getDateTimeInstance().format(event.getStartTime()));
 		locationView.setText(event.getLocationText());
 	}
 }

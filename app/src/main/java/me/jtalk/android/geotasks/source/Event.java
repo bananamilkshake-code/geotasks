@@ -1,5 +1,7 @@
 package me.jtalk.android.geotasks.source;
 
+import java.util.Calendar;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
@@ -14,7 +16,7 @@ public class Event {
 	private String title;
 
 	@Getter
-	private String startTimeText;
+	private Calendar startTime;
 
 	@Getter
 	private TaskCoordinates coordinates;
