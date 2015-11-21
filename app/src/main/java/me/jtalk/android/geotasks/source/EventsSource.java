@@ -42,8 +42,8 @@ public class EventsSource {
 					"ELSE NULL END)" +
 					"AS %s";
 
-	private static final String EVENT_LATITUDE = "latitude";
-	private static final String EVENT_LONGITUDE = "longitude";
+	static final String EVENT_LATITUDE = "latitude";
+	static final String EVENT_LONGITUDE = "longitude";
 
 	private Context context;
 
