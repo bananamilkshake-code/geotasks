@@ -16,6 +16,9 @@ public class Event {
 	private String title;
 
 	@Getter
+	private String description;
+
+	@Getter
 	private Calendar startTime;
 
 	@Getter

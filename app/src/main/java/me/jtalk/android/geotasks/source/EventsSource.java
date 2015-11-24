@@ -73,7 +73,7 @@ public class EventsSource {
 		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
 		Calendar startTime = getTimeText(cursor, Events.DTSTART);
 		TaskCoordinates geoPoint = getCoordinates(cursor);
-		return new Event(id, title, startTime, geoPoint);
+		return new Event(id, title, description, startTime, geoPoint);
 	}
 
 	/**
