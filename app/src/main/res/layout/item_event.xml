@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    android:paddingStart="25sp">
     <TextView
         android:id="@+id/event_element_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@+id/event_element_alarm"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:textSize="24sp"
         android:text="Event title" />
@@ -20,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/event_element_title"
-        android:layout_alignLeft="@+id/event_element_title"
+        android:layout_alignStart="@+id/event_element_title"
         android:text="lon: 34.234 lat: 45.00" />
 
     <TextView
@@ -38,8 +37,8 @@
         android:layout_height="48dp"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="14dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="10dp"
         android:src="@drawable/ic_alarm_on_black_48dp"
         android:contentDescription="@string/event_element_reminder_toggler_desc"/>
 
