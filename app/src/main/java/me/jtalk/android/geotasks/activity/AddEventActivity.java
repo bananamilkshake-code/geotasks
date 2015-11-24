@@ -28,6 +28,7 @@ import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
+import me.jtalk.android.geotasks.util.TimeFormat;
 
 
 public class AddEventActivity extends BaseActivity implements Validator.ValidationListener {
@@ -136,7 +137,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		try {
 			String timeText = textView.getText().toString();
 			if (!timeText.isEmpty()) {
-				calendar.setTime(DateFormat.getTimeInstance().parse(timeText));
+				calendar = TimeFormat.parseTime(this, timeText);
 			}
 		} catch (ParseException exception) {
 			LOG.warn(exception, "Time value from time text field cannot be parsed");
@@ -146,7 +147,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 			Calendar picked = Calendar.getInstance();
 			picked.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			picked.set(Calendar.MINUTE, minute);
-			textView.setText(DateFormat.getTimeInstance().format(picked.getTime()));
+			textView.setText(TimeFormat.formatTime(this, picked));
 		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
 	}
 
@@ -162,7 +163,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		try {
 			String dateText = textView.getText().toString();
 			if (!dateText.isEmpty()) {
-				calendar.setTime(DateFormat.getDateInstance().parse(dateText));
+				calendar = (TimeFormat.parseDate(this, dateText));
 			}
 		} catch (ParseException exception) {
 			LOG.warn(exception, "Date value from date text field cannot be parsed");
@@ -171,7 +172,7 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
 			Calendar picked = Calendar.getInstance();
 			picked.set(year, monthOfYear, dayOfMonth);
-			textView.setText(DateFormat.getDateInstance().format(picked.getTime()));
+			textView.setText(TimeFormat.formatDate(this, picked));
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
 	}
 
@@ -209,8 +210,8 @@ public class AddEventActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private Calendar getStartTime() {
-		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, DateFormat.getDateInstance());
-		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, DateFormat.getDateTimeInstance());
+		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, TimeFormat.getDateFormat(this));
+		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, TimeFormat.getTimeFormat(this));
 
 		if (dateCalendar == null || timeCalendar == null) {
 			return EventsSource.EMPTY_TIME;

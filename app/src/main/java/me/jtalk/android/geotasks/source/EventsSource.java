@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract.Events;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
