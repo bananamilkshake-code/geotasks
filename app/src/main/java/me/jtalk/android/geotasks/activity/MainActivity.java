@@ -8,8 +8,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.CursorAdapter;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.CursorTreeAdapter;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.text.MessageFormat;
@@ -166,11 +167,27 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	}
 
 	private void initEventsList() {
-		CursorAdapter eventsAdapter = new EventElementAdapter(this);
+		CursorTreeAdapter eventsAdapter = new EventElementAdapter(this);
 
-		ListView eventsList = (ListView) findViewById(R.id.events_list);
+		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
 		eventsList.setAdapter(eventsAdapter);
-
+		eventsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+			private int previouslyExpanded = -1;
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+				if (parent.isGroupExpanded(groupPosition)) {
+					parent.collapseGroup(groupPosition);
+					previouslyExpanded = -1;
+				} else {
+					if (previouslyExpanded != -1) {
+						parent.collapseGroup(previouslyExpanded);
+					}
+					parent.expandGroup(groupPosition);
+					previouslyExpanded = groupPosition;
+				}
+				return true;
+			}
+		});
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
 			long eventId = parent.getAdapter().getItemId(position);
 			String eventTitle = ((TextView) view.findViewById(R.id.event_element_title)).getText().toString();
@@ -197,8 +214,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		locationListener.setEventsSource(eventsSource);
 
-		ListView eventsList = (ListView) findViewById(R.id.events_list);
-		CursorAdapter eventsAdapter = (CursorAdapter) eventsList.getAdapter();
+		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
+		CursorTreeAdapter eventsAdapter = (CursorTreeAdapter) eventsList.getExpandableListAdapter();
 		getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
 				new TasksLoaderCallbacks(this, eventsAdapter, calendarId));
 	}

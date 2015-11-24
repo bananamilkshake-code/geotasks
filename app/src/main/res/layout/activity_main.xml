@@ -6,9 +6,10 @@
     android:layout_height="match_parent"
     android:launchMode = "singleInstance"
     tools:context=".MainActivity">
-    <ListView
+    <ExpandableListView
         android:id="@+id/events_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+    </ExpandableListView>
 </RelativeLayout>

@@ -7,11 +7,11 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.widget.CursorAdapter;
+import android.widget.CursorTreeAdapter;
 
 import lombok.AllArgsConstructor;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.CalendarHelper;
+import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
 /**
@@ -23,7 +23,7 @@ public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Curso
 
 	private Context context;
 
-	private CursorAdapter tasksAdapter;
+	private CursorTreeAdapter tasksAdapter;
 
 	private long calendarId;
 
@@ -31,7 +31,7 @@ public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Curso
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		LOG.debug("TasksLoaderCallbacks creates loader for {0} calendar", calendarId);
 
-		String selection = CalendarHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
+		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
 		String[] selectionArgs = new String[]{String.valueOf(calendarId)};
 
 		return new CursorLoader(context, CalendarContract.Events.CONTENT_URI,
@@ -40,11 +40,11 @@ public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Curso
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		tasksAdapter.swapCursor(data);
+		tasksAdapter.changeCursor(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		tasksAdapter.swapCursor(null);
+		tasksAdapter.changeCursor(null);
 	}
 }
