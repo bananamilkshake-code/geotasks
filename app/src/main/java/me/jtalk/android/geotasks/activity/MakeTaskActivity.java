@@ -31,8 +31,10 @@ import me.jtalk.android.geotasks.util.TasksChain;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
 
-public class AddEventActivity extends BaseActivity implements Validator.ValidationListener {
-	private static final Logger LOG = new Logger(AddEventActivity.class);
+public class MakeTaskActivity extends BaseActivity implements Validator.ValidationListener {
+	private static final Logger LOG = new Logger(MakeTaskActivity.class);
+
+	public static final String INTENT_EDIT_TASK = "edit";
 
 	private Validator validator;
 

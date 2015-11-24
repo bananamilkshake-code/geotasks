@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.TextView;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,12 +23,12 @@ import static org.robolectric.Shadows.shadowOf;
 @Config(constants = BuildConfig.class,
 		sdk = 21,
 		manifest = "src/main/AndroidManifest.xml")
-public class AddEventActivityTest {
-	private AddEventActivity activity;
+public class MakeTaskActivityTest {
+	private MakeTaskActivity activity;
 
 	@Before
 	public void setUp() {
-		activity = Robolectric.setupActivity(AddEventActivity.class);
+		activity = Robolectric.setupActivity(MakeTaskActivity.class);
 	}
 
 	@Test

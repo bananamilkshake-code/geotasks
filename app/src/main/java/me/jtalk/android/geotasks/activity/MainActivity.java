@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * @return
 	 */
 	public boolean openAddEventIntent(MenuItem menuItem) {
-		startActivity(new Intent(this, AddEventActivity.class));
+		startActivity(new Intent(this, MakeTaskActivity.class));
 		return true;
 	}
 

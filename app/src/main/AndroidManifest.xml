@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.AddEventActivity"
+            android:name=".activity.MakeTaskActivity"
             android:label="@string/title_activity_add_event" >
         </activity>
         <activity
