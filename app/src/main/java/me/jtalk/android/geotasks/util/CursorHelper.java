@@ -1,6 +1,7 @@
 package me.jtalk.android.geotasks.util;
 
 import android.database.Cursor;
+import android.database.MatrixCursor;
 
 import static me.jtalk.android.geotasks.util.Assert.*;
 
@@ -31,7 +32,7 @@ public class CursorHelper {
 	 * Wrapper method to get long field value from cursor.
 	 *
 	 * @param cursor cursor to retrieve value from
-	 * @param field field to retrieve value from
+	 * @param field  field to retrieve value from
 	 * @return value of the field in cursor
 	 * @see Cursor#getLong
 	 */
@@ -43,7 +44,7 @@ public class CursorHelper {
 	 * Wrapper method to get string field value from cursor.
 	 *
 	 * @param cursor cursor to retrieve value from
-	 * @param field field to retrieve value from
+	 * @param field  field to retrieve value from
 	 * @return value of the field in cursor
 	 * @see Cursor#getString
 	 */
@@ -52,10 +53,34 @@ public class CursorHelper {
 	}
 
 	/**
+	 * Wrapper method to get int field value from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field  field to retrieve value from
+	 * @return value of the field in cursor
+	 * @see Cursor#getInt
+	 */
+	private static int getInt(Cursor cursor, String field) {
+		return cursor.getInt(cursor.getColumnIndex(field));
+	}
+
+	/**
+	 * Wrapper method to get float field value from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field  field to retrieve value from
+	 * @return value of the field in cursor
+	 * @see Cursor#getFloat
+	 */
+	public static Object getFloat(Cursor cursor, String field) {
+		return cursor.getFloat(cursor.getColumnIndex(field));
+	}
+
+	/**
 	 * Wrapper method to get double field value from cursor.
 	 *
 	 * @param cursor cursor to retrieve value from
-	 * @param field field to retrieve value from
+	 * @param field  field to retrieve value from
 	 * @return value of the field in cursor
 	 * @see Cursor#getDouble
 	 */
@@ -64,13 +89,94 @@ public class CursorHelper {
 	}
 
 	/**
+	 * Wrapper method to get blob field value from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field  field to retrieve value from
+	 * @return value of the field in cursor
+	 * @see Cursor#getBlob
+	 */
+	public static Object getBlob(Cursor cursor, String field) {
+		return cursor.getBlob(cursor.getColumnIndex(field));
+	}
+
+	/**
 	 * Wrapper method to check if column value in cursor is null.
 	 *
 	 * @param cursor cursor to retrieve value from
-	 * @param field field to retrieve value from
+	 * @param field  field to retrieve value from
 	 * @return true if column field contains NULL, false otherwise
 	 */
 	public static boolean isNull(Cursor cursor, String field) {
-		return cursor.getType(cursor.getColumnIndex(field)) == Cursor.FIELD_TYPE_NULL;
+		return getType(cursor, field) == Cursor.FIELD_TYPE_NULL;
+	}
+
+	/**
+	 * Wrapper method to get field type from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field  field to retrieve type
+	 * @return type of the field in cursor
+	 * @see Cursor#getType
+	 */
+	public static int getType(Cursor cursor, String field) {
+		return cursor.getType(cursor.getColumnIndex(field));
+	}
+
+	/**
+	 * Creates new cursor which data is copied from group cursor.
+	 *
+	 * @param groupCursor
+	 * @return
+	 */
+	public static Cursor clone(Cursor groupCursor) {
+		return clone(groupCursor, groupCursor.getCount());
+	}
+
+	/**
+	 * Creates new cursor which data is copied from first {@amount}
+	 * elements of group cursor.
+	 *
+	 * @param groupCursor
+	 * @param amount
+	 * @return
+	 */
+	public static Cursor clone(Cursor groupCursor, int amount) {
+		final String[] columns = groupCursor.getColumnNames();
+		MatrixCursor cursor = new MatrixCursor(columns, amount);
+
+		int startPosition = groupCursor.getPosition();
+
+		for (int i = 0; i < amount; ++i) {
+			MatrixCursor.RowBuilder rowBuilder = cursor.newRow();
+			for (String column : columns) {
+				switch (getType(groupCursor, column)) {
+					case Cursor.FIELD_TYPE_NULL:
+						rowBuilder.add(column, null);
+						break;
+					case Cursor.FIELD_TYPE_INTEGER:
+						rowBuilder.add(column, getInt(groupCursor, column));
+						break;
+					case Cursor.FIELD_TYPE_FLOAT:
+						rowBuilder.add(column, getFloat(groupCursor, column));
+						break;
+					case Cursor.FIELD_TYPE_STRING:
+						rowBuilder.add(column, getString(groupCursor, column));
+						break;
+					case Cursor.FIELD_TYPE_BLOB:
+						rowBuilder.add(column, getBlob(groupCursor, column));
+						break;
+				}
+			}
+
+			if (!groupCursor.moveToNext()) {
+				break;
+			}
+		}
+
+		// Restore position.
+		groupCursor.moveToPosition(startPosition);
+
+		return cursor;
 	}
 }
