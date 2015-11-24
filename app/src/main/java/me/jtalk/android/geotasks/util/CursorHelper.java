@@ -135,7 +135,7 @@ public class CursorHelper {
 
 	/**
 	 * Creates new cursor which data is copied from first {@amount}
-	 * elements of group cursor.
+	 * elements of group cursor (or less if there is not enough rows).
 	 *
 	 * @param groupCursor
 	 * @param amount
@@ -147,7 +147,7 @@ public class CursorHelper {
 
 		int startPosition = groupCursor.getPosition();
 
-		for (int i = 0; i < amount; ++i) {
+		for (int i = 0; i < amount && !groupCursor.isAfterLast(); ++i) {
 			MatrixCursor.RowBuilder rowBuilder = cursor.newRow();
 			for (String column : columns) {
 				switch (getType(groupCursor, column)) {
@@ -169,9 +169,7 @@ public class CursorHelper {
 				}
 			}
 
-			if (!groupCursor.moveToNext()) {
-				break;
-			}
+			groupCursor.moveToNext();
 		}
 
 		// Restore position.
