@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.location.TaskCoordinates;
-import me.jtalk.android.geotasks.util.CalendarHelper;
+import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
 import static java.lang.String.format;
@@ -68,8 +68,9 @@ public class EventsSource {
 	 * @return Event object that was created from retrieved data.
 	 */
 	public static Event extractEvent(Cursor cursor) {
-		long id = CalendarHelper.getLong(cursor, Events._ID);
-		String title = CalendarHelper.getString(cursor, Events.TITLE);
+		long id = CursorHelper.getLong(cursor, Events._ID);
+		String title = CursorHelper.getString(cursor, Events.TITLE);
+		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
 		Calendar startTime = getTimeText(cursor, Events.DTSTART);
 		TaskCoordinates geoPoint = getCoordinates(cursor);
 		return new Event(id, title, startTime, geoPoint);
@@ -84,7 +85,7 @@ public class EventsSource {
 	 * @return calendar with start time value or null if time hadn't been set
 	 */
 	public static Calendar getTimeText(Cursor cursor, String timeField) {
-		long timeInMillis = CalendarHelper.getLong(cursor, timeField);
+		long timeInMillis = CursorHelper.getLong(cursor, timeField);
 		if (timeInMillis == DEFAULT_TIME_VALUE) {
 			return null;
 		}
@@ -114,12 +115,12 @@ public class EventsSource {
 	 * Returns null if location for event has not been set.
 	 */
 	private static TaskCoordinates getCoordinates(Cursor cursor) {
-		if (CalendarHelper.getString(cursor, Events.EVENT_LOCATION).isEmpty()) {
+		if (CursorHelper.getString(cursor, Events.EVENT_LOCATION).isEmpty()) {
 			return null;
 		}
 
-		double lat = CalendarHelper.getDouble(cursor, EVENT_LATITUDE);
-		double lon = CalendarHelper.getDouble(cursor, EVENT_LONGITUDE);
+		double lat = CursorHelper.getDouble(cursor, EVENT_LATITUDE);
+		double lon = CursorHelper.getDouble(cursor, EVENT_LONGITUDE);
 		return new TaskCoordinates(lat, lon);
 	}
 
