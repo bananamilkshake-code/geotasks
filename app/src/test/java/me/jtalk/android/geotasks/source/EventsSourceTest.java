@@ -108,9 +108,9 @@ public class EventsSourceTest {
 	public void testGetActive() {
 		final Calendar eventTime = Calendar.getInstance();
 		eventTime.set(2015, 11, 12);
-		Event event1 = new Event(1, "Title1", eventTime, new TaskCoordinates(1, 1));
-		Event event2 = new Event(2, "Title2", eventTime, new TaskCoordinates(2, 2));
-		Event event3 = new Event(3, "Title3", eventTime, new TaskCoordinates(3, 3));
+		Event event1 = new Event(1, "Title1", "Description1", eventTime, new TaskCoordinates(1, 1));
+		Event event2 = new Event(2, "Title2", "Description1", eventTime, new TaskCoordinates(2, 2));
+		Event event3 = new Event(3, "Title3", "Description1", eventTime, new TaskCoordinates(3, 3));
 
 		Cursor cursor = createCursor(event1, event2, event3);
 
