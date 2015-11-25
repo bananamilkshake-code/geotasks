@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.os.Build;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.NonNull;
 import me.jtalk.android.geotasks.application.GeoTasksApplication;
