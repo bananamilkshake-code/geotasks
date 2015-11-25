@@ -1,14 +1,17 @@
 package me.jtalk.android.geotasks.activity.item;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CursorTreeAdapter;
 import android.widget.TextView;
 
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.activity.MakeTaskActivity;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
@@ -55,8 +58,14 @@ public class EventElementAdapter extends CursorTreeAdapter {
 	@Override
 	protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
 		TextView descriptionView = (TextView) view.findViewById(R.id.item_event_expanded_descripion);
+		Button buttonEdit = (Button) view.findViewById(R.id.item_event_expanded_button_edit);
 
 		Event event = EventsSource.extractEvent(cursor);
 		descriptionView.setText(event.getDescription());
+		buttonEdit.setOnClickListener(v -> {
+			Intent intent = new Intent(context, MakeTaskActivity.class);
+			intent.putExtra(MakeTaskActivity.INTENT_EDIT_TASK, event.getId());
+			context.startActivity(intent);
+		});
 	}
 }

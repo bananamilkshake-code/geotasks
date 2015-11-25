@@ -145,20 +145,45 @@ public class EventsSource {
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
 	public void add(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
-		LOG.debug("Inserting new event for calendarId {0}", calendarId);
-
-		ContentValues values = new ContentValues();
-		values.put(Events.CALENDAR_ID, calendarId);
-		values.put(Events.TITLE, title);
-		values.put(Events.DESCRIPTION, description);
-		values.put(Events.EVENT_LOCATION, location);
-		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
-
-		values.put(Events.DTSTART, getMillis(startTime));
-		values.put(Events.DTEND, getMillis(endTime));
+		ContentValues values = createContentValues(title, description, location, startTime, endTime);
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
+
 		LOG.debug("New event was created. Uri: {0}", created.toString());
+	}
+
+	/**
+	 * Selects event with id {@id}.
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Event get(long id) {
+		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
+
+		Cursor cursor = this.context.getContentResolver().query(uri, PROJECTION_EVENTS, null, null, null);
+		cursor.moveToFirst();
+
+		return extractEvent(cursor);
+	}
+
+	/**
+	 * Updates values for event with id {@id}
+	 *
+	 * @param id          even id to update
+	 * @param title
+	 * @param description
+	 * @param location
+	 * @param startTime   event start time. This value can be null if start time is not set.
+	 * @param endTime     event end time. This value can be null if start time is not set.
+	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
+	 */
+	public void edit(long id, String title, String description, String location, Calendar startTime, Calendar endTime) {
+		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
+
+		ContentValues values = createContentValues(title, description, location, startTime, endTime);
+
+		this.context.getContentResolver().update(uri, values, null, null);
 	}
 
 	/**
@@ -195,6 +220,19 @@ public class EventsSource {
 		}
 
 		return events;
+	}
+
+	private ContentValues createContentValues(String title, String description, String location, Calendar startTime, Calendar endTime) {
+		ContentValues values = new ContentValues();
+		values.put(Events.CALENDAR_ID, calendarId);
+		values.put(Events.TITLE, title);
+		values.put(Events.DESCRIPTION, description);
+		values.put(Events.EVENT_LOCATION, location);
+		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+
+		values.put(Events.DTSTART, getMillis(startTime));
+		values.put(Events.DTEND, getMillis(endTime));
+		return values;
 	}
 
 	private final String NEAR_EVENTS_SELECTION = Events.CALENDAR_ID + " = ? AND " +

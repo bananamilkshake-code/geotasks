@@ -21,8 +21,11 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
@@ -30,18 +33,32 @@ import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
-
 public class MakeTaskActivity extends BaseActivity implements Validator.ValidationListener {
 	private static final Logger LOG = new Logger(MakeTaskActivity.class);
 
 	public static final String INTENT_EDIT_TASK = "edit";
 
-	private Validator validator;
+	private static final long NO_TASK = -1;
 
 	@NotEmpty
-	private EditText titleText;
+	@Bind(R.id.add_event_name_text)
+	EditText titleText;
 
-	private TasksChain<PermissionDependentTask> addEventChain;
+	@Bind(R.id.add_event_description_text)
+	EditText descriptionText;
+
+	@Bind(R.id.add_event_location_coordinates_text)
+	TextView locationText;
+
+	@Bind(R.id.add_event_date_text)
+	TextView dateText;
+
+	@Bind(R.id.add_event_time_text)
+	TextView timeText;
+
+	private Validator validator;
+
+	private TasksChain<PermissionDependentTask> saveEventChain;
 	private TasksChain<PermissionDependentTask> openLocationPickActivityChain;
 
 	@Override
@@ -49,13 +66,27 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_event);
 
-		titleText = (EditText) findViewById(R.id.add_event_name_text);
+		ButterKnife.bind(this);
 
 		validator = new Validator(this);
 		validator.setValidationListener(this);
 
-		addEventChain = new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR));
+		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, NO_TASK);
+		if (eventId == NO_TASK) {
+			saveEventChain = new TasksChain<PermissionDependentTask>()
+					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR));
+		} else {
+			LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
+
+			Event event = getEventsSource().get(eventId);
+
+			titleText.setText(event.getTitle());
+			descriptionText.setText(event.getDescription());
+			locationText.setText(CoordinatesFormat.formatSimple(event.getCoordinates()));
+
+			saveEventChain = new TasksChain<PermissionDependentTask>()
+					.add(makeTask(() -> editEvent(eventId), Manifest.permission.WRITE_CALENDAR));
+		}
 
 		openLocationPickActivityChain = new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::openLocationPickActivity,
@@ -85,7 +116,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		processPermissionRequestResult(addEventChain, requestCode, permissions, values);
+		processPermissionRequestResult(saveEventChain, requestCode, permissions, values);
 	}
 
 	@Override
@@ -95,7 +126,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onValidationSucceeded() {
-		processChain(addEventChain);
+		processChain(saveEventChain);
 	}
 
 	@Override
@@ -180,14 +211,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	private void onLocationResult(Intent data) {
 		TaskCoordinates taskCoordinates = data.getParcelableExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES);
-		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		locationText.setText(CoordinatesFormat.formatSimple(taskCoordinates));
 	}
 
 	private void addEvent() {
-		TextView descriptionText = (TextView) findViewById(R.id.add_event_description_text);
-		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
-
 		String eventTitle = titleText.getText().toString();
 		String eventDescription = descriptionText.getText().toString();
 		String location = locationText.getText().toString();
@@ -199,9 +226,20 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		finish();
 	}
 
+	private void editEvent(long eventId) {
+		String eventTitle = titleText.getText().toString();
+		String eventDescription = descriptionText.getText().toString();
+		String location = locationText.getText().toString();
+		Calendar startTime = this.getStartTime();
+		Calendar endTime = EventsSource.EMPTY_TIME;
+
+		getEventsSource().edit(eventId, eventTitle, eventDescription, location, startTime, endTime);
+
+		finish();
+	}
+
 	private void openLocationPickActivity() {
 		Intent intent = new Intent(this, LocationPickActivity.class);
-		TextView locationText = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		String locationString = locationText.getText().toString();
 		if (!locationString.isEmpty()) {
 			intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
@@ -212,8 +250,8 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private Calendar getStartTime() {
-		Calendar dateCalendar = parseFromTextView(R.id.add_event_date_text, TimeFormat.getDateFormat(this));
-		Calendar timeCalendar = parseFromTextView(R.id.add_event_time_text, TimeFormat.getTimeFormat(this));
+		Calendar dateCalendar = parseFromTextView(dateText, TimeFormat.getDateFormat(this));
+		Calendar timeCalendar = parseFromTextView(timeText, TimeFormat.getTimeFormat(this));
 
 		if (dateCalendar == null || timeCalendar == null) {
 			return EventsSource.EMPTY_TIME;
@@ -228,8 +266,8 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		return calendar;
 	}
 
-	private Calendar parseFromTextView(int viewId, DateFormat format) {
-		String calendarStr = ((TextView) findViewById(viewId)).getText().toString();
+	private Calendar parseFromTextView(TextView view, DateFormat format) {
+		String calendarStr = view.getText().toString();
 		if (calendarStr.isEmpty()) {
 			return null;
 		}
@@ -239,7 +277,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			calendar.setTime(format.parse(calendarStr));
 			return calendar;
 		} catch (ParseException exception) {
-			LOG.warn(exception, "Parsing event start time values {0} from view {1} failed", calendarStr, viewId);
+			LOG.warn(exception, "Parsing event start time values {0} from view {1} failed", calendarStr, view.getId());
 			return null;
 		}
 	}

@@ -36,6 +36,7 @@ dependencies {
     compile 'org.mapsforge:mapsforge-map-android:0.5.2'
     compile 'org.slf4j:slf4j-android:1.7.12'
     compile 'ch.acra:acra:4.6.2'
+    compile 'com.jakewharton:butterknife:7.0.1'
 
     provided 'org.projectlombok:lombok:1.16.6'
     apt 'org.projectlombok:lombok:1.16.6'
