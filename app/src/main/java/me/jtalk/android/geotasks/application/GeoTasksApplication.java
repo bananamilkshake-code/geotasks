@@ -9,6 +9,7 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
+import lombok.Getter;
 import me.jtalk.android.geotasks.BuildConfig;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.CrashReportsStatusChangeListener;
@@ -28,6 +29,7 @@ import me.jtalk.android.geotasks.util.Logger;
 public class GeoTasksApplication extends Application {
 	private static final Logger LOG = new Logger(GeoTasksApplication.class);
 
+	@Getter
 	private EventsSource eventsSource;
 
 	private CrashReportsStatusChangeListener crashReportsStatusChangeListener = new CrashReportsStatusChangeListener(this);
@@ -50,10 +52,6 @@ public class GeoTasksApplication extends Application {
 				.unregisterOnSharedPreferenceChangeListener(crashReportsStatusChangeListener);
 
 		super.onTerminate();
-	}
-
-	public EventsSource getEventsSource() {
-		return eventsSource;
 	}
 
 	public void setEventsSource(EventsSource eventsSourceObj) {
