@@ -112,4 +112,9 @@ public class TaskCoordinates implements Parcelable {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "lat: " + getLatitude() + "; lon: " + getLongitude();
+	}
 }
