@@ -58,8 +58,8 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	private Validator validator;
 
-	private TasksChain<PermissionDependentTask> saveEventChain;
-	private TasksChain<PermissionDependentTask> openLocationPickActivityChain;
+	private int saveEventChainId;
+	private int openLocationPickActivityChainId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +73,8 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, NO_TASK);
 		if (eventId == NO_TASK) {
-			saveEventChain = new TasksChain<PermissionDependentTask>()
-					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR));
+			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR)));
 		} else {
 			LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
 
@@ -84,15 +84,15 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			descriptionText.setText(event.getDescription());
 			locationText.setText(CoordinatesFormat.formatSimple(event.getCoordinates()));
 
-			saveEventChain = new TasksChain<PermissionDependentTask>()
-					.add(makeTask(() -> editEvent(eventId), Manifest.permission.WRITE_CALENDAR));
+			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+					.add(makeTask(() -> editEvent(eventId), Manifest.permission.WRITE_CALENDAR)));
 		}
 
-		openLocationPickActivityChain = new TasksChain<PermissionDependentTask>()
+		openLocationPickActivityChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::openLocationPickActivity,
 						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
 						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
-						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE));
+						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE)));
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		processPermissionRequestResult(saveEventChain, requestCode, permissions, values);
+		processPermissionRequestResult(requestCode, permissions, values);
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onValidationSucceeded() {
-		processChain(saveEventChain);
+		processChain(saveEventChainId);
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @param view
 	 */
 	public void showLocationActivity(View view) {
-		processChain(openLocationPickActivityChain);
+		processChain(openLocationPickActivityChainId);
 	}
 
 	/**

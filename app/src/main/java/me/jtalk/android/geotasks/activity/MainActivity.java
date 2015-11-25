@@ -34,8 +34,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	private TasksChain<PermissionDependentTask> initChain;
-	private TasksChain<PermissionDependentTask> toggleGeoListenChain;
+	private int initChainId;
+	private int toggleGeoListenChainId;
 
 	private EventsLocationListener locationListener;
 
@@ -44,16 +44,16 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		initChain = new TasksChain<PermissionDependentTask>()
+		initChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::createLocationListener))
 				.add(makeTask(this::getCalendarId, Manifest.permission.WRITE_CALENDAR))
 				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR))
-				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR));
+				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR)));
 
-		toggleGeoListenChain = new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::toggleGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION));
+		toggleGeoListenChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+				.add(makeTask(this::toggleGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)));
 
-		processChain(initChain);
+		processChain(initChainId);
 
 		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 				.registerOnSharedPreferenceChangeListener(this);
@@ -65,14 +65,14 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		locationListener.setMenuItem(menu.findItem(R.id.menu_action_enable_geolistening));
 
-		processChain(toggleGeoListenChain);
+		processChain(toggleGeoListenChainId);
 
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		processPermissionRequestResult(initChain, requestCode, permissions, values);
+		processPermissionRequestResult(requestCode, permissions, values);
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (key == getString(R.string.pref_is_geolistening_enabled)) {
-			processChain(toggleGeoListenChain);
+			processChain(toggleGeoListenChainId);
 		}
 	}
 
