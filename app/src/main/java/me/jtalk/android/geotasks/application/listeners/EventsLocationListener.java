@@ -51,6 +51,8 @@ public class EventsLocationListener implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
+		LOG.debug("Location update ({0})", location);
+
 		Calendar currentTime = Calendar.getInstance();
 		TaskCoordinates currentCoordinates = new TaskCoordinates(location);
 		List<Event> events = eventsSource.getActive(currentTime);
