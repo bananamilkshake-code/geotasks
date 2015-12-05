@@ -58,6 +58,6 @@ public class TimeFormat {
 	}
 
 	private static String innerFormat(java.text.DateFormat format, Calendar calendar) {
-		return (calendar != null) ? format.format(calendar) : "";
+		return (calendar != null) ? format.format(calendar.getTime()) : "";
 	}
 }
