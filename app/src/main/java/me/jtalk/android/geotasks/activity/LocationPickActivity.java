@@ -179,7 +179,7 @@ public class LocationPickActivity extends Activity {
 	private void initSearchEditText() {
 		EditText searchEditText = (EditText) findViewById(R.id.location_pick_search_text_edit);
 		searchEditText.setOnEditorActionListener((view, actionId, event) -> {
-			if (event.getKeyCode() != KeyEvent.KEYCODE_ENTER) {
+			if (event == null) { // Event triggered by ENTER key
 				return false;
 			}
 
