@@ -33,7 +33,9 @@
             android:selectAllOnFocus="true"
             android:nestedScrollingEnabled="false"
             android:longClickable="false"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:elevation="5sp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/add_event_location_coordinates_text"
