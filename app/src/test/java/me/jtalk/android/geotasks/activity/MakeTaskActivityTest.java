@@ -7,16 +7,25 @@ import android.widget.TextView;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import me.jtalk.android.geotasks.BuildConfig;
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.application.GeoTasksApplication;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
@@ -81,5 +90,46 @@ public class MakeTaskActivityTest {
 
 		TextView coordinatesText = (TextView) activity.findViewById(R.id.add_event_location_coordinates_text);
 		assertEquals(formattedCoordinates, coordinatesText.getText().toString());
+	}
+
+	@Test
+	public void testOpenActivityToEditEvent() {
+		long eventId = 1;
+
+		Intent intent = new Intent();
+		intent.putExtra(MakeTaskActivity.INTENT_EDIT_TASK, eventId);
+
+		String title = "Title";
+		String description = "Desc";
+		String location = "010.223000 023.232000";
+		String time = "";
+		String date = "";
+		TaskCoordinates coordinates = new TaskCoordinates(10.223, 23.232);
+
+		Event event = new Event(eventId, title, description, null, coordinates);
+
+		EventsSource mockEventSource = Mockito.mock(EventsSource.class);
+		when(mockEventSource.get(eq(eventId))).thenReturn(event);
+		doNothing().when(mockEventSource).edit(eventId, title, description, location, null, null);
+
+		GeoTasksApplication geoTasksApplication = new GeoTasksApplication();
+		geoTasksApplication.setEventsSource(mockEventSource);
+
+		activity = Robolectric
+				.buildActivity(MakeTaskActivity.class)
+				.withApplication(geoTasksApplication)
+				.withIntent(intent)
+				.setup()
+				.get();
+
+		assertEquals(title, activity.titleText.getText().toString());
+		assertEquals(description, activity.descriptionText.getText().toString());
+		assertEquals(location, activity.locationText.getText().toString());
+		assertEquals(time, activity.timeText.getText().toString());
+		assertEquals(date, activity.dateText.getText().toString());
+
+		activity.onAddCalendarClick(null);
+
+		verify(mockEventSource).edit(eventId, title, description, location, null, null);
 	}
 }
