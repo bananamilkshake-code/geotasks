@@ -2,12 +2,12 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
     <item
-        android:id="@+id/action_example"
-        android:showAsAction="ifRoom"
-        android:title="Test"/>
+        android:onClick="sendReports"
+        android:showAsAction="always"
+        android:title="Report"/>
     <item
         android:id="@+id/menu_action_enable_geolistening"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:checkable="true"
         android:icon="@drawable/ic_gps_off_black_48dp"
         android:title="@string/action_enable_geo_listening"

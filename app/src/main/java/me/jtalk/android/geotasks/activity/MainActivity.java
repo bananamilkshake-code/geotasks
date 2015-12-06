@@ -13,6 +13,8 @@ import android.widget.CursorTreeAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import org.acra.ACRA;
+
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
@@ -132,6 +134,11 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		return true;
 	}
 
+	public boolean sendReports(MenuItem menuItem) {
+		ACRA.getErrorReporter().handleSilentException(new Exception());
+		return true;
+	}
+
 	private void createLocationListener() {
 		locationListener = new EventsLocationListener();
 		locationListener.setDistanceToAlarm(Settings.DEFAULT_DISTANCE_TO_ALARM);
@@ -173,6 +180,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		eventsList.setAdapter(eventsAdapter);
 		eventsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 			private int previouslyExpanded = -1;
+
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 				if (parent.isGroupExpanded(groupPosition)) {
