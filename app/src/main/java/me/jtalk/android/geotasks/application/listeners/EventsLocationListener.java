@@ -26,8 +26,8 @@ import me.jtalk.android.geotasks.util.Logger;
 public class EventsLocationListener implements LocationListener {
 	private static final Logger LOG = new Logger(EventsLocationListener.class);
 
-	public static final long MIN_TIME = 0;
-	public static final float MIN_DISTANCE = 0;
+	public static final long MIN_TIME = 2000;
+	public static final float MIN_DISTANCE = 1;
 
 	@Setter(onParam = @__(@NonNull))
 	private EventsSource eventsSource;
@@ -91,7 +91,7 @@ public class EventsLocationListener implements LocationListener {
 	}
 
 	private void onEnabled(Context context) throws SecurityException {
-		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		LocationManager locationManager = getLocationMamager(context);
 		locationManager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER,
 				EventsLocationListener.MIN_TIME,
@@ -105,8 +105,8 @@ public class EventsLocationListener implements LocationListener {
 		LOG.debug("Geo listening enabled");
 	}
 
-	private void onDisabled(Context context)  throws SecurityException {
-		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+	private void onDisabled(Context context) throws SecurityException {
+		LocationManager locationManager = getLocationMamager(context);
 		locationManager.removeUpdates(this);
 
 		menuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
@@ -123,5 +123,9 @@ public class EventsLocationListener implements LocationListener {
 
 		this.isEnabled = enabled;
 		return true;
+	}
+
+	private LocationManager getLocationMamager(Context context) {
+		return (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 }

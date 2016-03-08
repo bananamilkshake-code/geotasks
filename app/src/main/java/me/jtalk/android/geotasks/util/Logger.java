@@ -3,6 +3,8 @@ package me.jtalk.android.geotasks.util;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import org.acra.ACRA;
+
 import java.text.MessageFormat;
 
 /**
@@ -37,6 +39,7 @@ public class Logger {
 	}
 
 	public void warn(Throwable throwable, String format, Object... objects) {
+		ACRA.getErrorReporter().handleSilentException(throwable);
 		Log.w(tag, format(format, objects), throwable);
 	}
 
@@ -45,6 +48,7 @@ public class Logger {
 	}
 
 	public void error(Throwable throwable, String format, Object... objects) {
+		ACRA.getErrorReporter().handleSilentException(throwable);
 		Log.e(tag, format(format, objects), throwable);
 	}
 

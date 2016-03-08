@@ -17,7 +17,7 @@ import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
 @ReportsCrashes(
-		formUri = "https://android.jtalk.me/acra/reports",
+		formUri = "https://as.jtalk.me/jacra-submit",
 		buildConfigClass = BuildConfig.class,
 		mode = ReportingInteractionMode.DIALOG,
 		resDialogTitle = R.string.crash_dialog_title,
