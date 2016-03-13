@@ -91,7 +91,7 @@ public class EventsLocationListener implements LocationListener {
 	}
 
 	private void onEnabled(Context context) throws SecurityException {
-		LocationManager locationManager = getLocationMamager(context);
+		LocationManager locationManager = getLocationManager(context);
 		locationManager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER,
 				EventsLocationListener.MIN_TIME,
@@ -106,7 +106,7 @@ public class EventsLocationListener implements LocationListener {
 	}
 
 	private void onDisabled(Context context) throws SecurityException {
-		LocationManager locationManager = getLocationMamager(context);
+		LocationManager locationManager = getLocationManager(context);
 		locationManager.removeUpdates(this);
 
 		menuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
@@ -125,7 +125,7 @@ public class EventsLocationListener implements LocationListener {
 		return true;
 	}
 
-	private LocationManager getLocationMamager(Context context) {
+	private LocationManager getLocationManager(Context context) {
 		return (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 }
