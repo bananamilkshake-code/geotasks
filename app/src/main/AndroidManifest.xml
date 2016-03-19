@@ -44,6 +44,10 @@
             android:launchMode="singleInstance"
             android:process=":error_report"
             android:theme="@android:style/Theme.Material.Dialog"/>
+        <service
+            android:name=".application.service.LocationTrackService"
+            android:enabled="true"
+            android:permission="android.permission.ACCESS_COARSE_LOCATION"
+            android:exported="false" />
     </application>
-
 </manifest>

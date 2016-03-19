@@ -52,10 +52,8 @@ public class EventsLocationListenerTest {
 		Notifier mockNotifier = Mockito.mock(Notifier.class);
 		doNothing().when(mockNotifier).onEventIsNear(any());
 
-		EventsLocationListener eventLocationListener = new EventsLocationListener();
+		EventsLocationListener eventLocationListener = new EventsLocationListener(mockEventsSource, mockNotifier);
 		eventLocationListener.setDistanceToAlarm(100);
-		eventLocationListener.setEventsSource(mockEventsSource);
-		eventLocationListener.setNotifier(mockNotifier);
 
 		eventLocationListener.onLocationChanged(mockCurrentLocation);
 

@@ -2,9 +2,12 @@ package me.jtalk.android.geotasks.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,17 +15,18 @@ import android.view.View;
 import android.widget.CursorTreeAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
-import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
-import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
+import me.jtalk.android.geotasks.application.service.LocationTrackService;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
@@ -39,7 +43,9 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private int initChainId;
 	private int toggleGeoListenChainId;
 
-	private EventsLocationListener locationListener;
+	private MenuItem geoTrackMenuItem;
+
+	private LocationTrackServiceConnection locationTrackServiceConnection;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,28 +53,24 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		setContentView(R.layout.activity_main);
 
 		initChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::createLocationListener))
 				.add(makeTask(this::getCalendarId, Manifest.permission.WRITE_CALENDAR))
 				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR))
 				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR)));
 
 		toggleGeoListenChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::toggleGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)));
+				.add(makeTask(this::setupGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)));
 
 		processChain(initChainId);
 
-		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+ 		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 				.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
-
-		locationListener.setMenuItem(menu.findItem(R.id.menu_action_enable_geolistening));
-
+		this.geoTrackMenuItem = menu.findItem(R.id.menu_action_enable_geolistening);
 		processChain(toggleGeoListenChainId);
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -116,6 +118,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean toggleGeoListeningClick(MenuItem menuItem) {
 		boolean isChecked = !menuItem.isChecked();
 
+		LOG.debug("Toggling geolistening: make checked {0}", isChecked);
+
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putBoolean(getString(pref_is_geolistening_enabled), isChecked);
@@ -137,12 +141,6 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean sendReports(MenuItem menuItem) {
 		ACRA.getErrorReporter().handleSilentException(new Exception());
 		return true;
-	}
-
-	private void createLocationListener() {
-		locationListener = new EventsLocationListener();
-		locationListener.setDistanceToAlarm(Settings.DEFAULT_DISTANCE_TO_ALARM);
-		locationListener.setNotifier(new Notifier(this));
 	}
 
 	/**
@@ -178,6 +176,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
 		eventsList.setAdapter(eventsAdapter);
+
 		eventsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 			private static final int NOTHING_EXPANDED = -1;
 
@@ -198,6 +197,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 				return true;
 			}
 		});
+
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
 			long eventId = parent.getAdapter().getItemId(position);
 			String eventTitle = ((TextView) view.findViewById(R.id.event_element_title)).getText().toString();
@@ -218,11 +218,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private void initEventsSource() {
 		long calendarId = getCalendarId();
 
-		EventsSource eventsSource = new EventsSource(this, calendarId);
-
-		setEventsSource(eventsSource);
-
-		locationListener.setEventsSource(eventsSource);
+		setEventsSource(new EventsSource(this, calendarId));
 
 		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
 		CursorTreeAdapter eventsAdapter = (CursorTreeAdapter) eventsList.getExpandableListAdapter();
@@ -237,12 +233,50 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * @throws SecurityException if geolistening cannot be enabled because permission
 	 *                           is denied.
 	 */
-	private void toggleGeoListening() throws SecurityException {
+	private void setupGeoListening() throws SecurityException {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean isEnabled = settings.getBoolean(getString(R.string.pref_is_geolistening_enabled), Settings.DEFAULT_GEO_LISTENING);
 
-		if (locationListener.tryToggle(isEnabled)) {
-			locationListener.toggleGeoListening(this);
+		if (isEnabled) {
+			LOG.debug("Bind to LocationTrackService");
+			locationTrackServiceConnection = new LocationTrackServiceConnection();
+			if (!bindService(new Intent(this, LocationTrackService.class), locationTrackServiceConnection, BIND_AUTO_CREATE)) {
+				LOG.error("Failed to bind LocationTrackService");
+			}
+
+			geoTrackMenuItem.setChecked(true);
+			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
+
+			Toast.makeText(this, R.string.toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
+		} else {
+			if (locationTrackServiceConnection != null) {
+				LOG.debug("Unbinding from LocationTrackService");
+				locationTrackServiceConnection.locationBinder.disable();
+				unbindService(locationTrackServiceConnection);
+			}
+
+			geoTrackMenuItem.setChecked(false);
+			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
+
+			Toast.makeText(this, R.string.toast_geolistening_disnabled, Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private class LocationTrackServiceConnection implements ServiceConnection {
+
+		public LocationTrackService.LocationBinder locationBinder;
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			locationBinder = (LocationTrackService.LocationBinder) service;
+			locationBinder.setup(MainActivity.this.getEventsSource(), new Notifier(MainActivity.this), Settings.DEFAULT_DISTANCE_TO_ALARM);
+
+			LOG.debug("LocationTrackService is connected");
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			LOG.debug("LocationTrackService is disconnected");
 		}
 	}
 }
