@@ -179,15 +179,17 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
 		eventsList.setAdapter(eventsAdapter);
 		eventsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-			private int previouslyExpanded = -1;
+			private static final int NOTHING_EXPANDED = -1;
+
+			private int previouslyExpanded = NOTHING_EXPANDED;
 
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 				if (parent.isGroupExpanded(groupPosition)) {
 					parent.collapseGroup(groupPosition);
-					previouslyExpanded = -1;
+					previouslyExpanded = NOTHING_EXPANDED;
 				} else {
-					if (previouslyExpanded != -1) {
+					if (previouslyExpanded != NOTHING_EXPANDED) {
 						parent.collapseGroup(previouslyExpanded);
 					}
 					parent.expandGroup(groupPosition);
