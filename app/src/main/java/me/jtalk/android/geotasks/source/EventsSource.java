@@ -164,7 +164,11 @@ public class EventsSource {
 		Cursor cursor = this.context.getContentResolver().query(uri, PROJECTION_EVENTS, null, null, null);
 		cursor.moveToFirst();
 
-		return extractEvent(cursor);
+		Event event = extractEvent(cursor);
+
+		cursor.close();
+
+		return event;
 	}
 
 	/**
@@ -218,6 +222,8 @@ public class EventsSource {
 		while (cursor.moveToNext()) {
 			events.add(extractEvent(cursor));
 		}
+
+		cursor.close();
 
 		return events;
 	}
