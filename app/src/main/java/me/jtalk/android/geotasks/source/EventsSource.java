@@ -250,9 +250,9 @@ public class EventsSource {
 
 	private static String[] buildSelectionArgsForNearEvents(long calendarId, Calendar currentTime) {
 		return new String[]{
-				String.valueOf(calendarId),
-				String.valueOf(currentTime.getTimeInMillis()),
-				String.valueOf(currentTime.getTimeInMillis())
+				String.valueOf(calendarId)
+				, String.valueOf(currentTime.getTimeInMillis())
+				, String.valueOf(currentTime.getTimeInMillis())
 		};
 	}
 }
