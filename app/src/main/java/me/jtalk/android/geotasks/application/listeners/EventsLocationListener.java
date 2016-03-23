@@ -52,7 +52,7 @@ public class EventsLocationListener implements LocationListener {
 			if (distance <= distanceToAlarm) {
 				LOG.debug("Notify about event {0} (distance {1}, current coordinates {2})",
 						event.getTitle(), distance, currentCoordinates);
-				notifier.onEventIsNear(event);
+				notifier.onEventIsNear(event, distance);
 			}
 		}
 	}

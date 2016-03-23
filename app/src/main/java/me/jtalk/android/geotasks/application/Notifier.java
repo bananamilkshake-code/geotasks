@@ -23,10 +23,10 @@ public class Notifier {
 	 *
 	 * @param event
 	 */
-	public void onEventIsNear(Event event) {
+	public void onEventIsNear(Event event, double distance) {
 		Notification.Builder builder = new Notification.Builder(context)
 				.setContentTitle(getNotificationTitle(event))
-				.setContentText(getNotificationText(event))
+				.setContentText(getNotificationText(distance))
 				.setAutoCancel(true)
 				.setVibrate(new long[]{1000, 0});
 
@@ -67,10 +67,10 @@ public class Notifier {
 	/**
 	 * Creates formatted text for event notification.
 	 *
-	 * @param event
+	 * @param distance in meters to event
 	 * @return text string
 	 */
-	private String getNotificationText(@NonNull Event event) {
-		return MessageFormat.format(context.getString(R.string.notification_event_is_near_text_arg_1), event.getLocationText());
+	private String getNotificationText(double distance) {
+		return MessageFormat.format(context.getString(R.string.notification_event_is_near_text_arg_1), distance);
 	}
 }
