@@ -16,6 +16,9 @@ import me.jtalk.android.geotasks.source.Event;
 
 @AllArgsConstructor
 public class Notifier {
+
+	private static final long[] VIBRATION_PATTERN = new long[]{1000, 0};
+
 	private Context context;
 
 	/**
@@ -28,7 +31,7 @@ public class Notifier {
 				.setContentTitle(getNotificationTitle(event))
 				.setContentText(getNotificationText(distance))
 				.setAutoCancel(true)
-				.setVibrate(new long[]{1000, 0});
+				.setVibrate(VIBRATION_PATTERN);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			builder.setSmallIcon(getSmallIcon());
