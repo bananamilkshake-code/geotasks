@@ -44,12 +44,14 @@ public class EventsLocationListener implements LocationListener {
 		TaskCoordinates currentCoordinates = new TaskCoordinates(location);
 		List<Event> events = eventsSource.getActive(currentTime);
 
+		LOG.debug("Events for check: {0}", events);
+
 		for (Event event : events) {
 			double distance = event.getCoordinates().distanceTo(currentCoordinates);
+			LOG.debug("Event {0} is checked. Distance {1}", event.getTitle(), distance);
 			if (distance <= distanceToAlarm) {
 				LOG.debug("Notify about event {0} (distance {1}, current coordinates {2})",
 						event.getTitle(), distance, currentCoordinates);
-
 				notifier.onEventIsNear(event);
 			}
 		}
