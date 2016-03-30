@@ -43,7 +43,7 @@
     <string name="locatio_pick_incorrect_address">Not found</string>
     <string name="crash_dialog_ok_toast">Thank you!</string>
     <string name="crash_positive_button">Send</string>
-    <string name="pref_crash_report_status_summary">If error occurres application can send report o developers.</string>
+    <string name="pref_crash_report_status_summary">If error occurred application can send report to developers.</string>
     <string name="pref_crash_report_status_title">Send report about crash</string>
     <string name="crash_dialog_title">GeoTasks crashed</string>
     <string name="item_event_expanded_button_edit">Edit</string>
