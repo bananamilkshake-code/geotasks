@@ -286,7 +286,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			locationBinder = (LocationTrackService.LocationBinder) service;
-			locationBinder.setup(MainActivity.this.getEventsSource(), new Notifier(MainActivity.this), Settings.DEFAULT_DISTANCE_TO_ALARM);
+			locationBinder.setup(MainActivity.this.getEventsSource(), new Notifier(MainActivity.this));
 
 			LOG.debug("LocationTrackService is connected");
 		}

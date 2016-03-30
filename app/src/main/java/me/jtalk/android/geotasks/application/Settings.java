@@ -30,5 +30,5 @@ public class Settings {
 	/**
 	 * Default value of distance to event location when reminder must be enabled.
 	 */
-	public static final float DEFAULT_DISTANCE_TO_ALARM = 100;
+	public static final Float DEFAULT_DISTANCE_TO_ALARM = 100.0f;
 }

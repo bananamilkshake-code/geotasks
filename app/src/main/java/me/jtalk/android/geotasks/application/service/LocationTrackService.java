@@ -20,12 +20,16 @@ package me.jtalk.android.geotasks.application.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
+import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Notifier;
+import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
@@ -53,14 +57,13 @@ public class LocationTrackService extends Service {
 		return super.onUnbind(intent);
 	}
 
-	public class LocationBinder extends Binder {
+	public class LocationBinder extends Binder implements SharedPreferences.OnSharedPreferenceChangeListener {
 		// TODO: make list of locationListeners because LocationTrackService always
 		// returns first created IBinder object.
 		private EventsLocationListener locationListener;
 
-		public void setup(EventsSource eventsSource, Notifier notifier, float distanceToAlarm) throws SecurityException {
+		public void setup(EventsSource eventsSource, Notifier notifier) throws SecurityException {
 			locationListener = new EventsLocationListener(eventsSource, notifier);
-			locationListener.setDistanceToAlarm(distanceToAlarm);
 
 			LocationManager locationManager = LocationTrackService.this.getLocationManager();
 			if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) {
@@ -71,9 +74,7 @@ public class LocationTrackService extends Service {
 						locationListener);
 
 				LOG.debug("Geo listening enabled via NetworkProvider");
-			}
-
-			if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
+			} else if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
 				locationManager.requestLocationUpdates(
 						LocationManager.GPS_PROVIDER,
 						EventsLocationListener.MIN_TIME,
@@ -82,12 +83,33 @@ public class LocationTrackService extends Service {
 
 				LOG.debug("Geo listening enabled via GpsProvider");
 			}
+
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			settings.registerOnSharedPreferenceChangeListener(this);
+			updateDistanceToAlarm(settings);
 		}
 
 		public void disable() throws SecurityException {
 			LocationTrackService.this.getLocationManager().removeUpdates(locationListener);
 
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			settings.unregisterOnSharedPreferenceChangeListener(this);
+
+			locationListener = null;
+
 			LOG.debug("Geo listening disabled");
+		}
+
+		private void updateDistanceToAlarm(SharedPreferences settings) {
+			float distanceToAlarm = Float.parseFloat(settings.getString(getString(R.string.pref_alarm_distance), Settings.DEFAULT_DISTANCE_TO_ALARM.toString()));
+			locationListener.setDistanceToAlarm(distanceToAlarm);
+		}
+
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+			if (key.equals(getString(R.string.pref_alarm_distance))) {
+				updateDistanceToAlarm(sharedPreferences);
+			}
 		}
 	}
 }

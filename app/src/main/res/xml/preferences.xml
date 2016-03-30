@@ -14,4 +14,11 @@
         android:key="@string/pref_crash_report_send_status"
         android:summary="@string/pref_crash_report_status_summary"
         android:title="@string/pref_crash_report_status_title"/>
+
+    <EditTextPreference
+        android:defaultValue="100.0"
+        android:key="@string/pref_alarm_distance"
+        android:summary="@string/pref_alarm_distance_summary"
+        android:title="@string/pref_alarm_distance_title"
+        android:numeric="decimal" />
 </PreferenceScreen>
