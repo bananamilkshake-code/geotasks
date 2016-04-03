@@ -50,4 +50,8 @@
     <string name="pref_alarm_distance_title">Alarm distance</string>
     <string name="pref_alarm_distance_summary">If distance to even will be less notification will be shown</string>
     <string name="pref_alarm_distance">pref_alarm_distance</string>
+    <string name="dialog_location_setup">Setup</string>
+    <string name="dialog_location_cancel">Cancel</string>
+    <string name="dialog_location_title">Enter coordinates</string>
+    <string name="dialog_location_error">Cannot be empty</string>
 </resources>

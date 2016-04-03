@@ -17,18 +17,25 @@
  */
 package me.jtalk.android.geotasks.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Environment;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
@@ -46,14 +53,21 @@ import org.mapsforge.map.reader.MapFile;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
 import java.io.File;
+import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
+import me.jtalk.android.geotasks.util.Logger;
 
 public class LocationPickActivity extends Activity {
+	private static final Logger LOG = new Logger(LocationPickActivity.class);
+
 	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(48.8583, 2.2944);
 
 	private static final byte DEFAULT_ZOOM = 9;
@@ -91,6 +105,7 @@ public class LocationPickActivity extends Activity {
 
 		initMapView();
 		initSearchEditText();
+		initLocationCoordinatesText();
 	}
 
 	@Override
@@ -220,6 +235,99 @@ public class LocationPickActivity extends Activity {
 		});
 	}
 
+	private void initLocationCoordinatesText() {
+		TextView textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
+		textLocationCoordinates.setOnClickListener(new LocationDialogViewOnClickListener());
+	}
+
+	@AllArgsConstructor
+	private class NumericValueFilter implements InputFilter {
+		double min;
+		double max;
+
+		@Override
+		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+			String newValue = dest.subSequence(0, dstart).toString() + source.subSequence(start, end) + dest.subSequence(dend, dest.length()).toString();
+			if (newValue.length() == 0) {
+				return null;
+			}
+
+			try {
+				Double newNumericValue = Double.parseDouble(newValue);
+				if (min <= newNumericValue && newNumericValue <= max) {
+					return null;
+				}
+			} catch (NumberFormatException exception) {
+				LOG.warn(exception, "String {0} cannot be parsed to float in NumericValueFilter", newValue);
+			}
+
+			return "";
+		}
+	}
+
+	public class LocationDialogViewOnClickListener implements View.OnClickListener, Validator.ValidationListener {
+		@NotEmpty
+		@Bind(R.id.dialog_location_latitude)
+		TextView latitudeText;
+
+		@NotEmpty
+		@Bind(R.id.dialog_location_longitude)
+		TextView longitudeText;
+
+		private Validator validator;
+
+		private AlertDialog dialog;
+
+		@Override
+		public void onClick(View v) {
+			LayoutInflater inflater = LocationPickActivity.this.getLayoutInflater();
+			View dialogView = inflater.inflate(R.layout.dialog_location, null);
+
+			ButterKnife.bind(this, dialogView);
+
+			validator = new Validator(this);
+			validator.setValidationListener(this);
+
+			latitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-90.0, 90.0) });
+			longitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-180.0, 180.0) });
+
+			if (pickedLocation != null) {
+				latitudeText.setText(Double.toString(pickedLocation.getLatitude()));
+				longitudeText.setText(Double.toString(pickedLocation.getLongitude()));
+			}
+
+			AlertDialog.Builder builder =
+					new AlertDialog.Builder(LocationPickActivity.this)
+							.setView(dialogView)
+							.setNeutralButton(R.string.dialog_location_setup, (d, w) -> validator.validate())
+							.setNegativeButton(R.string.dialog_location_cancel, null);
+
+			dialog = builder.create();
+			dialog.show();
+		}
+
+		@Override
+		public void onValidationSucceeded() {
+			Float latitude = Float.parseFloat(latitudeText.getText().toString());
+			Float longitude = Float.parseFloat(longitudeText.getText().toString());
+
+			TaskCoordinates coordinates = new TaskCoordinates(latitude, longitude);
+			LocationPickActivity.this.onLocationPick(coordinates);
+
+			dialog.dismiss();
+		}
+
+		@Override
+		public void onValidationFailed(List<ValidationError> errors) {
+			for (ValidationError error : errors) {
+				View errorView = error.getView();
+				if (errorView == latitudeText || errorView == longitudeText) {
+					((TextView) errorView).setError(getString(R.string.dialog_location_error));
+				}
+			}
+		}
+	}
+
 	private void searchLocation(String addressText) {
 		if (addressText.isEmpty()) {
 			return;
@@ -302,7 +410,6 @@ public class LocationPickActivity extends Activity {
 	private void updateCurrentLocation(TaskCoordinates coordinates) {
 		TextView textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
 		textLocationCoordinates.setText(CoordinatesFormat.format(coordinates));
-		textLocationCoordinates.setVisibility(View.VISIBLE);
 
 		marker.setLatLong(coordinates.toLatLong());
 		marker.requestRedraw();
