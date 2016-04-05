@@ -23,7 +23,7 @@
         android:text="lon: 34.234 lat: 45.00" />
 
     <TextView
-        android:id="@+id/event_element_time"
+        android:id="@+id/event_element_start_time"
         android:textColor="@android:color/secondary_text_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

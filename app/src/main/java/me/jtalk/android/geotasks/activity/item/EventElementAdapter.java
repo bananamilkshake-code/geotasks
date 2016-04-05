@@ -57,12 +57,12 @@ public class EventElementAdapter extends CursorTreeAdapter {
 	@Override
 	protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
 		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
-		TextView timeView = (TextView) view.findViewById(R.id.event_element_time);
+		TextView startTimeView = (TextView) view.findViewById(R.id.event_element_start_time);
 		TextView locationView = (TextView) view.findViewById(R.id.event_element_location);
 
 		Event event = EventsSource.extractEvent(cursor);
 		titleView.setText(event.getTitle());
-		timeView.setText(TimeFormat.formatDateTime(context, event.getStartTime()));
+		startTimeView.setText(TimeFormat.formatDateTime(context, event.getStartTime()));
 		locationView.setText(event.getLocationText());
 	}
 
