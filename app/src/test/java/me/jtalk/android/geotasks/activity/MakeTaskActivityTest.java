@@ -125,8 +125,8 @@ public class MakeTaskActivityTest {
 		assertEquals(title, activity.titleText.getText().toString());
 		assertEquals(description, activity.descriptionText.getText().toString());
 		assertEquals(location, activity.locationText.getText().toString());
-		assertEquals(time, activity.timeText.getText().toString());
-		assertEquals(date, activity.dateText.getText().toString());
+		assertEquals(time, activity.startTimeText.getText().toString());
+		assertEquals(date, activity.startDateText.getText().toString());
 
 		activity.onAddCalendarClick(null);
 

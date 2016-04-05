@@ -66,10 +66,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	TextView locationText;
 
 	@Bind(R.id.add_event_start_date_text)
-	TextView dateText;
+	TextView startDateText;
 
 	@Bind(R.id.add_event_start_time_text)
-	TextView timeText;
+	TextView startTimeText;
 
 	private Validator validator;
 
@@ -242,7 +242,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private void setTimeViews() {
-		setDateForView(dateText, timeText, event.getStartTime());
+		setDateForView(startDateText, startTimeText, event.getStartTime());
 	}
 
 	private void setDateForView(TextView dateView, TextView timeView, Calendar calendar) {
@@ -251,7 +251,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private boolean isStartTimeView(View view) {
-		return view == dateText || view == timeText;
+		return view == startDateText || view == startTimeText;
 	}
 
 	/**
