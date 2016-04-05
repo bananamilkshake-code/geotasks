@@ -131,7 +131,8 @@ public class EventsSource {
 	 * Returns null if location for event has not been set.
 	 */
 	private static TaskCoordinates getCoordinates(Cursor cursor) {
-		if (CursorHelper.getString(cursor, Events.EVENT_LOCATION).isEmpty()) {
+		String locationValue = CursorHelper.getString(cursor, Events.EVENT_LOCATION);
+		if (locationValue == null || locationValue.isEmpty()) {
 			return null;
 		}
 
