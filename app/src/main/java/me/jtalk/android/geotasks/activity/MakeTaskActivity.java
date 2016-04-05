@@ -115,7 +115,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			setDateForView(dateText, event.getStartTime());
 
 			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
-					.add(makeTask(() -> editEvent(), Manifest.permission.WRITE_CALENDAR)));
+					.add(makeTask(this::editEvent, Manifest.permission.WRITE_CALENDAR)));
 		}
 
 		titleText.addTextChangedListener(new TextWatcher() {
