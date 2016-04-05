@@ -13,24 +13,6 @@
         android:textSize="24sp"
         android:text="Event title" />
 
-    <TextView
-        android:id="@+id/event_element_location"
-        android:textColor="@android:color/secondary_text_light"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/event_element_title"
-        android:layout_alignStart="@+id/event_element_title"
-        android:text="lon: 34.234 lat: 45.00" />
-
-    <TextView
-        android:id="@+id/event_element_start_time"
-        android:textColor="@android:color/secondary_text_light"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/event_element_title"
-        android:layout_alignEnd="@+id/event_element_title"
-        android:text="12/03/2015 8:05" />
-
     <ImageView
         android:id="@+id/event_element_alarm"
         android:layout_width="48dp"

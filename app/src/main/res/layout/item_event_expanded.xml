@@ -11,4 +11,20 @@
         android:padding="10sp"
         android:text="Hey! This is big event description. It tells why event has been created and why this is important. You mustn't read all of it each time so we hid it in expanded form."
         android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/event_element_location"
+        android:textColor="@android:color/secondary_text_light"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10sp"
+        android:text="lon: 34.234 lat: 45.00" />
+
+    <TextView
+        android:id="@+id/event_element_start_time"
+        android:textColor="@android:color/secondary_text_light"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10sp"
+        android:text="12/03/2015 8:05" />
 </LinearLayout>
