@@ -31,7 +31,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CursorTreeAdapter;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.acra.ACRA;
@@ -45,6 +44,7 @@ import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
 import me.jtalk.android.geotasks.application.service.LocationTrackService;
 import me.jtalk.android.geotasks.source.CalendarsSource;
+import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
@@ -217,14 +217,12 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		});
 
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
-			long eventId = parent.getAdapter().getItemId(position);
-			String eventTitle = ((TextView) view.findViewById(R.id.event_element_title)).getText().toString();
-
+			Event event = EventsSource.extractEvent(eventsAdapter.getGroup(position));
 			new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.dialog_delete_event_title)
-					.setMessage(MessageFormat.format(getString(R.string.dialog_delete_event_text), eventTitle))
+					.setMessage(MessageFormat.format(getString(R.string.dialog_delete_event_text), event.getTitle()))
 					.setPositiveButton(R.string.dialog_delete_event_yes, (dialog, which) -> {
-						MainActivity.this.getEventsSource().remove(eventId);
+						getEventsSource().remove(event.getId());
 					})
 					.setNegativeButton(R.string.dialog_delete_event_no, null)
 					.setCancelable(true)
