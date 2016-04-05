@@ -35,8 +35,6 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -45,7 +43,6 @@ import butterknife.ButterKnife;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
-import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
@@ -112,7 +109,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			titleText.setText(event.getTitle());
 			descriptionText.setText(event.getDescription());
 			setLocationText();
-			setDateForView(dateText, event.getStartTime());
+			setTimeViews();
 
 			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
 					.add(makeTask(this::editEvent, Manifest.permission.WRITE_CALENDAR)));
@@ -225,27 +222,9 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
 			calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			calendar.set(Calendar.MINUTE, minute);
-			setDateForView(((TextView) view), calendar);
-		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
-	}
-
-	private void setDateForView(TextView view, Calendar calendar) {
-		view.setText(TimeFormat.formatTime(this, calendar));
-	}
-
-	/**
-	 * Return value of event time that is bound to given view:
-	 * date
-	 * @param view to get time for
-	 * @return
-	 */
-
-	private Calendar getTimeByView(View view) {
-		if (view == dateText) {
-			return event.getStartTime();
-		} else {
-			return null;
-		}
+			setTimeViews();
+		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true)
+				.show();
 	}
 
 	/**
@@ -254,23 +233,35 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @param view
 	 */
 	public void showDatePickerDialog(View view) {
-		TextView textView = (TextView) view;
-		Calendar calendar = Calendar.getInstance();
-
-		try {
-			String dateText = textView.getText().toString();
-			if (!dateText.isEmpty()) {
-				calendar = (TimeFormat.parseDate(this, dateText));
-			}
-		} catch (ParseException exception) {
-			LOG.warn(exception, "Date value from date text field cannot be parsed");
-		}
-
+		final Calendar calendar = getTimeByView(view);
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
-			Calendar picked = Calendar.getInstance();
-			picked.set(year, monthOfYear, dayOfMonth);
-			textView.setText(TimeFormat.formatDate(this, picked));
-		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+			calendar.set(year, monthOfYear, dayOfMonth);
+			setTimeViews();
+		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+				.show();
+	}
+
+	private void setTimeViews() {
+		setDateForView(dateText, timeText, event.getStartTime());
+	}
+
+	private void setDateForView(TextView dateView, TextView timeView, Calendar calendar) {
+		dateView.setText(TimeFormat.formatDate(this, calendar));
+		timeView.setText(TimeFormat.formatTime(this, calendar));
+	}
+
+	/**
+	 * Return value of event time that is bound to given view:
+	 * date
+	 * @param view to get time for
+	 * @return
+	 */
+	private Calendar getTimeByView(View view) {
+		if (view == dateText || view == timeText) {
+			return event.getStartTime();
+		} else {
+			return null;
+		}
 	}
 
 	private void onLocationResult(Intent data) {
@@ -297,38 +288,5 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		}
 
 		startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);
-	}
-
-	private Calendar getDateText() {
-		Calendar dateCalendar = parseFromTextView(dateText, TimeFormat.getDateFormat(this));
-		Calendar timeCalendar = parseFromTextView(timeText, TimeFormat.getTimeFormat(this));
-
-		if (dateCalendar == null || timeCalendar == null) {
-			return EventsSource.EMPTY_TIME;
-		}
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(dateCalendar.get(Calendar.YEAR),
-				dateCalendar.get(Calendar.MONTH),
-				dateCalendar.get(Calendar.DAY_OF_MONTH),
-				timeCalendar.get(Calendar.HOUR_OF_DAY),
-				timeCalendar.get(Calendar.MINUTE));
-		return calendar;
-	}
-
-	private Calendar parseFromTextView(TextView view, DateFormat format) {
-		String calendarStr = view.getText().toString();
-		if (calendarStr.isEmpty()) {
-			return null;
-		}
-
-		try {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(format.parse(calendarStr));
-			return calendar;
-		} catch (ParseException exception) {
-			LOG.warn(exception, "Parsing event start time values {0} from view {1} failed", calendarStr, view.getId());
-			return null;
-		}
 	}
 }
