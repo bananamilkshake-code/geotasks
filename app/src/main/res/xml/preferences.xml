@@ -21,4 +21,18 @@
         android:summary="@string/pref_alarm_distance_summary"
         android:title="@string/pref_alarm_distance_title"
         android:numeric="decimal" />
+
+    <EditTextPreference
+        android:defaultValue="1.0"
+        android:key="@string/pref_location_update_min_distance"
+        android:summary="@string/pref_location_update_min_distance_summary"
+        android:title="@string/pref_location_update_min_distance_title"
+        android:numeric="decimal" />
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:key="@string/pref_location_update_min_time"
+        android:summary="@string/ref_location_update_min_time_summary"
+        android:title="@string/pref_location_update_min_time_title"
+        android:numeric="integer" />
 </PreferenceScreen>

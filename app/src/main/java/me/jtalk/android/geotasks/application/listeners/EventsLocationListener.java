@@ -35,8 +35,8 @@ import me.jtalk.android.geotasks.util.Logger;
 public class EventsLocationListener implements LocationListener {
 	private static final Logger LOG = new Logger(EventsLocationListener.class);
 
-	public static final long MIN_TIME = 200;
-	public static final float MIN_DISTANCE = 1.0f;
+	public static final Long MIN_TIME = Long.valueOf(5);
+	public static final Float MIN_DISTANCE = 1.0f;
 
 	private EventsSource eventsSource;
 

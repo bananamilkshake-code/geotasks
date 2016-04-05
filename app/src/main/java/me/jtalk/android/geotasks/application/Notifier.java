@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import java.text.MessageFormat;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.source.Event;
 
@@ -36,6 +37,7 @@ public class Notifier {
 
 	private static final long[] VIBRATION_PATTERN = new long[]{1000, 0};
 
+	@Getter
 	private Context context;
 
 	/**
