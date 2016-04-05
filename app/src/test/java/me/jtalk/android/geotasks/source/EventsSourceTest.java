@@ -24,6 +24,7 @@ import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.BuildConfig;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -59,9 +60,11 @@ public class EventsSourceTest {
 
 	@Test
 	public void testEventCreation() throws SecurityException {
+		TaskCoordinates coordinates = new TaskCoordinates(12.3434, 54.23434);
+
 		final String title = "Title";
 		final String description = "Description";
-		final String location = "12.3434 54.23434";
+		final String location = CoordinatesFormat.format(coordinates);
 		final Calendar startTime = Calendar.getInstance();
 		final Calendar endTime = Calendar.getInstance();
 
@@ -80,7 +83,8 @@ public class EventsSourceTest {
 		when(mockedContentResolver.insert(CalendarContract.Events.CONTENT_URI, expectedValues))
 				.thenReturn(new Uri.Builder().build());
 
-		eventsSource.add(title, description, location, startTime, endTime);
+		Event event = new Event(-1, title, description, startTime, endTime, coordinates);
+		eventsSource.add(event);
 
 		verify(mockedContext).getContentResolver();
 		verify(mockedContentResolver).insert(CalendarContract.Events.CONTENT_URI, expectedValues);
@@ -108,9 +112,9 @@ public class EventsSourceTest {
 	public void testGetActive() {
 		final Calendar eventTime = Calendar.getInstance();
 		eventTime.set(2015, 11, 12);
-		Event event1 = new Event(1, "Title1", "Description1", eventTime, new TaskCoordinates(1, 1));
-		Event event2 = new Event(2, "Title2", "Description1", eventTime, new TaskCoordinates(2, 2));
-		Event event3 = new Event(3, "Title3", "Description1", eventTime, new TaskCoordinates(3, 3));
+		Event event1 = new Event(1, "Title1", "Description1", eventTime, null, new TaskCoordinates(1, 1));
+		Event event2 = new Event(2, "Title2", "Description1", eventTime, null, new TaskCoordinates(2, 2));
+		Event event3 = new Event(3, "Title3", "Description1", eventTime, null, new TaskCoordinates(3, 3));
 
 		Cursor cursor = createCursor(event1, event2, event3);
 
