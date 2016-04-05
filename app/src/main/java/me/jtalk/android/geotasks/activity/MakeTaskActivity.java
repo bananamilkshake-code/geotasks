@@ -78,6 +78,16 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	private int saveEventChainId;
 	private int openLocationPickActivityChainId;
 
+	private Event event;
+
+	{
+		openLocationPickActivityChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+				.add(makeTask(this::openLocationPickActivity,
+						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
+						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
+						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE)));
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -105,11 +115,8 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 					.add(makeTask(() -> editEvent(eventId), Manifest.permission.WRITE_CALENDAR)));
 		}
 
-		openLocationPickActivityChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::openLocationPickActivity,
-						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
-						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
-						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE)));
+	private void setLocationText() {
+		locationText.setText(event.getLocationText());
 	}
 
 	@Override
