@@ -72,6 +72,7 @@ public class EventsSource {
 			Events.DESCRIPTION,
 			Events.EVENT_LOCATION,
 			Events.DTSTART,
+			Events.DTEND,
 			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), EVENT_LATITUDE),
 			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), EVENT_LONGITUDE)
 	};
@@ -88,8 +89,9 @@ public class EventsSource {
 		String title = CursorHelper.getString(cursor, Events.TITLE);
 		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
 		Calendar startTime = getTimeText(cursor, Events.DTSTART);
+		Calendar endTime = getTimeText(cursor, Events.DTEND);
 		TaskCoordinates geoPoint = getCoordinates(cursor);
-		return new Event(id, title, description, startTime, EMPTY_TIME, geoPoint);
+		return new Event(id, title, description, startTime, endTime, geoPoint);
 	}
 
 	/**
