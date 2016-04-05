@@ -222,7 +222,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
 			calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			calendar.set(Calendar.MINUTE, minute);
-			setTimeViews();
+			setTimeByView(view, calendar);
 		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true)
 				.show();
 	}
@@ -236,7 +236,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		final Calendar calendar = getTimeByView(view);
 		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
 			calendar.set(year, monthOfYear, dayOfMonth);
-			setTimeViews();
+			setTimeByView(view, calendar);
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
 				.show();
 	}
@@ -250,6 +250,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		timeView.setText(TimeFormat.formatTime(this, calendar));
 	}
 
+	private boolean isStartTimeView(View view) {
+		return view == dateText || view == timeText;
+	}
+
 	/**
 	 * Return value of event time that is bound to given view:
 	 * date
@@ -257,11 +261,26 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @return
 	 */
 	private Calendar getTimeByView(View view) {
-		if (view == dateText || view == timeText) {
-			return event.getStartTime();
+		Calendar calendar;
+		if (isStartTimeView(view)) {
+			calendar = event.getStartTime();
 		} else {
 			return null;
 		}
+
+		if (calendar == null) {
+			calendar = Calendar.getInstance();
+		}
+
+		return calendar;
+	}
+
+	private void setTimeByView(View view, Calendar calendar) {
+		// calendar can be newly created, so we need to set it manually
+		if (isStartTimeView(view)) {
+			event.setStartTime(calendar);
+		}
+		setTimeViews();
 	}
 
 	private void onLocationResult(Intent data) {
