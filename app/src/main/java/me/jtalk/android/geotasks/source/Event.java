@@ -55,7 +55,7 @@ public class Event {
 
 	public String getLocationText() {
 		if (coordinates == null) {
-			return null;
+			return "";
 		}
 
 		return CoordinatesFormat.format(coordinates);
