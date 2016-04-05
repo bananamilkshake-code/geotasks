@@ -23,7 +23,6 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CursorTreeAdapter;
 import android.widget.TextView;
 
@@ -74,15 +73,15 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
-		TextView descriptionView = (TextView) view.findViewById(R.id.item_event_expanded_descripion);
-		Button buttonEdit = (Button) view.findViewById(R.id.item_event_expanded_button_edit);
-
 		Event event = EventsSource.extractEvent(cursor);
-		descriptionView.setText(event.getDescription());
-		buttonEdit.setOnClickListener(v -> {
+
+		view.setOnClickListener(v -> {
 			Intent intent = new Intent(context, MakeTaskActivity.class);
 			intent.putExtra(MakeTaskActivity.INTENT_EDIT_TASK, event.getId());
 			context.startActivity(intent);
 		});
+
+		TextView descriptionView = (TextView) view.findViewById(R.id.item_event_expanded_descripion);
+		descriptionView.setText(event.getDescription());
 	}
 }
