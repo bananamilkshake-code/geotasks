@@ -77,7 +77,7 @@ public class EventsSource {
 	};
 
 	/**
-	 * Exracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
+	 * Extracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
 	 * and creates Event object from it.
 	 *
 	 * @param cursor
@@ -89,7 +89,7 @@ public class EventsSource {
 		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
 		Calendar startTime = getTimeText(cursor, Events.DTSTART);
 		TaskCoordinates geoPoint = getCoordinates(cursor);
-		return new Event(id, title, description, startTime, geoPoint);
+		return new Event(id, title, description, startTime, EMPTY_TIME, geoPoint);
 	}
 
 	/**
@@ -154,15 +154,11 @@ public class EventsSource {
 	/**
 	 * Creates new event in Android Calendar Provider.
 	 *
-	 * @param title
-	 * @param description
-	 * @param location
-	 * @param startTime   event start time. This value can be null if start time is not set.
-	 * @param endTime     event end time. This value can be null if start time is not set.
+	 * @param event to create
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
-	public void add(String title, String description, String location, Calendar startTime, Calendar endTime) throws SecurityException {
-		ContentValues values = createContentValues(title, description, location, startTime, endTime);
+	public void add(Event event) throws SecurityException {
+		ContentValues values = createContentValues(event);
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
 
@@ -189,20 +185,15 @@ public class EventsSource {
 	}
 
 	/**
-	 * Updates values for event with id {@id}
+	 * Update event
 	 *
-	 * @param id          even id to update
-	 * @param title
-	 * @param description
-	 * @param location
-	 * @param startTime   event start time. This value can be null if start time is not set.
-	 * @param endTime     event end time. This value can be null if start time is not set.
+	 * @param event          event to update
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
-	public void edit(long id, String title, String description, String location, Calendar startTime, Calendar endTime) {
-		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
+	public void edit(Event event) {
+		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, event.getId());
 
-		ContentValues values = createContentValues(title, description, location, startTime, endTime);
+		ContentValues values = createContentValues(event);
 
 		this.context.getContentResolver().update(uri, values, null, null);
 	}
@@ -245,16 +236,16 @@ public class EventsSource {
 		return events;
 	}
 
-	private ContentValues createContentValues(String title, String description, String location, Calendar startTime, Calendar endTime) {
+	private ContentValues createContentValues(Event event) {
 		ContentValues values = new ContentValues();
 		values.put(Events.CALENDAR_ID, calendarId);
-		values.put(Events.TITLE, title);
-		values.put(Events.DESCRIPTION, description);
-		values.put(Events.EVENT_LOCATION, location);
+		values.put(Events.TITLE, event.getTitle());
+		values.put(Events.DESCRIPTION, event.getDescription());
+		values.put(Events.EVENT_LOCATION, event.getLocationText());
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 
-		values.put(Events.DTSTART, getMillis(startTime));
-		values.put(Events.DTEND, getMillis(endTime));
+		values.put(Events.DTSTART, getMillis(event.getStartTime()));
+		values.put(Events.DTEND, getMillis(event.getEndTime()));
 		return values;
 	}
 

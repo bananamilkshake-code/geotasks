@@ -19,25 +19,37 @@ package me.jtalk.android.geotasks.source;
 
 import java.util.Calendar;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
-@AllArgsConstructor()
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Event {
 	@Getter
 	private long id;
 
+	@Setter
 	@Getter
 	private String title;
 
+	@Setter
 	@Getter
 	private String description;
 
+	@Setter
 	@Getter
 	private Calendar startTime;
 
+	@Setter
+	@Getter
+	private Calendar endTime;
+
+	@Setter
 	@Getter
 	private TaskCoordinates coordinates;
 
@@ -60,5 +72,23 @@ public class Event {
 		}
 
 		return false;
+	}
+
+	static public Event copyOf(final Event event) {
+		if (event == null) {
+			return null;
+		}
+
+		return new Event(
+				event.getId(),
+				event.getTitle(),
+				event.getDescription(),
+				event.getStartTime(),
+				event.getEndTime(),
+				event.getCoordinates());
+	}
+
+	static public Event createEmpty() {
+		return new Event();
 	}
 }

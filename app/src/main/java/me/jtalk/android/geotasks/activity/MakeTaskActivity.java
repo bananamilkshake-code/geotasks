@@ -22,6 +22,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +46,6 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
@@ -100,20 +101,52 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, NO_TASK);
 		if (eventId == NO_TASK) {
+			event = Event.createEmpty();
 			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
 					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR)));
 		} else {
 			LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
 
-			Event event = getEventsSource().get(eventId);
+			event = Event.copyOf(getEventsSource().get(eventId));
 
 			titleText.setText(event.getTitle());
 			descriptionText.setText(event.getDescription());
-			locationText.setText(CoordinatesFormat.formatSimple(event.getCoordinates()));
+			setLocationText();
+			setDateForView(dateText, event.getStartTime());
 
 			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
-					.add(makeTask(() -> editEvent(eventId), Manifest.permission.WRITE_CALENDAR)));
+					.add(makeTask(() -> editEvent(), Manifest.permission.WRITE_CALENDAR)));
 		}
+
+		titleText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				event.setTitle(s.toString());
+			}
+		});
+		descriptionText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				event.setDescription(s.toString());
+			}
+		});
+	}
 
 	private void setLocationText() {
 		locationText.setText(event.getLocationText());
@@ -188,24 +221,31 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @param view
 	 */
 	public void showTimePickerDialog(View view) {
-		TextView textView = (TextView) view;
-		Calendar calendar = Calendar.getInstance();
-
-		try {
-			String timeText = textView.getText().toString();
-			if (!timeText.isEmpty()) {
-				calendar = TimeFormat.parseTime(this, timeText);
-			}
-		} catch (ParseException exception) {
-			LOG.warn(exception, "Time value from time text field cannot be parsed");
-		}
-
+		final Calendar calendar = getTimeByView(view);
 		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
-			Calendar picked = Calendar.getInstance();
-			picked.set(Calendar.HOUR_OF_DAY, hourOfDay);
-			picked.set(Calendar.MINUTE, minute);
-			textView.setText(TimeFormat.formatTime(this, picked));
+			calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+			calendar.set(Calendar.MINUTE, minute);
+			setDateForView(((TextView) view), calendar);
 		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+	}
+
+	private void setDateForView(TextView view, Calendar calendar) {
+		view.setText(TimeFormat.formatTime(this, calendar));
+	}
+
+	/**
+	 * Return value of event time that is bound to given view:
+	 * date
+	 * @param view to get time for
+	 * @return
+	 */
+
+	private Calendar getTimeByView(View view) {
+		if (view == dateText) {
+			return event.getStartTime();
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -234,46 +274,32 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private void onLocationResult(Intent data) {
-		TaskCoordinates taskCoordinates = data.getParcelableExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES);
-		locationText.setText(CoordinatesFormat.formatSimple(taskCoordinates));
+		event.setCoordinates(data.getParcelableExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES));
+		setLocationText();
 	}
 
 	private void addEvent() {
-		String eventTitle = titleText.getText().toString();
-		String eventDescription = descriptionText.getText().toString();
-		String location = locationText.getText().toString();
-		Calendar startTime = this.getStartTime();
-		Calendar endTime = EventsSource.EMPTY_TIME;
-
-		getEventsSource().add(eventTitle, eventDescription, location, startTime, endTime);
-
+		getEventsSource().add(event);
 		finish();
 	}
 
-	private void editEvent(long eventId) {
-		String eventTitle = titleText.getText().toString();
-		String eventDescription = descriptionText.getText().toString();
-		String location = locationText.getText().toString();
-		Calendar startTime = this.getStartTime();
-		Calendar endTime = EventsSource.EMPTY_TIME;
-
-		getEventsSource().edit(eventId, eventTitle, eventDescription, location, startTime, endTime);
-
+	private void editEvent() {
+		getEventsSource().edit(event);
 		finish();
 	}
 
 	private void openLocationPickActivity() {
 		Intent intent = new Intent(this, LocationPickActivity.class);
-		String locationString = locationText.getText().toString();
-		if (!locationString.isEmpty()) {
+		final TaskCoordinates coordinates = event.getCoordinates();
+		if (coordinates != null) {
 			intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, CoordinatesFormat.parse(locationString));
+			intent.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, coordinates);
 		}
 
 		startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);
 	}
 
-	private Calendar getStartTime() {
+	private Calendar getDateText() {
 		Calendar dateCalendar = parseFromTextView(dateText, TimeFormat.getDateFormat(this));
 		Calendar timeCalendar = parseFromTextView(timeText, TimeFormat.getTimeFormat(this));
 
