@@ -23,7 +23,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/add_event_date_text"
+            android:id="@+id/add_event_start_date_text"
             style="?android:attr/spinnerStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
             android:onClick="showDatePickerDialog"/>
 
         <TextView
-            android:id="@+id/add_event_time_text"
+            android:id="@+id/add_event_start_time_text"
             style="?android:attr/spinnerStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -67,10 +67,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	@Bind(R.id.add_event_location_coordinates_text)
 	TextView locationText;
 
-	@Bind(R.id.add_event_date_text)
+	@Bind(R.id.add_event_start_date_text)
 	TextView dateText;
 
-	@Bind(R.id.add_event_time_text)
+	@Bind(R.id.add_event_start_time_text)
 	TextView timeText;
 
 	private Validator validator;
