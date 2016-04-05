@@ -64,11 +64,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	private LocationTrackServiceConnection locationTrackServiceConnection;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
+	{
 		initChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::getCalendarId, Manifest.permission.WRITE_CALENDAR))
 				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR))
@@ -76,7 +72,12 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		toggleGeoListenChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::setupGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)));
+	}
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 		processChain(initChainId);
 
  		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
