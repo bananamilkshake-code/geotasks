@@ -244,7 +244,6 @@ public class EventsSource {
 		values.put(Events.DESCRIPTION, event.getDescription());
 		values.put(Events.EVENT_LOCATION, event.getLocationText());
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
-
 		values.put(Events.DTSTART, getMillis(event.getStartTime()));
 		values.put(Events.DTEND, getMillis(event.getEndTime()));
 		return values;
