@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_toStartOf="@+id/event_element_alarm"
         android:layout_alignParentStart="true"
-        android:layout_margin="16dp"
+        android:layout_margin="10dp"
         android:textSize="24sp"
         android:layout_centerVertical="true"
         android:text="Event title" />
@@ -19,7 +19,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
+        android:layout_margin="10dp"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_alarm_on_black_48dp"
         android:contentDescription="@string/event_element_reminder_toggler_desc"/>
