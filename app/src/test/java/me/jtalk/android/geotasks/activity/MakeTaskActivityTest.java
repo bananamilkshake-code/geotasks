@@ -21,7 +21,6 @@ import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -106,11 +105,11 @@ public class MakeTaskActivityTest {
 		String date = "";
 		TaskCoordinates coordinates = new TaskCoordinates(10.223, 23.232);
 
-		Event event = new Event(eventId, title, description, null, coordinates);
+		Event event = new Event(eventId, title, description, null, null, coordinates);
 
 		EventsSource mockEventSource = Mockito.mock(EventsSource.class);
 		when(mockEventSource.get(eq(eventId))).thenReturn(event);
-		doNothing().when(mockEventSource).edit(eventId, title, description, location, null, null);
+		doNothing().when(mockEventSource).edit(event);
 
 		GeoTasksApplication geoTasksApplication = new GeoTasksApplication();
 		geoTasksApplication.setEventsSource(mockEventSource);
@@ -130,6 +129,6 @@ public class MakeTaskActivityTest {
 
 		activity.onAddCalendarClick(null);
 
-		verify(mockEventSource).edit(eventId, title, description, location, null, null);
+		verify(mockEventSource).edit(event);
 	}
 }
