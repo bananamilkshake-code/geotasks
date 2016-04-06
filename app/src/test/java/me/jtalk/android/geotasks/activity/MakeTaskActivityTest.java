@@ -49,20 +49,6 @@ public class MakeTaskActivityTest {
 	}
 
 	@Test
-	public void testStartLocationPickActivityAndPassCoordinates() {
-		TaskCoordinates previousCoordinates = new TaskCoordinates(12.23, 45.45);
-		TextView locationCoordinatesText = (TextView) activity.findViewById(R.id.add_event_location_coordinates_text);
-		locationCoordinatesText.setText(CoordinatesFormat.formatSimple(previousCoordinates));
-		locationCoordinatesText.performClick();
-
-		Intent expectedIntent = new Intent(activity, LocationPickActivity.class);
-		expectedIntent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
-		expectedIntent.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, previousCoordinates);
-
-		assertEquals(shadowOf(activity).getNextStartedActivity(), expectedIntent);
-	}
-
-	@Test
 	public void testCoordinatesPickingWithLocationPickedActivityCancelled() {
 		Intent emptyIntent = new Intent();
 		activity.onActivityResult(
