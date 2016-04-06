@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
@@ -244,7 +245,7 @@ public class EventsSource {
 		values.put(Events.CALENDAR_ID, calendarId);
 		values.put(Events.TITLE, event.getTitle());
 		values.put(Events.DESCRIPTION, event.getDescription());
-		values.put(Events.EVENT_LOCATION, event.getLocationText());
+		values.put(Events.EVENT_LOCATION, CoordinatesFormat.formatSimple(event.getCoordinates()));
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 		values.put(Events.DTSTART, getMillis(event.getStartTime()));
 		values.put(Events.DTEND, getMillis(event.getEndTime()));
