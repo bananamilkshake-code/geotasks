@@ -313,6 +313,7 @@ public class LocationPickActivity extends Activity {
 
 			TaskCoordinates coordinates = new TaskCoordinates(latitude, longitude);
 			LocationPickActivity.this.onLocationPick(coordinates);
+			LocationPickActivity.this.mapView.getModel().mapViewPosition.setCenter(coordinates.toLatLong());
 
 			dialog.dismiss();
 		}
