@@ -17,14 +17,4 @@ public class CoordinatesFormatTest {
 
 		assertEquals("042.345678 041.234000", result);
 	}
-
-	@Test
-	public void testParsing() {
-		String value = "042.345678 041.234000";
-
-		TaskCoordinates result = CoordinatesFormat.parse(value);
-
-		assertEquals(42.345678, result.getLatitude(), 0.00001);
-		assertEquals(41.234, result.getLongitude(), 0.00001);
-	}
 }

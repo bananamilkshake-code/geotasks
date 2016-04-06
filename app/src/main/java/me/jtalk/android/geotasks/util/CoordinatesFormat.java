@@ -54,19 +54,4 @@ public class CoordinatesFormat {
 				GEO_FORMAT.format(taskCoordinates.getLatitude()),
 				GEO_FORMAT.format(taskCoordinates.getLongitude()));
 	}
-
-	/**
-	 * Parses geo point values (lat and lon) from simple formatted string.
-	 *
-	 * @param str
-	 * @return
-	 */
-	public static TaskCoordinates parse(String str) {
-		String[] values = str.split(SPLITTER);
-
-		double lat = Double.valueOf(values[0]);
-		double lon = Double.valueOf(values[1]);
-
-		return new TaskCoordinates(lat, lon);
-	}
 }
