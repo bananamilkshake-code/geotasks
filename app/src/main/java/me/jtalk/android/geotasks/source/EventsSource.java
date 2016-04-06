@@ -88,9 +88,9 @@ public class EventsSource {
 		long id = CursorHelper.getLong(cursor, Events._ID);
 		String title = CursorHelper.getString(cursor, Events.TITLE);
 		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
-		Calendar startTime = getTimeText(cursor, Events.DTSTART);
-		Calendar endTime = getTimeText(cursor, Events.DTEND);
-		TaskCoordinates geoPoint = getCoordinates(cursor);
+		Calendar startTime = extractTime(cursor, Events.DTSTART);
+		Calendar endTime = extractTime(cursor, Events.DTEND);
+		TaskCoordinates geoPoint = extractCoordinates(cursor);
 		return new Event(id, title, description, startTime, endTime, geoPoint);
 	}
 
@@ -102,7 +102,7 @@ public class EventsSource {
 	 * @param timeField field name that contains time value (long)
 	 * @return calendar with start time value or null if time hadn't been set
 	 */
-	public static Calendar getTimeText(Cursor cursor, String timeField) {
+	public static Calendar extractTime(Cursor cursor, String timeField) {
 		long timeInMillis = CursorHelper.getLong(cursor, timeField);
 		if (timeInMillis == DEFAULT_TIME_VALUE) {
 			return null;
@@ -132,7 +132,7 @@ public class EventsSource {
 	 * @return TaskCoordinates object that contains information about longitude and latitude.
 	 * Returns null if location for event has not been set.
 	 */
-	private static TaskCoordinates getCoordinates(Cursor cursor) {
+	private static TaskCoordinates extractCoordinates(Cursor cursor) {
 		String locationValue = CursorHelper.getString(cursor, Events.EVENT_LOCATION);
 		if (locationValue == null || locationValue.isEmpty()) {
 			return null;
