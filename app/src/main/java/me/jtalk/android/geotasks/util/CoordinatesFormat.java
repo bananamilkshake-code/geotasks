@@ -29,7 +29,7 @@ public class CoordinatesFormat {
 	private static final String FORMAT_COORDINATES_SIMPLE = "{0}" + SPLITTER + "{1}";
 
 	private static final int INTEGER_DIGITS_COUNT = 3;
-	private static final int FRACTION_DIGITS_COUNT = 6;
+	private static final int FRACTION_DIGITS_COUNT = 16;
 	private static final NumberFormat GEO_FORMAT;
 
 	/**
@@ -45,11 +45,25 @@ public class CoordinatesFormat {
 		GEO_FORMAT.setMinimumFractionDigits(FRACTION_DIGITS_COUNT);
 	}
 
-	public static String format(TaskCoordinates taskCoordinates) {
+	/**
+	 * Use this method to present data to user (in Views)
+	 * @param taskCoordinates
+	 * @return
+	 */
+	public static String prettyFormat(TaskCoordinates taskCoordinates) {
+		if (taskCoordinates == null) {
+			return "";
+		}
+
 		return MessageFormat.format(FORMAT_COORDINATES, taskCoordinates.getLatitude(), taskCoordinates.getLongitude());
 	}
 
-	public static String formatSimple(TaskCoordinates taskCoordinates) {
+	/**
+	 * Use this method to save coordinates to database.
+	 * @param taskCoordinates
+	 * @return
+	 */
+	public static String formatForDatabase(TaskCoordinates taskCoordinates) {
 		return MessageFormat.format(FORMAT_COORDINATES_SIMPLE,
 				GEO_FORMAT.format(taskCoordinates.getLatitude()),
 				GEO_FORMAT.format(taskCoordinates.getLongitude()));

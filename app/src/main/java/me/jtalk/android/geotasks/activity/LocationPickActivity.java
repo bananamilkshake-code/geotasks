@@ -410,7 +410,7 @@ public class LocationPickActivity extends Activity {
 	 */
 	private void updateCurrentLocation(TaskCoordinates coordinates) {
 		TextView textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates_text);
-		textLocationCoordinates.setText(CoordinatesFormat.format(coordinates));
+		textLocationCoordinates.setText(CoordinatesFormat.prettyFormat(coordinates));
 
 		marker.setLatLong(coordinates.toLatLong());
 		marker.requestRedraw();

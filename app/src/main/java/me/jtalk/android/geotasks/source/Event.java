@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
-import me.jtalk.android.geotasks.util.CoordinatesFormat;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -52,14 +51,6 @@ public class Event {
 	@Setter
 	@Getter
 	private TaskCoordinates coordinates;
-
-	public String getLocationText() {
-		if (coordinates == null) {
-			return "";
-		}
-
-		return CoordinatesFormat.format(coordinates);
-	}
 
 	@Override
 	public boolean equals(Object obj) {

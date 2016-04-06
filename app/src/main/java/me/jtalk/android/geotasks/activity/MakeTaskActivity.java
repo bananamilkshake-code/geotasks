@@ -43,6 +43,7 @@ import butterknife.ButterKnife;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
@@ -146,7 +147,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private void setLocationText() {
-		locationText.setText(event.getLocationText());
+		locationText.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
 	}
 
 	@Override

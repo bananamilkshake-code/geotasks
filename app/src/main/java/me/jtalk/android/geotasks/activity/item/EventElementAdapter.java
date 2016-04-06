@@ -30,6 +30,7 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MakeTaskActivity;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
@@ -83,6 +84,6 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		startTimeView.setText(TimeFormat.formatDateTime(context, event.getStartTime()));
 
 		TextView locationView = (TextView) view.findViewById(R.id.event_element_location);
-		locationView.setText(event.getLocationText());
+		locationView.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
 	}
 }
