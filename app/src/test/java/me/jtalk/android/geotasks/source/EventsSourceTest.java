@@ -64,7 +64,7 @@ public class EventsSourceTest {
 
 		final String title = "Title";
 		final String description = "Description";
-		final String location = CoordinatesFormat.format(coordinates);
+		final String location = CoordinatesFormat.prettyFormat(coordinates);
 		final Calendar startTime = Calendar.getInstance();
 		final Calendar endTime = Calendar.getInstance();
 
@@ -110,11 +110,14 @@ public class EventsSourceTest {
 
 	@Test
 	public void testGetActive() {
-		final Calendar eventTime = Calendar.getInstance();
-		eventTime.set(2015, 11, 12);
-		Event event1 = new Event(1, "Title1", "Description1", eventTime, null, new TaskCoordinates(1, 1));
-		Event event2 = new Event(2, "Title2", "Description1", eventTime, null, new TaskCoordinates(2, 2));
-		Event event3 = new Event(3, "Title3", "Description1", eventTime, null, new TaskCoordinates(3, 3));
+		final Calendar eventStartTime = Calendar.getInstance();
+		eventStartTime.set(2015, 11, 12);
+
+		final Calendar eventEndTime = Calendar.getInstance();
+		eventEndTime.set(2015, 11, 12);
+		Event event1 = new Event(1, "Title1", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(1, 1));
+		Event event2 = new Event(2, "Title2", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(2, 2));
+		Event event3 = new Event(3, "Title3", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(3, 3));
 
 		Cursor cursor = createCursor(event1, event2, event3);
 
@@ -137,8 +140,10 @@ public class EventsSourceTest {
 		cursor = new MatrixCursor(new String[]{
 				CalendarContract.Events._ID,
 				CalendarContract.Events.TITLE,
+				CalendarContract.Events.DESCRIPTION,
 				CalendarContract.Events.EVENT_LOCATION,
 				CalendarContract.Events.DTSTART,
+				CalendarContract.Events.DTEND,
 				EventsSource.EVENT_LATITUDE,
 				EventsSource.EVENT_LONGITUDE},
 				rowNumber);
@@ -147,8 +152,10 @@ public class EventsSourceTest {
 			cursor.newRow()
 					.add(CalendarContract.Events._ID, event.getId())
 					.add(CalendarContract.Events.TITLE, event.getTitle())
-					.add(CalendarContract.Events.EVENT_LOCATION, event.getLocationText())
+					.add(CalendarContract.Events.DESCRIPTION, event.getDescription())
+					.add(CalendarContract.Events.EVENT_LOCATION, CoordinatesFormat.prettyFormat(event.getCoordinates()))
 					.add(CalendarContract.Events.DTSTART, event.getStartTime().getTimeInMillis())
+					.add(CalendarContract.Events.DTEND, event.getEndTime().getTimeInMillis())
 					.add(EventsSource.EVENT_LATITUDE, event.getCoordinates().getLatitude())
 					.add(EventsSource.EVENT_LONGITUDE, event.getCoordinates().getLongitude());
 		}

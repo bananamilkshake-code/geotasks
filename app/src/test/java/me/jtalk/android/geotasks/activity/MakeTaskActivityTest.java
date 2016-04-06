@@ -77,7 +77,7 @@ public class MakeTaskActivityTest {
 	@Test
 	public void testCoordinatesPickedWithLocationPickedActivity() {
 		TaskCoordinates pickedCoordinates = new TaskCoordinates(12.34, 34.23);
-		String formattedCoordinates = CoordinatesFormat.formatSimple(pickedCoordinates);
+		String formattedCoordinates = CoordinatesFormat.prettyFormat(pickedCoordinates);
 
 		Intent intentWithCoordinates = new Intent();
 		intentWithCoordinates.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, pickedCoordinates);
@@ -100,7 +100,7 @@ public class MakeTaskActivityTest {
 
 		String title = "Title";
 		String description = "Desc";
-		String location = "010.223000 023.232000";
+		String location = "lat: 10.223; lon: 23.232";
 		String time = "";
 		String date = "";
 		TaskCoordinates coordinates = new TaskCoordinates(10.223, 23.232);
