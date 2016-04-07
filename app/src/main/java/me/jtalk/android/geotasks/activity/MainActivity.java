@@ -221,9 +221,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 			new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.dialog_delete_event_title)
 					.setMessage(MessageFormat.format(getString(R.string.dialog_delete_event_text), event.getTitle()))
-					.setPositiveButton(R.string.dialog_delete_event_yes, (dialog, which) -> {
-						getEventsSource().remove(event.getId());
-					})
+					.setPositiveButton(R.string.dialog_delete_event_yes, (d, w) -> getEventsSource().remove(event.getId()))
 					.setNegativeButton(R.string.dialog_delete_event_no, null)
 					.setCancelable(true)
 					.show();
