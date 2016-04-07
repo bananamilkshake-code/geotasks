@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import lombok.Getter;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
@@ -64,6 +65,7 @@ public class EventsSource {
 
 	private Context context;
 
+	@Getter
 	private long calendarId;
 
 	public static final String[] PROJECTION_EVENTS = new String[]{

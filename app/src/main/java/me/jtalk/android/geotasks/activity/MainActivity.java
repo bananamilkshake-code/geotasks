@@ -237,7 +237,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
 		CursorTreeAdapter eventsAdapter = (CursorTreeAdapter) eventsList.getExpandableListAdapter();
 		getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
-				new TasksLoaderCallbacks(this, eventsAdapter, calendarId));
+				new TasksLoaderCallbacks(this, eventsAdapter, getEventsSource().getCalendarId()));
 	}
 
 	/**
