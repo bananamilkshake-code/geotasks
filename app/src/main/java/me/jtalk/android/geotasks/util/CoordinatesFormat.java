@@ -65,6 +65,10 @@ public class CoordinatesFormat {
 	 * @return
 	 */
 	public static String formatForDatabase(TaskCoordinates taskCoordinates) {
+		if (taskCoordinates == null) {
+			return null;
+		}
+
 		return MessageFormat.format(FORMAT_COORDINATES_SIMPLE,
 				GEO_FORMAT.format(taskCoordinates.getLatitude()),
 				GEO_FORMAT.format(taskCoordinates.getLongitude()));
