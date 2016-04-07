@@ -19,6 +19,7 @@ package me.jtalk.android.geotasks.util;
 
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 
@@ -38,7 +39,7 @@ public class CoordinatesFormat {
 	public static final int POINT_ACCURACY = INTEGER_DIGITS_COUNT + SPLITTER.length() + FRACTION_DIGITS_COUNT;
 
 	static {
-		GEO_FORMAT = NumberFormat.getInstance();
+		GEO_FORMAT = NumberFormat.getInstance(Locale.ENGLISH);
 		GEO_FORMAT.setMinimumIntegerDigits(INTEGER_DIGITS_COUNT);
 		GEO_FORMAT.setMaximumFractionDigits(INTEGER_DIGITS_COUNT);
 		GEO_FORMAT.setMaximumFractionDigits(FRACTION_DIGITS_COUNT);
