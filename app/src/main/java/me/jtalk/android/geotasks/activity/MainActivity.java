@@ -41,6 +41,7 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
+import me.jtalk.android.geotasks.application.TaskChainHandler;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
 import me.jtalk.android.geotasks.application.service.LocationTrackService;
 import me.jtalk.android.geotasks.source.CalendarsSource;
@@ -51,6 +52,7 @@ import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
 import static me.jtalk.android.geotasks.R.string.pref_is_geolistening_enabled;
+import static me.jtalk.android.geotasks.application.TaskChainHandler.makeTask;
 
 public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 	private static final Logger LOG = new Logger(MainActivity.class);
@@ -64,13 +66,26 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	private LocationTrackServiceConnection locationTrackServiceConnection;
 
-	{
-		initChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::getCalendarId, Manifest.permission.WRITE_CALENDAR))
-				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR))
-				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR)));
+	private TaskChainHandler chainHandler = new TaskChainHandler(this) {
+		@Override
+		protected void onNeededPermissionDenied() {
+			new AlertDialog.Builder(MainActivity.this)
+					.setTitle(R.string.dialog_no_permission_for_calendar_creation_title)
+					.setMessage(R.string.dialog_no_permission_for_calendar_creation_message)
+					.setPositiveButton(R.string.dialog_no_permission_for_calendar_creation_button, (dialog, which) -> {
+						dialog.dismiss();
+						MainActivity.this.finish();
+					})
+					.show();
+		}
+	};
 
-		toggleGeoListenChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+	{
+		initChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
+				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR))
+				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR)));
+
+		toggleGeoListenChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::setupGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)));
 	}
 
@@ -78,7 +93,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		processChain(initChainId);
+		chainHandler.processChain(initChainId);
 
  		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 				.registerOnSharedPreferenceChangeListener(this);
@@ -88,31 +103,19 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.geoTrackMenuItem = menu.findItem(R.id.menu_action_enable_geolistening);
-		processChain(toggleGeoListenChainId);
+		chainHandler.processChain(toggleGeoListenChainId);
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		processPermissionRequestResult(requestCode, permissions, values);
-	}
-
-	@Override
-	protected void onNeededPermissionDenied() {
-		new AlertDialog.Builder(this)
-				.setTitle(R.string.dialog_no_permission_for_calendar_creation_title)
-				.setMessage(R.string.dialog_no_permission_for_calendar_creation_message)
-				.setPositiveButton(R.string.dialog_no_permission_for_calendar_creation_button, (dialog, which) -> {
-					dialog.dismiss();
-					MainActivity.this.finish();
-				})
-				.show();
+		chainHandler.processPermissionRequestResult(requestCode, permissions, values);
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (key == getString(R.string.pref_is_geolistening_enabled)) {
-			processChain(toggleGeoListenChainId);
+			chainHandler.processChain(toggleGeoListenChainId);
 		}
 	}
 
@@ -163,30 +166,27 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	/**
 	 * Retrieve calendar id in Calendar Provider that contains information about events.
-	 * Calendar id is kept in Settings storage. In no calendar had been used (application
+	 * Calendar id is kept in Settings storage. If no calendar had been used (application
 	 * started for the first time) new calendar will be created and used (it's id will be returned).
 	 *
-	 * @return calendar id that contains events.
 	 * @throws SecurityException occurs if no calendar is set and
 	 *                           permission to create calendars is not granted.
 	 */
-	private long getCalendarId() throws SecurityException {
+	private void initEventsSource() throws SecurityException {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
-		if (calendarId != EventsSource.DEFAULT_CALENDAR) {
-			return calendarId;
+		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
+			calendarId = new CalendarsSource(this).addCalendar();
+
+			LOG.info("No calendar was defined in settings. Created calendar {0}", calendarId);
+
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putLong(getString(R.string.pref_calendar_id), calendarId);
+			editor.commit();
 		}
 
-		LOG.info("No calendar defined in settings. Creating new calendar.");
-
-		calendarId = new CalendarsSource(this).addCalendar();
-
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putLong(getString(R.string.pref_calendar_id), calendarId);
-		editor.commit();
-
-		return calendarId;
+		setEventsSource(new EventsSource(this, calendarId));
 	}
 
 	private void initEventsList() {
@@ -227,15 +227,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 					.show();
 			return true;
 		});
-	}
 
-	private void initEventsSource() {
-		long calendarId = getCalendarId();
-
-		setEventsSource(new EventsSource(this, calendarId));
-
-		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
-		CursorTreeAdapter eventsAdapter = (CursorTreeAdapter) eventsList.getExpandableListAdapter();
 		getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
 				new TasksLoaderCallbacks(this, eventsAdapter, getEventsSource().getCalendarId()));
 	}

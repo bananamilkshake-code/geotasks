@@ -41,6 +41,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.application.TaskChainHandler;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
@@ -48,6 +49,8 @@ import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 import me.jtalk.android.geotasks.util.TimeFormat;
+
+import static me.jtalk.android.geotasks.application.TaskChainHandler.makeTask;
 
 public class MakeTaskActivity extends BaseActivity implements Validator.ValidationListener {
 	private static final Logger LOG = new Logger(MakeTaskActivity.class);
@@ -79,8 +82,15 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	private Event event;
 
+	private TaskChainHandler chainHandler = new TaskChainHandler(this) {
+		@Override
+		protected void onNeededPermissionDenied() {
+			Toast.makeText(MakeTaskActivity.this, R.string.toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
+		}
+	};
+
 	{
-		openLocationPickActivityChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+		openLocationPickActivityChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
 				.add(makeTask(this::openLocationPickActivity,
 						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
 						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
@@ -100,7 +110,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, NO_TASK);
 		if (eventId == NO_TASK) {
 			event = Event.createEmpty();
-			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+			saveEventChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
 					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR)));
 		} else {
 			LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
@@ -112,7 +122,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			setLocationText();
 			setTimeViews();
 
-			saveEventChainId = addTaskChain(new TasksChain<PermissionDependentTask>()
+			saveEventChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
 					.add(makeTask(this::editEvent, Manifest.permission.WRITE_CALENDAR)));
 		}
 
@@ -171,17 +181,12 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		processPermissionRequestResult(requestCode, permissions, values);
-	}
-
-	@Override
-	protected void onNeededPermissionDenied() {
-		Toast.makeText(this, R.string.toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
+		chainHandler.processPermissionRequestResult(requestCode, permissions, values);
 	}
 
 	@Override
 	public void onValidationSucceeded() {
-		processChain(saveEventChainId);
+		chainHandler.processChain(saveEventChainId);
 	}
 
 	@Override
@@ -210,7 +215,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @param view
 	 */
 	public void showLocationActivity(View view) {
-		processChain(openLocationPickActivityChainId);
+		chainHandler.processChain(openLocationPickActivityChainId);
 	}
 
 	/**

@@ -27,6 +27,7 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.jtalk.android.geotasks.BuildConfig;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.CrashReportsStatusChangeListener;
@@ -46,6 +47,7 @@ import me.jtalk.android.geotasks.util.Logger;
 public class GeoTasksApplication extends Application {
 	private static final Logger LOG = new Logger(GeoTasksApplication.class);
 
+	@Setter
 	@Getter
 	private EventsSource eventsSource;
 
@@ -69,15 +71,5 @@ public class GeoTasksApplication extends Application {
 				.unregisterOnSharedPreferenceChangeListener(crashReportsStatusChangeListener);
 
 		super.onTerminate();
-	}
-
-	public void setEventsSource(EventsSource eventsSourceObj) {
-		if (this.eventsSource != null) {
-			throw new IllegalStateException("EventSource has already being set");
-		}
-
-		this.eventsSource = eventsSourceObj;
-
-		LOG.debug("EventsSource is set");
 	}
 }
