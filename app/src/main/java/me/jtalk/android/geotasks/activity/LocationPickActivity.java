@@ -261,7 +261,7 @@ public class LocationPickActivity extends Activity {
 				LOG.warn(exception, "String {0} cannot be parsed to float in NumericValueFilter", newValue);
 			}
 
-			return "";
+			return dest.subSequence(dstart, dend);
 		}
 	}
 
