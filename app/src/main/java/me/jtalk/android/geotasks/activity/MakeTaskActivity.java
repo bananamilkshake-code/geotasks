@@ -75,6 +75,12 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	@Bind(R.id.add_event_start_time_text)
 	TextView startTimeText;
 
+	@Bind(R.id.add_event_end_date_text)
+	TextView endDateText;
+
+	@Bind(R.id.add_event_end_time_text)
+	TextView endTimeText;
+
 	private Validator validator;
 
 	private int saveEventChainId;
@@ -249,6 +255,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	private void setTimeViews() {
 		setDateForView(startDateText, startTimeText, event.getStartTime());
+		setDateForView(endDateText, endTimeText, event.getEndTime());
 	}
 
 	private void setDateForView(TextView dateView, TextView timeView, Calendar calendar) {
@@ -260,6 +267,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		return view == startDateText || view == startTimeText;
 	}
 
+	private boolean isEndTimeView(View view) {
+		return view == endDateText || view == endTimeText;
+	}
+
 	/**
 	 * Return value of event time that is bound to given view:
 	 * date
@@ -267,17 +278,18 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @return
 	 */
 	private Calendar getTimeByView(View view) {
-		Calendar calendar;
+		Calendar calendar = null;
 		if (isStartTimeView(view)) {
 			calendar = event.getStartTime();
+		} else if (isEndTimeView(view)) {
+			calendar = event.getEndTime();
 		} else {
-			return null;
+			LOG.warn("Incorrect view to get calendar instance");
 		}
 
 		if (calendar == null) {
 			calendar = Calendar.getInstance();
 		}
-
 		return calendar;
 	}
 
@@ -285,6 +297,11 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		// calendar can be newly created, so we need to set it manually
 		if (isStartTimeView(view)) {
 			event.setStartTime(calendar);
+		} else if (isEndTimeView(view)) {
+			event.setEndTime(calendar);
+		} else {
+			LOG.warn("Incorrect view to set date, nothing changed");
+			return;
 		}
 		setTimeViews();
 	}

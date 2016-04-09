@@ -16,8 +16,10 @@
     <string name="dialog_delete_event_yes">Remove</string>
     <string name="dialog_delete_event_no">Cancel</string>
     <string name="menu_add_event_save">Save</string>
-    <string name="add_event_date_field">Date</string>
-    <string name="add_event_time_field">Time</string>
+    <string name="add_event_start_date_field">Start date</string>
+    <string name="add_event_start_time_field">Start time</string>
+    <string name="add_event_end_date_field">End date</string>
+    <string name="add_event_end_time_field">End time</string>
     <string name="event_element_reminder_toggler_desc">Reminder toggler</string>
     <string name="add_event_timezone_spinner">Choose timezone</string>
     <string name="add_event_location_text">Location</string>
