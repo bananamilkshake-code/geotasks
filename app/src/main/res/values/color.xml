@@ -2,4 +2,5 @@
 <resources>
     <color name="ui_theme_dark_colour">#561097</color>
     <color name="ui_theme_dark_text_colour">#ffffff</color>
+    <color name="inactive_event">#818181</color>
 </resources>

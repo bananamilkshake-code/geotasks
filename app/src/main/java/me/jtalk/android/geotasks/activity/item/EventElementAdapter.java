@@ -20,11 +20,14 @@ package me.jtalk.android.geotasks.activity.item;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorTreeAdapter;
 import android.widget.TextView;
+
+import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MakeTaskActivity;
@@ -35,8 +38,16 @@ import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
 public class EventElementAdapter extends CursorTreeAdapter {
+	private final int INACTIVE_EVENT;
+
 	public EventElementAdapter(Context context) {
 		super(null, context, true);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			INACTIVE_EVENT = context.getResources().getColor(R.color.inactive_event, context.getTheme());
+		} else {
+			INACTIVE_EVENT = context.getResources().getColor(R.color.inactive_event);
+		}
 	}
 
 	@Override
@@ -59,6 +70,10 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		Event event = EventsSource.extractEvent(cursor);
 		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
 		titleView.setText(event.getTitle());
+
+		if (!event.isActive(Calendar.getInstance())) {
+			titleView.setTextColor(INACTIVE_EVENT);
+		}
 	}
 
 	@Override
@@ -85,5 +100,11 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 		TextView locationView = (TextView) view.findViewById(R.id.event_element_location);
 		locationView.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
+
+		if (!event.isActive(Calendar.getInstance())) {
+			descriptionView.setTextColor(INACTIVE_EVENT);
+			startTimeView.setTextColor(INACTIVE_EVENT);
+			locationView.setTextColor(INACTIVE_EVENT);
+		}
 	}
 }

@@ -65,6 +65,10 @@ public class Event {
 		return false;
 	}
 
+	public boolean isActive(Calendar currentTime) {
+		return endTime == null || endTime.getTimeInMillis() >= currentTime.getTimeInMillis();
+	}
+
 	static public Event copyOf(final Event event) {
 		if (event == null) {
 			return null;
