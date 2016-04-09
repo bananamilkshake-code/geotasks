@@ -53,6 +53,8 @@ import org.mapsforge.map.reader.MapFile;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
 import java.io.File;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -242,8 +244,10 @@ public class LocationPickActivity extends Activity {
 
 	@AllArgsConstructor
 	private class NumericValueFilter implements InputFilter {
-		double min;
-		double max;
+		private double min;
+		private double max;
+
+		private NumberFormat format;
 
 		@Override
 		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -253,11 +257,11 @@ public class LocationPickActivity extends Activity {
 			}
 
 			try {
-				Double newNumericValue = Double.parseDouble(newValue);
+				Double newNumericValue = format.parse(newValue).doubleValue();
 				if (min <= newNumericValue && newNumericValue <= max) {
 					return null;
 				}
-			} catch (NumberFormatException exception) {
+			} catch (ParseException exception) {
 				LOG.warn(exception, "String {0} cannot be parsed to float in NumericValueFilter", newValue);
 			}
 
@@ -278,8 +282,10 @@ public class LocationPickActivity extends Activity {
 
 		private AlertDialog dialog;
 
+		private NumberFormat format = CoordinatesFormat.getFormatForCoordinate(LocationPickActivity.this);
+
 		@Override
-		public void onClick(View v) {
+		public void onClick(View view) {
 			LayoutInflater inflater = LocationPickActivity.this.getLayoutInflater();
 			View dialogView = inflater.inflate(R.layout.dialog_location, null);
 
@@ -288,12 +294,12 @@ public class LocationPickActivity extends Activity {
 			validator = new Validator(this);
 			validator.setValidationListener(this);
 
-			latitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-90.0, 90.0) });
-			longitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-180.0, 180.0) });
+			latitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-90.0, 90.0, format) });
+			longitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-180.0, 180.0, format) });
 
 			if (pickedLocation != null) {
-				latitudeText.setText(Double.toString(pickedLocation.getLatitude()));
-				longitudeText.setText(Double.toString(pickedLocation.getLongitude()));
+				latitudeText.setText(format.format(pickedLocation.getLatitude()));
+				longitudeText.setText(format.format(pickedLocation.getLongitude()));
 			}
 
 			AlertDialog.Builder builder =
@@ -301,7 +307,6 @@ public class LocationPickActivity extends Activity {
 							.setView(dialogView)
 							.setNeutralButton(R.string.dialog_location_setup, (d, w) -> validator.validate())
 							.setNegativeButton(R.string.dialog_location_cancel, null);
-
 			dialog = builder.create();
 			dialog.show();
 		}

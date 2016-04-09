@@ -17,6 +17,8 @@
  */
 package me.jtalk.android.geotasks.util;
 
+import android.content.Context;
+
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -72,5 +74,11 @@ public class CoordinatesFormat {
 		return MessageFormat.format(FORMAT_COORDINATES_SIMPLE,
 				GEO_FORMAT.format(taskCoordinates.getLatitude()),
 				GEO_FORMAT.format(taskCoordinates.getLongitude()));
+	}
+
+	public static NumberFormat getFormatForCoordinate(Context context) {
+		NumberFormat format = NumberFormat.getInstance(context.getResources().getConfiguration().locale);
+		format.setMaximumFractionDigits(FRACTION_DIGITS_COUNT);
+		return format;
 	}
 }
