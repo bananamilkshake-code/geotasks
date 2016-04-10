@@ -28,6 +28,7 @@ import android.os.Build;
 import android.provider.CalendarContract.Events;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -49,6 +50,8 @@ public class EventsSource {
 
 	public static final Calendar EMPTY_TIME = null;
 
+	static final String ACTIVE = "active";
+
 	/**
 	 * First argument - value range in location string value
 	 * Second argument - column name
@@ -57,8 +60,13 @@ public class EventsSource {
 			"(CASE WHEN " + Events.EVENT_LOCATION + " IS NOT NULL " +
 					"OR length(" + Events.EVENT_LOCATION + ") = 0 " +
 					"THEN CAST(substr(" + Events.EVENT_LOCATION + ", %s) AS REAL) " +
-					"ELSE NULL END)" +
+					"ELSE NULL END) " +
 					"AS %s";
+
+	private static final String QUERY_ACTIVE_FIELD =
+			"(CASE WHEN " + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND  +  "  >= %d THEN 'TRUE'" +
+			"ELSE 'FALSE' END) " +
+			"AS " + ACTIVE;
 
 	static final String EVENT_LATITUDE = "latitude";
 	static final String EVENT_LONGITUDE = "longitude";
@@ -68,7 +76,7 @@ public class EventsSource {
 	@Getter
 	private long calendarId;
 
-	public static final String[] PROJECTION_EVENTS = new String[]{
+	public static final String[] PROJECTION_EVENTS = new String[] {
 			Events._ID,
 			Events.CALENDAR_ID,
 			Events.TITLE,
@@ -79,6 +87,8 @@ public class EventsSource {
 			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), EVENT_LATITUDE),
 			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), EVENT_LONGITUDE)
 	};
+
+	private static String SORT_ORDER = ACTIVE + " DESC";
 
 	/**
 	 * Extracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
@@ -94,6 +104,7 @@ public class EventsSource {
 		Calendar startTime = extractTime(cursor, Events.DTSTART);
 		Calendar endTime = extractTime(cursor, Events.DTEND);
 		TaskCoordinates geoPoint = extractCoordinates(cursor);
+		LOG.debug("Event {0} extracted. Start time {1}, end time is {2}", title, startTime, endTime);
 		return new Event(id, title, description, startTime, endTime, geoPoint);
 	}
 
@@ -114,6 +125,16 @@ public class EventsSource {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(timeInMillis);
 		return calendar;
+	}
+
+	public static String[] getCurrentProjectionEvents(Calendar currentTime) {
+		String[] result = Arrays.copyOf(PROJECTION_EVENTS, PROJECTION_EVENTS.length + 1);
+		result[result.length - 1] = String.format(QUERY_ACTIVE_FIELD, currentTime.getTimeInMillis());
+		return result;
+	}
+
+	public static String getSortOrder() {
+		return SORT_ORDER;
 	}
 
 	/**
@@ -228,7 +249,7 @@ public class EventsSource {
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,
 				PROJECTION_EVENTS,
-				NEAR_EVENTS_SELECTION,
+				ACTIVE_EVENTS_SELECTION,
 				selectionArgs,
 				null);
 
@@ -254,7 +275,7 @@ public class EventsSource {
 		return values;
 	}
 
-	private final String NEAR_EVENTS_SELECTION =
+	private final String ACTIVE_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
 			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
 			+ "AND (" + Events.DTSTART + " == -1 OR " + Events.DTSTART + " >= ?) "

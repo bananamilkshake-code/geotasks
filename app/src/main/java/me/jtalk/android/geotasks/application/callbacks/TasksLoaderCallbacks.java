@@ -26,6 +26,8 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.widget.CursorTreeAdapter;
 
+import java.util.Calendar;
+
 import lombok.AllArgsConstructor;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
@@ -46,13 +48,18 @@ public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Curso
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		LOG.debug("TasksLoaderCallbacks creates loader for {0} calendar", calendarId);
+		LOG.debug("Created for {0} calendar", calendarId);
 
 		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
-		String[] selectionArgs = new String[]{String.valueOf(calendarId)};
+		String[] selectionArgs = new String[] { String.valueOf(calendarId) };
 
-		return new CursorLoader(context, CalendarContract.Events.CONTENT_URI,
-				EventsSource.PROJECTION_EVENTS, selection, selectionArgs, null);
+		return new CursorLoader(
+				context,
+				CalendarContract.Events.CONTENT_URI,
+				EventsSource.getCurrentProjectionEvents(Calendar.getInstance()),
+				selection,
+				selectionArgs,
+				EventsSource.getSortOrder());
 	}
 
 	@Override
