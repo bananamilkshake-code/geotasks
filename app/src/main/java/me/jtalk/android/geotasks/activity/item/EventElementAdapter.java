@@ -35,18 +35,23 @@ import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
-import me.jtalk.android.geotasks.util.TimeFormat;
+
+import static java.text.MessageFormat.format;
+import static me.jtalk.android.geotasks.util.TimeFormat.formatDateTime;
 
 public class EventElementAdapter extends CursorTreeAdapter {
-	private final int INACTIVE_EVENT;
+	private final int INACTIVE_EVENT_COLOUR;
+	private final int ACTIVE_EVENT_COLOUR;
 
 	public EventElementAdapter(Context context) {
 		super(null, context, true);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			INACTIVE_EVENT = context.getResources().getColor(R.color.inactive_event, context.getTheme());
+			INACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.inactive_event, context.getTheme());
+			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.active_event, context.getTheme());
 		} else {
-			INACTIVE_EVENT = context.getResources().getColor(R.color.inactive_event);
+			INACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.inactive_event);
+			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.active_event);
 		}
 	}
 
@@ -70,10 +75,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		Event event = EventsSource.extractEvent(cursor);
 		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
 		titleView.setText(event.getTitle());
-
-		if (!event.isActive(Calendar.getInstance())) {
-			titleView.setTextColor(INACTIVE_EVENT);
-		}
+		titleView.setTextColor(getColorFor(event));
 	}
 
 	@Override
@@ -92,19 +94,39 @@ public class EventElementAdapter extends CursorTreeAdapter {
 			context.startActivity(intent);
 		});
 
+		final int color = getColorFor(event);
+
 		TextView descriptionView = (TextView) view.findViewById(R.id.item_event_expanded_descripion);
 		descriptionView.setText(event.getDescription());
+		descriptionView.setTextColor(color);
 
-		TextView startTimeView = (TextView) view.findViewById(R.id.event_element_start_time);
-		startTimeView.setText(TimeFormat.formatDateTime(context, event.getStartTime()));
+		TextView timePeriodView = (TextView) view.findViewById(R.id.event_element_time_period);
+		String timeText = "";
+		if (event.getStartTime() != null) {
+			timeText = timeText + format(context.getString(R.string.event_element_start_time), formatDateTime(context, event.getStartTime()));
+		}
+
+		if (event.getEndTime() != null) {
+			if (timeText.isEmpty()) {
+				timeText = timeText + " ";
+			}
+
+			timeText = timeText + format(context.getString(R.string.event_element_end_time), formatDateTime(context, event.getEndTime()));
+		}
+
+		timePeriodView.setText(timeText);
+		timePeriodView.setTextColor(color);
 
 		TextView locationView = (TextView) view.findViewById(R.id.event_element_location);
 		locationView.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
+		locationView.setTextColor(color);
+	}
 
-		if (!event.isActive(Calendar.getInstance())) {
-			descriptionView.setTextColor(INACTIVE_EVENT);
-			startTimeView.setTextColor(INACTIVE_EVENT);
-			locationView.setTextColor(INACTIVE_EVENT);
+	private int getColorFor(Event event) {
+		if (event.isActive(Calendar.getInstance())) {
+			return ACTIVE_EVENT_COLOUR;
+		} else {
+			return INACTIVE_EVENT_COLOUR;
 		}
 	}
 }
