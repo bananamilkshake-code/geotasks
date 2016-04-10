@@ -172,7 +172,7 @@ public class CursorHelper {
 						rowBuilder.add(column, null);
 						break;
 					case Cursor.FIELD_TYPE_INTEGER:
-						rowBuilder.add(column, getInt(groupCursor, column));
+						rowBuilder.add(column, getLong(groupCursor, column));
 						break;
 					case Cursor.FIELD_TYPE_FLOAT:
 						rowBuilder.add(column, getFloat(groupCursor, column));
