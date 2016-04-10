@@ -59,4 +59,6 @@
     <string name="pref_location_update_min_distance_title">Location update distance</string>
     <string name="ref_location_update_min_time_summary">Minimum time to check location change in seconds (works with Location update distance parameter)</string>
     <string name="pref_location_update_min_time_title">Location update time</string>
+    <string name="event_element_start_time">Since {0}</string>
+    <string name="event_element_end_time">Until {0}</string>
 </resources>

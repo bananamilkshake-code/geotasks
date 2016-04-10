@@ -27,16 +27,21 @@ import android.view.ViewGroup;
 import android.widget.CursorTreeAdapter;
 import android.widget.TextView;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Calendar;
+import java.util.Map;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MakeTaskActivity;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
+import me.jtalk.android.geotasks.util.StringValueExtractor;
 
 import static java.text.MessageFormat.format;
+import static me.jtalk.android.geotasks.util.CoordinatesFormat.prettyFormat;
 import static me.jtalk.android.geotasks.util.TimeFormat.formatDateTime;
 
 public class EventElementAdapter extends CursorTreeAdapter {
@@ -84,6 +89,24 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		return inflater.inflate(R.layout.item_event_expanded, parent, false);
 	}
 
+	private static final ImmutableMap<Integer, StringValueExtractor> EVENT_VIEW_MAPPING;
+	static {
+		EVENT_VIEW_MAPPING = ImmutableMap.<Integer, StringValueExtractor>builder()
+				.put(R.id.item_event_expanded_descripion, (event, context) -> event.getDescription())
+				.put(R.id.event_element_location, (event, context) -> prettyFormat(event.getCoordinates()))
+				.put(R.id.event_element_start_time, (event, context) -> getFormattedTimeString(R.string.event_element_start_time, event.getStartTime(), context))
+				.put(R.id.event_element_end_time, (event, context) -> getFormattedTimeString(R.string.event_element_end_time, event.getEndTime(), context))
+				.build();
+	}
+
+	private static String getFormattedTimeString(int resource, Calendar time, Context context) {
+		return time != null ? format(context.getString(resource), formatDateTime(context, time)) : null;
+	}
+
+	private static Function<Event, String> createExtractor(final StringValueExtractor extractor, final Context context) {
+		return (event) -> extractor.getString(event, context);
+	}
+
 	@Override
 	protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
 		Event event = EventsSource.extractEvent(cursor);
@@ -94,32 +117,9 @@ public class EventElementAdapter extends CursorTreeAdapter {
 			context.startActivity(intent);
 		});
 
-		final int color = getColorFor(event);
-
-		TextView descriptionView = (TextView) view.findViewById(R.id.item_event_expanded_descripion);
-		descriptionView.setText(event.getDescription());
-		descriptionView.setTextColor(color);
-
-		TextView timePeriodView = (TextView) view.findViewById(R.id.event_element_time_period);
-		String timeText = "";
-		if (event.getStartTime() != null) {
-			timeText = timeText + format(context.getString(R.string.event_element_start_time), formatDateTime(context, event.getStartTime()));
+		for (Map.Entry<Integer, StringValueExtractor> viewMapping : EVENT_VIEW_MAPPING.entrySet()) {
+			setElementValue(view, viewMapping.getKey(), event, createExtractor(viewMapping.getValue(), context));
 		}
-
-		if (event.getEndTime() != null) {
-			if (timeText.isEmpty()) {
-				timeText = timeText + " ";
-			}
-
-			timeText = timeText + format(context.getString(R.string.event_element_end_time), formatDateTime(context, event.getEndTime()));
-		}
-
-		timePeriodView.setText(timeText);
-		timePeriodView.setTextColor(color);
-
-		TextView locationView = (TextView) view.findViewById(R.id.event_element_location);
-		locationView.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
-		locationView.setTextColor(color);
 	}
 
 	private int getColorFor(Event event) {
@@ -127,6 +127,18 @@ public class EventElementAdapter extends CursorTreeAdapter {
 			return ACTIVE_EVENT_COLOUR;
 		} else {
 			return INACTIVE_EVENT_COLOUR;
+		}
+	}
+
+	public void setElementValue(View parentView, int elementId, Event event, Function<Event, String> valueGetter) {
+		TextView view = (TextView)parentView.findViewById(elementId);
+		String text = valueGetter.apply(event);
+		if (text == null || text.isEmpty()) {
+			view.setVisibility(View.GONE);
+			return;
+		} else {
+			view.setText(text);
+			view.setTextColor(getColorFor(event));
 		}
 	}
 }

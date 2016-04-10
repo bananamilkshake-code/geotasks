@@ -2,8 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:paddingTop="15sp"
+              android:paddingBottom="15sp"
               android:orientation="vertical"
-              android:paddingStart="25sp">
+              android:paddingStart="25sp"
+              android:paddingEnd="25sp">
+
     <TextView
         android:id="@+id/item_event_expanded_descripion"
         android:layout_width="match_parent"
@@ -14,16 +18,28 @@
 
     <TextView
         android:id="@+id/event_element_location"
-        android:textColor="@android:color/secondary_text_light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10sp"
-        android:text="lon: 34.234 lat: 45.00" />
+        android:paddingTop="5sp"
+        android:text="lon: 34.234 lat: 45.00"
+        android:textColor="@android:color/secondary_text_light"/>
 
     <TextView
-        android:id="@+id/event_element_time_period"
+        android:id="@+id/event_element_start_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10sp"
-        android:text="12/03/2015 8:05" />
+        android:paddingTop="5sp"
+        android:text="12/03/2015 8:05"
+        android:textColor="@android:color/secondary_text_light"/>
+
+    <TextView
+        android:id="@+id/event_element_end_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10sp"
+        android:paddingTop="5sp"
+        android:text="12/04/2015 8:05"
+        android:textColor="@android:color/secondary_text_light"/>
 </LinearLayout>
