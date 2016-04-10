@@ -104,7 +104,6 @@ public class EventsSource {
 		Calendar startTime = extractTime(cursor, Events.DTSTART);
 		Calendar endTime = extractTime(cursor, Events.DTEND);
 		TaskCoordinates geoPoint = extractCoordinates(cursor);
-		LOG.debug("Event {0} extracted. Start time {1}, end time is {2}", title, startTime, endTime);
 		return new Event(id, title, description, startTime, endTime, geoPoint);
 	}
 
