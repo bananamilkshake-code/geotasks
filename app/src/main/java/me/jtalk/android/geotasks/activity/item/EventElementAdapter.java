@@ -137,6 +137,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 			view.setVisibility(View.GONE);
 			return;
 		} else {
+			view.setVisibility(View.VISIBLE);
 			view.setText(text);
 			view.setTextColor(getColorFor(event));
 		}
