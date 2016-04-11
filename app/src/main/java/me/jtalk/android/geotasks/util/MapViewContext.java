@@ -18,6 +18,7 @@
 package me.jtalk.android.geotasks.util;
 
 import android.content.Context;
+import android.os.Environment;
 
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.util.AndroidUtil;
@@ -26,7 +27,13 @@ import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.download.TileDownloadLayer;
 import org.mapsforge.map.layer.download.tilesource.OpenStreetMapMapnik;
+import org.mapsforge.map.layer.renderer.TileRendererLayer;
 import org.mapsforge.map.model.Model;
+import org.mapsforge.map.reader.MapDataStore;
+import org.mapsforge.map.reader.MapFile;
+import org.mapsforge.map.rendertheme.InternalRenderTheme;
+
+import java.io.File;
 
 import lombok.Getter;
 
@@ -71,5 +78,28 @@ public class MapViewContext {
 				model.displayModel.getTileSize(),
 				MAPSFORGE_SCREEN_RATIO,
 				model.frameBufferModel.getOverdrawFactor());
+	}
+
+
+	/**
+	 * Created layout uses data from file on sdcard
+	 *
+	 * @param tileCache
+	 * @return layout for map view
+	 */
+	private Layer createRenderLayer(TileCache tileCache, MapView mapView, String mapFilePath) {
+		MapDataStore mapDataStore = new MapFile(
+				new File(Environment.getExternalStorageDirectory(), mapFilePath));
+
+		TileRendererLayer tileRenderLayer = new TileRendererLayer(
+				tileCache,
+				mapDataStore,
+				mapView.getModel().mapViewPosition,
+				false,
+				true,
+				AndroidGraphicFactory.INSTANCE);
+		tileRenderLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
+
+		return tileRenderLayer;
 	}
 }

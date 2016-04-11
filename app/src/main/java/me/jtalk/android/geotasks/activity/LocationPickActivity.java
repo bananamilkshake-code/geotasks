@@ -333,28 +333,6 @@ public class LocationPickActivity extends Activity {
 	}
 
 	/**
-	 * Created layout uses data from file on sdcard
-	 *
-	 * @param tileCache
-	 * @return layout for map view
-	 */
-	private Layer createRenderLayer(TileCache tileCache, String mapFilePath) {
-		MapDataStore mapDataStore = new MapFile(
-				new File(Environment.getExternalStorageDirectory(), mapFilePath));
-
-		TileRendererLayer tileRenderLayer = new TileRendererLayer(
-				tileCache,
-				mapDataStore,
-				mapView.getModel().mapViewPosition,
-				false,
-				true,
-				AndroidGraphicFactory.INSTANCE);
-		tileRenderLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
-
-		return tileRenderLayer;
-	}
-
-	/**
 	 * Retrieves and returns start coordinates from provided intent ({@INTENT_EXTRA_COORDINATES}.
 	 * If no data was provided {@DEFAULT_COORDINATES} values will be used.
 	 * If intent has {@INTENT_EXTRA_EDIT} extra retrieved coordinates will be set up
