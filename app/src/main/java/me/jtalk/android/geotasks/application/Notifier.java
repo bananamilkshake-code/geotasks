@@ -22,6 +22,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.drawable.Icon;
+import android.media.RingtoneManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
@@ -50,7 +51,8 @@ public class Notifier {
 				.setContentTitle(getNotificationTitle(event))
 				.setContentText(getNotificationText(distance))
 				.setAutoCancel(true)
-				.setVibrate(VIBRATION_PATTERN);
+				.setVibrate(VIBRATION_PATTERN)
+				.setSound(RingtoneManager.getDefaultUri(Notification.DEFAULT_SOUND));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			builder.setSmallIcon(getSmallIcon());
