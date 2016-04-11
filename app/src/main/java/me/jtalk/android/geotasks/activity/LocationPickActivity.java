@@ -39,15 +39,11 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
-import org.mapsforge.map.android.util.AndroidUtil;
 import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.layer.cache.TileCache;
-import org.mapsforge.map.layer.download.TileDownloadLayer;
-import org.mapsforge.map.layer.download.tilesource.OpenStreetMapMapnik;
 import org.mapsforge.map.layer.overlay.Marker;
 import org.mapsforge.map.layer.renderer.TileRendererLayer;
-import org.mapsforge.map.model.Model;
 import org.mapsforge.map.reader.MapDataStore;
 import org.mapsforge.map.reader.MapFile;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
@@ -66,6 +62,7 @@ import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
+import me.jtalk.android.geotasks.util.MapViewContext;
 
 public class LocationPickActivity extends Activity {
 	private static final Logger LOG = new Logger(LocationPickActivity.class);
@@ -81,9 +78,6 @@ public class LocationPickActivity extends Activity {
 	public static final String INTENT_EXTRA_EDIT = "extra-is-edit";
 	public static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
 
-	private static final String MAPSFORGE_CACHE_NAME = "mapsforge-cache";
-	private static final float MAPSFORGE_SCREEN_RATIO = 1f;
-
 	@Getter
 	private MapView mapView;
 
@@ -98,7 +92,7 @@ public class LocationPickActivity extends Activity {
 	 */
 	private Marker marker;
 
-	private TileDownloadLayer tileDownloadLayer;
+	private MapViewContext mapViewContext;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -112,18 +106,14 @@ public class LocationPickActivity extends Activity {
 
 	@Override
 	public void onPause() {
-		if (tileDownloadLayer != null) {
-			tileDownloadLayer.onPause();
-		}
+		mapViewContext.pause();
 		super.onPause();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (tileDownloadLayer != null) {
-			tileDownloadLayer.onResume();
-		}
+		mapViewContext.resume();
 	}
 
 	@Override
@@ -185,11 +175,14 @@ public class LocationPickActivity extends Activity {
 		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
 		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
 
+		mapView = (MapView) findViewById(R.id.map);
+
 		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector(this));
 
 		TaskCoordinates startPoint = extractStartCoordinates(getIntent());
 
-		mapView = (MapView) findViewById(R.id.map);
+		mapViewContext = new MapViewContext(mapView, this);
+
 		mapView.setClickable(true);
 		mapView.setBuiltInZoomControls(false);
 		mapView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
@@ -197,17 +190,8 @@ public class LocationPickActivity extends Activity {
 		mapView.getModel().mapViewPosition.setZoomLevelMin(MIN_ZOOM);
 		mapView.getModel().mapViewPosition.setZoomLevelMax(MAX_ZOOM);
 		mapView.getModel().mapViewPosition.setCenter(startPoint.toLatLong());
-		mapView.getLayerManager().getLayers().add(createDownloadLayer(createTileCache(mapView.getModel())));
+		mapView.getLayerManager().getLayers().add(mapViewContext.getTileDownloadLayer());
 		mapView.getLayerManager().getLayers().add(marker);
-	}
-
-	private TileCache createTileCache(Model model) {
-		return AndroidUtil.createTileCache(
-				this,
-				MAPSFORGE_CACHE_NAME,
-				model.displayModel.getTileSize(),
-				MAPSFORGE_SCREEN_RATIO,
-				model.frameBufferModel.getOverdrawFactor());
 	}
 
 	private void initSearchEditText() {
@@ -368,22 +352,6 @@ public class LocationPickActivity extends Activity {
 		tileRenderLayer.setXmlRenderTheme(InternalRenderTheme.OSMARENDER);
 
 		return tileRenderLayer;
-	}
-
-	/**
-	 * Created layer will load OSM data from network.
-	 *
-	 * @param tileCache
-	 * @return layout for map view
-	 */
-	private Layer createDownloadLayer(TileCache tileCache) {
-		tileDownloadLayer = new TileDownloadLayer(
-				tileCache,
-				mapView.getModel().mapViewPosition,
-				OpenStreetMapMapnik.INSTANCE,
-				AndroidGraphicFactory.INSTANCE);
-
-		return tileDownloadLayer;
 	}
 
 	/**
