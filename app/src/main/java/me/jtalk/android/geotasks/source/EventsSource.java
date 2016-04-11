@@ -48,6 +48,8 @@ public class EventsSource {
 	public static final long DEFAULT_CALENDAR = -1;
 	public static final long DEFAULT_TIME_VALUE = -1;
 
+	public static final long NO_TASK = -1;
+
 	public static final Calendar EMPTY_TIME = null;
 
 	static final String ACTIVE = "active";

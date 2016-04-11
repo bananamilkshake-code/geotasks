@@ -44,6 +44,7 @@ import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.TaskChainHandler;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
@@ -56,8 +57,6 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	private static final Logger LOG = new Logger(MakeTaskActivity.class);
 
 	public static final String INTENT_EDIT_TASK = "edit";
-
-	private static final long NO_TASK = -1;
 
 	@NotEmpty
 	@Bind(R.id.add_event_name_text)
@@ -113,8 +112,8 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		validator = new Validator(this);
 		validator.setValidationListener(this);
 
-		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, NO_TASK);
-		if (eventId == NO_TASK) {
+		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, EventsSource.NO_TASK);
+		if (eventId == EventsSource.NO_TASK) {
 			event = Event.createEmpty();
 			saveEventChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
 					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR)));
