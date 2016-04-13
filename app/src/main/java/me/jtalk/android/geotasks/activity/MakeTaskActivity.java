@@ -106,7 +106,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_add_event);
+		setContentView(R.layout.activity_make_task);
 
 		ButterKnife.bind(this);
 
@@ -216,7 +216,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	/**
-	 * This method is called on activity_add_event.add_event_location_pick_button.
+	 * This method is called on activity_make_task.add_event_location_pick_button.
 	 *
 	 * @param view
 	 */
@@ -225,7 +225,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	/**
-	 * This method is called on activity_add_event.add_event_time_text click.
+	 * This method is called on activity_make_task.add_event_time_text click.
 	 *
 	 * @param view
 	 */
@@ -241,7 +241,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	/**
-	 * This method is called on activity_add_event.add_event_date_text click.
+	 * This method is called on activity_make_task.add_event_date_text click.
 	 *
 	 * @param view
 	 */
