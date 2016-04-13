@@ -20,6 +20,7 @@ package me.jtalk.android.geotasks.activity;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -230,12 +231,13 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 */
 	public void showTimePickerDialog(View view) {
 		final Calendar calendar = getTimeByView(view);
-		new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
+		TimePickerDialog timePickerDialog = new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
 			calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 			calendar.set(Calendar.MINUTE, minute);
 			setTimeByView(view, calendar);
-		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true)
-				.show();
+		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+		timePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_activity_calendar_dialog_clear), (dialog, which) -> setTimeByView(view, null));
+		timePickerDialog.show();
 	}
 
 	/**
@@ -245,11 +247,12 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 */
 	public void showDatePickerDialog(View view) {
 		final Calendar calendar = getTimeByView(view);
-		new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
+		DatePickerDialog datePickerDialog = new DatePickerDialog(this, (dateView, year, monthOfYear, dayOfMonth) -> {
 			calendar.set(year, monthOfYear, dayOfMonth);
 			setTimeByView(view, calendar);
-		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-				.show();
+		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+		datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_activity_calendar_dialog_clear), (dialog, which) -> setTimeByView(view, null));
+		datePickerDialog.show();
 	}
 
 	private void setTimeViews() {
