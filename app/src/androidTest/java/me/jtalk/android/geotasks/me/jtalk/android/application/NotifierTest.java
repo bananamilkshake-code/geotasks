@@ -29,8 +29,10 @@ public class NotifierTest extends AndroidTestCase {
 	public void testCreateNotification() {
 		Notifier notifier = new Notifier(getContext());
 
-		Event event = new Event(0, "TestEvent", "Description", null, null, new TaskCoordinates(23.34, 34.32));
+		TaskCoordinates currentPosition = new TaskCoordinates(23.34, 34.32);
 
-		notifier.onEventIsNear(event, 100);
+		Event event = new Event(0, "TestEvent", "Description", null, null, currentPosition);
+
+		notifier.onEventIsNear(event, currentPosition, 100);
 	}
 }

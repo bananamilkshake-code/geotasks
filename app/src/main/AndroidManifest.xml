@@ -45,6 +45,11 @@
             android:launchMode="singleInstance"
             android:process=":error_report"
             android:theme="@android:style/Theme.Material.Dialog"/>
+        <activity
+            android:name=".activity.ShowLocationActivity"
+            android:label="@string/title_activity_show_location">
+        </activity>
+
         <service
             android:name=".application.service.LocationTrackService"
             android:enabled="true"

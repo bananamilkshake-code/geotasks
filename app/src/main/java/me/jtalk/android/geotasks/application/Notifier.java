@@ -20,7 +20,9 @@ package me.jtalk.android.geotasks.application;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Icon;
 import android.media.RingtoneManager;
 import android.os.Build;
@@ -31,6 +33,8 @@ import java.text.MessageFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.activity.ShowLocationActivity;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 
 @AllArgsConstructor
@@ -46,13 +50,19 @@ public class Notifier {
 	 *
 	 * @param event
 	 */
-	public void onEventIsNear(Event event, double distance) {
+	public void onEventIsNear(Event event, TaskCoordinates currentPosition, double distance) {
+		Intent intent = new Intent(context, ShowLocationActivity.class);
+		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_EVENT_ID, event.getId());
+		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
+		PendingIntent openLocationIntent = PendingIntent.getActivity(context, ShowLocationActivity.SHOW_CURRENT, intent, 0);
+
 		Notification.Builder builder = new Notification.Builder(context)
 				.setContentTitle(getNotificationTitle(event))
 				.setContentText(getNotificationText(distance))
 				.setAutoCancel(true)
 				.setVibrate(VIBRATION_PATTERN)
-				.setSound(RingtoneManager.getDefaultUri(Notification.DEFAULT_SOUND));
+				.setSound(RingtoneManager.getDefaultUri(Notification.DEFAULT_SOUND))
+				.setContentIntent(openLocationIntent);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			builder.setSmallIcon(getSmallIcon());
