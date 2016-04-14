@@ -7,73 +7,72 @@
     tools:context="me.jtalk.android.geotasks.activity.LocationPickActivity">
 
     <org.mapsforge.map.android.view.MapView
-        android:id="@+id/map"
+        android:id="@+id/location_pick_map"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:clickable="true" />
+        android:clickable="true"/>
 
     <LinearLayout
-        android:id="@+id/main_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical"
         android:weightSum="1">
 
         <EditText
-            android:id="@+id/location_pick_search_text_edit"
+            android:id="@+id/location_pick_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:padding="9sp"
             android:background="@android:color/white"
             android:drawableEnd="@drawable/ic_search_black_18dp"
-            android:hint="@string/location_pick_search_text_edit"
-            android:selectAllOnFocus="true"
-            android:nestedScrollingEnabled="false"
-            android:longClickable="false"
-            android:singleLine="true"
             android:elevation="5sp"
+            android:hint="@string/location_pick_search_text_edit"
+            android:longClickable="false"
+            android:nestedScrollingEnabled="false"
+            android:padding="9sp"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
             android:visibility="gone"/>
 
         <TextView
-            android:id="@+id/add_event_location_coordinates_text"
-            android:text="Location coordinates"
-            android:gravity="center_horizontal"
+            android:id="@+id/add_event_location_coordinates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:padding="9sp"
-            android:textSize="20sp"
-            android:textColor="@android:color/tertiary_text_light"
             android:background="@color/ui_theme_dark_text_colour"
-            android:elevation="5sp"/>
+            android:elevation="5sp"
+            android:gravity="center_horizontal"
+            android:padding="9sp"
+            android:text="Location coordinates"
+            android:textColor="@android:color/tertiary_text_light"
+            android:textSize="20sp"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true">
+        android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/zoom_in"
+            android:id="@+id/location_pick_zoom_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onZoomInClick"
             android:padding="5dp"
             android:src="@drawable/ic_zoom_in_black_48dp"
-            android:onClick="onZoomInClick"
             />
 
         <ImageView
-            android:id="@+id/zoom_out"
+            android:id="@+id/location_pick_zoom_out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onZoomOutClick"
             android:padding="5dp"
-            android:src="@drawable/ic_zoom_out_black_48dp"
-            android:onClick="onZoomOutClick"/>
+            android:src="@drawable/ic_zoom_out_black_48dp"/>
     </LinearLayout>
 </RelativeLayout>
