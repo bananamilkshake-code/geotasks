@@ -94,8 +94,8 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		EVENT_VIEW_MAPPING = ImmutableMap.<Integer, StringValueExtractor>builder()
 				.put(R.id.item_event_expanded_descripion, (event, context) -> event.getDescription())
 				.put(R.id.event_element_location, (event, context) -> prettyFormat(event.getCoordinates()))
-				.put(R.id.event_element_start_time, (event, context) -> getFormattedTimeString(R.string.event_element_start_time, event.getStartTime(), context))
-				.put(R.id.event_element_end_time, (event, context) -> getFormattedTimeString(R.string.event_element_end_time, event.getEndTime(), context))
+				.put(R.id.event_element_start_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_start_time, event.getStartTime(), context))
+				.put(R.id.event_element_end_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_end_time, event.getEndTime(), context))
 				.build();
 	}
 

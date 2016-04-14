@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_menu_settings">Settings</string>
+    <string name="main_menu_add_event">Add event…</string>
+    <string name="main_menu_enable_geo_listening">Enable geolistening</string>
+
+    <string name="main_dialog_delete_event_text">Remove "{0}" event?</string>
+    <string name="main_dialog_delete_event_title">Remove event</string>
+    <string name="main_dialog_delete_event_yes">Remove</string>
+    <string name="main_dialog_delete_event_no">Cancel</string>
+
+    <string name="main_dialog_no_permission_for_calendar_creation_title">No permission</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_message">Calendar for application cannot be created. Grant this application a permission to write a calendar.</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_button">Close</string>
+
+    <string name="main_toast_geolistening_disabled">Geo listening disabled</string>
+    <string name="main_toast_geolistening_enabled">Geo listening enabled</string>
+
+    <string name="main_event_element_reminder_toggler_desc">Reminder toggler</string>
+    <string name="main_event_element_start_time">Since {0}</string>
+    <string name="main_event_element_end_time">Until {0}</string>
+</resources>

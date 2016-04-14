@@ -91,7 +91,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	private TaskChainHandler chainHandler = new TaskChainHandler(this) {
 		@Override
 		protected void onNeededPermissionDenied() {
-			Toast.makeText(MakeTaskActivity.this, R.string.toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
+			Toast.makeText(MakeTaskActivity.this, R.string.make_task_toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 		}
 	};
 
@@ -201,7 +201,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			View view = validationError.getView();
 
 			if (view == titleText) {
-				titleText.setError(getString(R.string.add_event_title_text_error));
+				titleText.setError(getString(R.string.make_task_error_title_is_empty));
 			}
 		}
 	}
@@ -236,7 +236,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			calendar.set(Calendar.MINUTE, minute);
 			setTimeByView(view, calendar);
 		}, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
-		timePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_activity_calendar_dialog_clear), (dialog, which) -> setTimeByView(view, null));
+		timePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_dialog_button_time_clear), (dialog, which) -> setTimeByView(view, null));
 		timePickerDialog.show();
 	}
 
@@ -251,7 +251,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 			calendar.set(year, monthOfYear, dayOfMonth);
 			setTimeByView(view, calendar);
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-		datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_activity_calendar_dialog_clear), (dialog, which) -> setTimeByView(view, null));
+		datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_dialog_button_time_clear), (dialog, which) -> setTimeByView(view, null));
 		datePickerDialog.show();
 	}
 

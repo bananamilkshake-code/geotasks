@@ -4,5 +4,5 @@
         android:id="@+id/menu_action_location_pick_save"
         android:onClick="onPickClick"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_location_pick_save"/>
+        android:title="@string/location_pick_menu_save"/>
 </menu>

@@ -4,5 +4,5 @@
         android:id="@+id/menu_action_add_event_save"
         android:onClick="onAddCalendarClick"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_add_event_save"/>
+        android:title="@string/make_task_menu_save"/>
 </menu>

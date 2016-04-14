@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_add_event">New event</string>
+
+    <string name="make_task_menu_save">Save</string>
+
+    <string name="make_task_field_title">Title</string>
+    <string name="make_task_field_description">Description</string>
+    <string name="make_task_field_location">Location</string>
+    <string name="make_task_field_start_date">Start date</string>
+    <string name="make_task_field_start_time">Start time</string>
+    <string name="make_task_field_end_date">End date</string>
+    <string name="make_task_field_end_time">End time</string>
+
+    <string name="make_task_dialog_button_time_clear">Clear</string>
+
+    <string name="make_task_error_title_is_empty">Title required</string>
+
+    <string name="make_task_toast_event_creation_no_permission">Event creation is not permitted</string>
+</resources>

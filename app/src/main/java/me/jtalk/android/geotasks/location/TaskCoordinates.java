@@ -134,4 +134,10 @@ public class TaskCoordinates implements Parcelable {
 	public String toString() {
 		return "lat: " + getLatitude() + "; lon: " + getLongitude();
 	}
+
+	public static TaskCoordinates getCenterBetween(TaskCoordinates coordinates, TaskCoordinates currentPosition) {
+		final double latitude = (coordinates.getLatitude() + currentPosition.getLatitude()) / 2;
+		final double longitude = (coordinates.getLatitude() + currentPosition.getLatitude()) / 2;
+		return new TaskCoordinates(latitude, longitude);
+	}
 }

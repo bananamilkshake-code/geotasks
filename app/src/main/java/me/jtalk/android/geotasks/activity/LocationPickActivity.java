@@ -21,7 +21,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
-import android.os.Environment;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.GestureDetector;
@@ -40,15 +39,8 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import org.mapsforge.map.android.view.MapView;
-import org.mapsforge.map.layer.Layer;
-import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.overlay.Marker;
-import org.mapsforge.map.layer.renderer.TileRendererLayer;
-import org.mapsforge.map.reader.MapDataStore;
-import org.mapsforge.map.reader.MapFile;
-import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
@@ -289,8 +281,8 @@ public class LocationPickActivity extends Activity {
 			AlertDialog.Builder builder =
 					new AlertDialog.Builder(LocationPickActivity.this)
 							.setView(dialogView)
-							.setNeutralButton(R.string.dialog_location_setup, (d, w) -> validator.validate())
-							.setNegativeButton(R.string.dialog_location_cancel, null);
+							.setNeutralButton(R.string.location_pick_dialog_location_setup, (d, w) -> validator.validate())
+							.setNegativeButton(R.string.location_pick_dialog_location_cancel, null);
 			dialog = builder.create();
 			dialog.show();
 		}
@@ -312,7 +304,7 @@ public class LocationPickActivity extends Activity {
 			for (ValidationError error : errors) {
 				View errorView = error.getView();
 				if (errorView == latitudeText || errorView == longitudeText) {
-					((TextView) errorView).setError(getString(R.string.dialog_location_error));
+					((TextView) errorView).setError(getString(R.string.location_pick_dialog_location_error));
 				}
 			}
 		}
@@ -326,7 +318,7 @@ public class LocationPickActivity extends Activity {
 		TaskCoordinates searched = TaskCoordinates.search(this, addressText);
 		if (searched == null) {
 			EditText searchEditText = (EditText) findViewById(R.id.location_pick_search_text_edit);
-			searchEditText.setError(getString(R.string.locatio_pick_incorrect_address));
+			searchEditText.setError(getString(R.string.location_pick_incorrect_address));
 		} else {
 			mapView.getModel().mapViewPosition.setCenter(searched.toLatLong());
 		}

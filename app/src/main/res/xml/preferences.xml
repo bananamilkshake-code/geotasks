@@ -4,7 +4,7 @@
     <SwitchPreference
         android:defaultValue="false"
         android:key="@string/pref_is_geolistening_enabled"
-        android:summary="@string/pref_hint_geo_listening"
+        android:summary="@string/pref_summary_geo_listening"
         android:title="@string/pref_title_geo_listening"/>
 
     <ListPreference
@@ -12,27 +12,27 @@
         android:entries="@array/crash_report_status"
         android:entryValues="@array/crash_report_status"
         android:key="@string/pref_crash_report_send_status"
-        android:summary="@string/pref_crash_report_status_summary"
-        android:title="@string/pref_crash_report_status_title"/>
+        android:summary="@string/pref_summary_crash_report_status"
+        android:title="@string/pref_title_crash_report_status"/>
 
     <EditTextPreference
         android:defaultValue="100.0"
         android:key="@string/pref_alarm_distance"
-        android:summary="@string/pref_alarm_distance_summary"
-        android:title="@string/pref_alarm_distance_title"
+        android:summary="@string/pref_summary_alarm_distance"
+        android:title="@string/pref_title_alarm_distance"
         android:numeric="decimal" />
 
     <EditTextPreference
         android:defaultValue="1.0"
         android:key="@string/pref_location_update_min_distance"
-        android:summary="@string/pref_location_update_min_distance_summary"
-        android:title="@string/pref_location_update_min_distance_title"
+        android:summary="@string/pref_summary_location_update_min_distance"
+        android:title="@string/pref_title_location_update_min_distance"
         android:numeric="decimal" />
 
     <EditTextPreference
         android:defaultValue="5"
         android:key="@string/pref_location_update_min_time"
-        android:summary="@string/ref_location_update_min_time_summary"
-        android:title="@string/pref_location_update_min_time_title"
+        android:summary="@string/pref_summary_location_update_min_time"
+        android:title="@string/pref_title_location_update_min_time"
         android:numeric="integer" />
 </PreferenceScreen>

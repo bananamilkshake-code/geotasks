@@ -70,9 +70,9 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		@Override
 		protected void onNeededPermissionDenied() {
 			new AlertDialog.Builder(MainActivity.this)
-					.setTitle(R.string.dialog_no_permission_for_calendar_creation_title)
-					.setMessage(R.string.dialog_no_permission_for_calendar_creation_message)
-					.setPositiveButton(R.string.dialog_no_permission_for_calendar_creation_button, (dialog, which) -> {
+					.setTitle(R.string.main_dialog_no_permission_for_calendar_creation_title)
+					.setMessage(R.string.main_dialog_no_permission_for_calendar_creation_message)
+					.setPositiveButton(R.string.main_dialog_no_permission_for_calendar_creation_button, (dialog, which) -> {
 						dialog.dismiss();
 						MainActivity.this.finish();
 					})
@@ -219,10 +219,10 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
 			Event event = EventsSource.extractEvent(eventsAdapter.getGroup(position));
 			new AlertDialog.Builder(MainActivity.this)
-					.setTitle(R.string.dialog_delete_event_title)
-					.setMessage(MessageFormat.format(getString(R.string.dialog_delete_event_text), event.getTitle()))
-					.setPositiveButton(R.string.dialog_delete_event_yes, (d, w) -> getEventsSource().remove(event.getId()))
-					.setNegativeButton(R.string.dialog_delete_event_no, null)
+					.setTitle(R.string.main_dialog_delete_event_title)
+					.setMessage(MessageFormat.format(getString(R.string.main_dialog_delete_event_text), event.getTitle()))
+					.setPositiveButton(R.string.main_dialog_delete_event_yes, (d, w) -> getEventsSource().remove(event.getId()))
+					.setNegativeButton(R.string.main_dialog_delete_event_no, null)
 					.setCancelable(true)
 					.show();
 			return true;
@@ -253,7 +253,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 			geoTrackMenuItem.setChecked(true);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
 
-			Toast.makeText(this, R.string.toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, R.string.main_toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
 		} else {
 			if (locationTrackServiceConnection != null) {
 				LOG.debug("Unbinding from LocationTrackService");
@@ -264,7 +264,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 			geoTrackMenuItem.setChecked(false);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
 
-			Toast.makeText(this, R.string.toast_geolistening_disnabled, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, R.string.main_toast_geolistening_disabled, Toast.LENGTH_SHORT).show();
 		}
 	}
 

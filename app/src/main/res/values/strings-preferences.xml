@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_label_settings">Settings</string>
+
+    <string name="pref_title_geo_listening">Enable geo listening</string>
+    <string name="pref_summary_geo_listening">Track current location to check events occurrence</string>
+
+    <string name="pref_title_alarm_distance">Alarm distance</string>
+    <string name="pref_summary_alarm_distance">If distance to even will be less notification will be shown</string>
+
+    <string name="pref_title_location_update_min_distance">Location update distance</string>
+    <string name="pref_summary_location_update_min_distance">Minimum distance to check location change in meters (works with Location update time parameter)</string>
+
+    <string name="pref_title_location_update_min_time">Location update time</string>
+    <string name="pref_summary_location_update_min_time">Minimum time to check location change in seconds (works with Location update distance parameter)</string>
+
+    <string name="pref_title_crash_report_status">Send report about crash</string>
+    <string name="pref_summary_crash_report_status">If error occurred application can send report to developers.</string>
+</resources>
