@@ -23,8 +23,6 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +48,7 @@ import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
+import me.jtalk.android.geotasks.util.TextUpdater;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
 import static me.jtalk.android.geotasks.application.TaskChainHandler.makeTask;
@@ -132,35 +131,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 					.add(makeTask(this::editEvent, Manifest.permission.WRITE_CALENDAR)));
 		}
 
-		titleText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				event.setTitle(s.toString());
-			}
-		});
-		descriptionText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				event.setDescription(s.toString());
-			}
-		});
+		titleText.addTextChangedListener(new TextUpdater((value) -> event.setTitle(value)));
+		descriptionText.addTextChangedListener(new TextUpdater((value) -> event.setDescription(value)));
 	}
+
 
 	private void setLocationText() {
 		locationText.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
