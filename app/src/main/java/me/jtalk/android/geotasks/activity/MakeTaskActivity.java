@@ -58,7 +58,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	public static final String INTENT_EDIT_TASK = "edit";
 
-	@NotEmpty
+	@NotEmpty(messageResId = R.string.make_task_error_title_is_empty)
 	@Bind(R.id.make_task_name)
 	EditText titleText;
 
@@ -171,11 +171,12 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onValidationFailed(List<ValidationError> errors) {
-		for (ValidationError validationError : errors) {
-			View view = validationError.getView();
+		for (ValidationError error : errors) {
+			View view = error.getView();
+			String message = error.getCollatedErrorMessage(this);
 
-			if (view == titleText) {
-				titleText.setError(getString(R.string.make_task_error_title_is_empty));
+			if (view instanceof EditText) {
+				((EditText) view).setError(message);
 			}
 		}
 	}
