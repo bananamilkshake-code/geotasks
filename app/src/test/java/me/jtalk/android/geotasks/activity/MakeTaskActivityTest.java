@@ -41,7 +41,7 @@ public class MakeTaskActivityTest {
 
 	@Test
 	public void testStartLocationPickActivityWithoutCoordinates() {
-		activity.findViewById(R.id.add_event_location_coordinates_text).performClick();
+		activity.findViewById(R.id.make_task_location).performClick();
 
 		Intent expectedIntent = new Intent(activity, LocationPickActivity.class);
 
@@ -56,7 +56,7 @@ public class MakeTaskActivityTest {
 				Activity.RESULT_CANCELED,
 				emptyIntent);
 
-		TextView coordinatesText = (TextView) activity.findViewById(R.id.add_event_location_coordinates_text);
+		TextView coordinatesText = (TextView) activity.findViewById(R.id.make_task_location);
 		assertEquals("", coordinatesText.getText().toString());
 	}
 
@@ -73,7 +73,7 @@ public class MakeTaskActivityTest {
 				Activity.RESULT_OK,
 				intentWithCoordinates);
 
-		TextView coordinatesText = (TextView) activity.findViewById(R.id.add_event_location_coordinates_text);
+		TextView coordinatesText = (TextView) activity.findViewById(R.id.make_task_location);
 		assertEquals(formattedCoordinates, coordinatesText.getText().toString());
 	}
 

@@ -60,25 +60,25 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	public static final String INTENT_EDIT_TASK = "edit";
 
 	@NotEmpty
-	@Bind(R.id.add_event_name_text)
+	@Bind(R.id.make_task_name)
 	EditText titleText;
 
-	@Bind(R.id.add_event_description_text)
+	@Bind(R.id.make_task_description)
 	EditText descriptionText;
 
-	@Bind(R.id.add_event_location_coordinates_text)
+	@Bind(R.id.make_task_location)
 	TextView locationText;
 
-	@Bind(R.id.add_event_start_date_text)
+	@Bind(R.id.make_task_start_date)
 	TextView startDateText;
 
-	@Bind(R.id.add_event_start_time_text)
+	@Bind(R.id.make_task_start_time)
 	TextView startTimeText;
 
-	@Bind(R.id.add_event_end_date_text)
+	@Bind(R.id.make_task_end_date)
 	TextView endDateText;
 
-	@Bind(R.id.add_event_end_time_text)
+	@Bind(R.id.make_task_end_time)
 	TextView endTimeText;
 
 	private Validator validator;

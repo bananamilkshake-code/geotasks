@@ -10,11 +10,33 @@
     tools:context="me.jtalk.android.geotasks.activity.MakeTaskActivity">
 
     <EditText
-        android:id="@+id/add_event_name_text"
+        android:id="@+id/make_task_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:hint="@string/make_task_field_title"/>
+        android:hint="@string/make_task_field_title"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:gravity="left"
+        android:inputType="textWebEditText"/>
+
+    <EditText
+        android:id="@+id/make_task_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.24"
+        android:ems="10"
+        android:hint="@string/make_task_field_description"
+        android:inputType="textMultiLine"/>
+
+    <TextView
+        android:id="@+id/make_task_location"
+        style="?android:attr/spinnerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/make_task_field_location"
+        android:onClick="showLocationActivity"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +45,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/add_event_start_date_text"
+            android:id="@+id/make_task_start_date"
             style="?android:attr/spinnerStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,7 +54,7 @@
             android:onClick="showDatePickerDialog"/>
 
         <TextView
-            android:id="@+id/add_event_start_time_text"
+            android:id="@+id/make_task_start_time"
             style="?android:attr/spinnerStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -48,7 +70,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/add_event_end_date_text"
+            android:id="@+id/make_task_end_date"
             style="?android:attr/spinnerStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -57,7 +79,7 @@
             android:onClick="showDatePickerDialog"/>
 
         <TextView
-            android:id="@+id/add_event_end_time_text"
+            android:id="@+id/make_task_end_time"
             style="?android:attr/spinnerStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -65,22 +87,5 @@
             android:hint="@string/make_task_field_end_time"
             android:onClick="showTimePickerDialog"/>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/add_event_location_coordinates_text"
-        style="?android:attr/spinnerStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/make_task_field_location"
-        android:onClick="showLocationActivity"/>
-
-    <EditText
-        android:id="@+id/add_event_description_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.24"
-        android:ems="10"
-        android:hint="@string/make_task_field_description"
-        android:inputType="textMultiLine"/>
 
 </LinearLayout>
