@@ -71,7 +71,14 @@ public class LocationPickActivity extends Activity {
 	public static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
 
 	@Getter
-	private MapView mapView;
+	@Bind(R.id.location_pick_map)
+	MapView mapView;
+
+	@Bind(R.id.location_pick_search)
+	EditText searchEditText;
+
+	@Bind(R.id.location_pick_coordinates)
+	TextView textLocationCoordinates;
 
 	/**
 	 * Coordinate that will be returned from this activity.
@@ -167,7 +174,7 @@ public class LocationPickActivity extends Activity {
 		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
 		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
 
-		mapView = (MapView) findViewById(R.id.location_pick_map);
+		ButterKnife.bind(this);
 
 		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector(this));
 
@@ -187,7 +194,6 @@ public class LocationPickActivity extends Activity {
 	}
 
 	private void initSearchEditText() {
-		EditText searchEditText = (EditText) findViewById(R.id.location_pick_search);
 		searchEditText.setOnEditorActionListener((view, actionId, event) -> {
 			if (event == null) { // Event triggered by ENTER key
 				return false;
@@ -214,7 +220,6 @@ public class LocationPickActivity extends Activity {
 	}
 
 	private void initLocationCoordinatesText() {
-		TextView textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates);
 		textLocationCoordinates.setOnClickListener(new LocationDialogViewOnClickListener());
 	}
 
@@ -317,7 +322,6 @@ public class LocationPickActivity extends Activity {
 
 		TaskCoordinates searched = TaskCoordinates.search(this, addressText);
 		if (searched == null) {
-			EditText searchEditText = (EditText) findViewById(R.id.location_pick_search);
 			searchEditText.setError(getString(R.string.location_pick_incorrect_address));
 		} else {
 			mapView.getModel().mapViewPosition.setCenter(searched.toLatLong());
@@ -352,7 +356,6 @@ public class LocationPickActivity extends Activity {
 	 * @param coordinates where marker must be drawn
 	 */
 	private void updateCurrentLocation(TaskCoordinates coordinates) {
-		TextView textLocationCoordinates = (TextView) findViewById(R.id.add_event_location_coordinates);
 		textLocationCoordinates.setText(CoordinatesFormat.prettyFormat(coordinates));
 
 		marker.setLatLong(coordinates.toLatLong());
