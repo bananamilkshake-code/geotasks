@@ -7,7 +7,7 @@
     android:launchMode = "singleInstance"
     tools:context=".MainActivity">
     <ExpandableListView
-        android:id="@+id/events_list"
+        android:id="@+id/main_events_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">

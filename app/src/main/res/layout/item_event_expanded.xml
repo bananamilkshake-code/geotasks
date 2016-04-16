@@ -9,7 +9,7 @@
               android:paddingEnd="25sp">
 
     <TextView
-        android:id="@+id/item_event_expanded_descripion"
+        android:id="@+id/item_event_expanded_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10sp"
@@ -17,28 +17,30 @@
         android:textSize="20sp"/>
 
     <TextView
-        android:id="@+id/event_element_location"
+        android:id="@+id/item_event_expanded_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10sp"
+        android:paddingStart="10sp"
         android:paddingTop="5sp"
         android:text="lon: 34.234 lat: 45.00"
         android:textColor="@android:color/secondary_text_light"/>
 
     <TextView
-        android:id="@+id/event_element_start_time"
+        android:id="@+id/item_event_expanded_start_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10sp"
+        android:paddingStart="10sp"
+        android:paddingEnd="10sp"
         android:paddingTop="5sp"
         android:text="12/03/2015 8:05"
         android:textColor="@android:color/secondary_text_light"/>
 
     <TextView
-        android:id="@+id/event_element_end_time"
+        android:id="@+id/item_event_expanded_end_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10sp"
+        android:paddingStart="10sp"
+        android:paddingEnd="10sp"
         android:paddingTop="5sp"
         android:text="12/04/2015 8:05"
         android:textColor="@android:color/secondary_text_light"/>

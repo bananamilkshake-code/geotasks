@@ -192,7 +192,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private void initEventsList() {
 		CursorTreeAdapter eventsAdapter = new EventElementAdapter(this);
 
-		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.events_list);
+		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.main_events_list);
 		eventsList.setAdapter(eventsAdapter);
 
 		eventsList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {

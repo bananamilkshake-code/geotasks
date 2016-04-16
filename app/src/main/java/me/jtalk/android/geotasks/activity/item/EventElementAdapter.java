@@ -78,7 +78,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 	@Override
 	protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
 		Event event = EventsSource.extractEvent(cursor);
-		TextView titleView = (TextView) view.findViewById(R.id.event_element_title);
+		TextView titleView = (TextView) view.findViewById(R.id.item_event_title);
 		titleView.setText(event.getTitle());
 		titleView.setTextColor(getColorFor(event));
 	}
@@ -92,10 +92,10 @@ public class EventElementAdapter extends CursorTreeAdapter {
 	private static final ImmutableMap<Integer, StringValueExtractor> EVENT_VIEW_MAPPING;
 	static {
 		EVENT_VIEW_MAPPING = ImmutableMap.<Integer, StringValueExtractor>builder()
-				.put(R.id.item_event_expanded_descripion, (event, context) -> event.getDescription())
-				.put(R.id.event_element_location, (event, context) -> prettyFormat(event.getCoordinates()))
-				.put(R.id.event_element_start_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_start_time, event.getStartTime(), context))
-				.put(R.id.event_element_end_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_end_time, event.getEndTime(), context))
+				.put(R.id.item_event_expanded_description, (event, context) -> event.getDescription())
+				.put(R.id.item_event_expanded_location, (event, context) -> prettyFormat(event.getCoordinates()))
+				.put(R.id.item_event_expanded_start_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_start_time, event.getStartTime(), context))
+				.put(R.id.item_event_expanded_end_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_end_time, event.getEndTime(), context))
 				.build();
 	}
 
