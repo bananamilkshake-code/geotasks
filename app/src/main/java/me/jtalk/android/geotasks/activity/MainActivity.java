@@ -257,7 +257,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		} else {
 			if (locationTrackServiceConnection != null) {
 				LOG.debug("Unbinding from LocationTrackService");
-				locationTrackServiceConnection.locationBinder.disable();
+				locationTrackServiceConnection.disable();
 				unbindService(locationTrackServiceConnection);
 			}
 
@@ -283,6 +283,12 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			LOG.debug("LocationTrackService is disconnected");
+		}
+
+		public void disable() {
+			if (locationBinder != null) {
+				locationBinder.disable();
+			}
 		}
 	}
 }
