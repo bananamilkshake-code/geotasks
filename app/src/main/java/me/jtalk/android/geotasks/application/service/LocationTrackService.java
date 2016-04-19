@@ -17,12 +17,17 @@
  */
 package me.jtalk.android.geotasks.application.service;
 
+import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -31,6 +36,7 @@ import android.widget.Toast;
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
+import me.jtalk.android.geotasks.activity.MainActivity;
 import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
@@ -47,9 +53,12 @@ public class LocationTrackService extends Service {
 		return (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	}
 
+	private static final int STATUS_BAR_NOTIFICATION_ID = Integer.MAX_VALUE;
+
 	@Nullable
 	@Override
 	public IBinder onBind(Intent intent) {
+		createNotification();
 		return binder;
 	}
 
@@ -57,9 +66,32 @@ public class LocationTrackService extends Service {
 	public boolean onUnbind (Intent intent) {
 		LOG.debug("Service unbind");
 
-		Toast.makeText(this, "LocationTrackService disabled", Toast.LENGTH_SHORT).show();
-
 		return super.onUnbind(intent);
+	}
+
+	/**
+	 * Creates and shows notification in status bar for application.
+	 */
+	private void createNotification() {
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		Notification.Builder builder = new Notification.Builder(this)
+				.setContentTitle(getText(R.string.app_name))
+				.setAutoCancel(false)
+				.setOngoing(true)
+				.setSmallIcon(R.drawable.treasure_map_white_24)
+				.setContentIntent(pendingIntent);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			builder.setLargeIcon(getLargeIcon());
+		}
+
+		startForeground(STATUS_BAR_NOTIFICATION_ID, builder.build());
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
+	private Icon getLargeIcon() {
+		return Icon.createWithResource(this, R.drawable.treasure_map_colour_50);
 	}
 
 	public class LocationBinder extends Binder implements SharedPreferences.OnSharedPreferenceChangeListener {
