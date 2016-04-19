@@ -81,7 +81,7 @@ public class Notifier {
 
 	@TargetApi(Build.VERSION_CODES.M)
 	private Icon getLargeIcon() {
-		return Icon.createWithResource(context, R.drawable.treasure_map_50);
+		return Icon.createWithResource(context, R.drawable.treasure_map_colour_50);
 	}
 
 	private int getNotificationId(Event event) {
