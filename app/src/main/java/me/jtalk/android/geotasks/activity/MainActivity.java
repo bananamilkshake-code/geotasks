@@ -19,12 +19,9 @@ package me.jtalk.android.geotasks.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +35,6 @@ import org.acra.ACRA;
 import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.application.TaskChainHandler;
@@ -63,8 +59,6 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private int toggleGeoListenChainId;
 
 	private MenuItem geoTrackMenuItem;
-
-	private LocationTrackServiceConnection locationTrackServiceConnection;
 
 	private TaskChainHandler chainHandler = new TaskChainHandler(this) {
 		@Override
@@ -243,52 +237,23 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean isEnabled = settings.getBoolean(getString(R.string.pref_is_geolistening_enabled), Settings.DEFAULT_GEO_LISTENING);
 
+		Intent intent = new Intent(this, LocationTrackService.class);
+
 		if (isEnabled) {
-			LOG.debug("Bind to LocationTrackService");
-			locationTrackServiceConnection = new LocationTrackServiceConnection();
-			if (!bindService(new Intent(this, LocationTrackService.class), locationTrackServiceConnection, BIND_AUTO_CREATE)) {
-				LOG.error("Failed to bind LocationTrackService");
-			}
+			intent.putExtra(LocationTrackService.INTENT_EXTRA_CALENDAR_ID, getEventsSource().getCalendarId());
+			startService(intent);
 
 			geoTrackMenuItem.setChecked(true);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
 
 			Toast.makeText(this, R.string.main_toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
 		} else {
-			if (locationTrackServiceConnection != null) {
-				LOG.debug("Unbinding from LocationTrackService");
-				locationTrackServiceConnection.disable();
-				unbindService(locationTrackServiceConnection);
-			}
+			stopService(intent);
 
 			geoTrackMenuItem.setChecked(false);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
 
 			Toast.makeText(this, R.string.main_toast_geolistening_disabled, Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	private class LocationTrackServiceConnection implements ServiceConnection {
-
-		public LocationTrackService.LocationBinder locationBinder;
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			locationBinder = (LocationTrackService.LocationBinder) service;
-			locationBinder.setup(MainActivity.this.getEventsSource(), new Notifier(MainActivity.this));
-
-			LOG.debug("LocationTrackService is connected");
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			LOG.debug("LocationTrackService is disconnected");
-		}
-
-		public void disable() {
-			if (locationBinder != null) {
-				locationBinder.disable();
-			}
 		}
 	}
 }

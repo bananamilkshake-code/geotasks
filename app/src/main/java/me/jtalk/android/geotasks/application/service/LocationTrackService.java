@@ -29,6 +29,7 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
@@ -47,26 +48,35 @@ public class LocationTrackService extends Service {
 
 	private static final Logger LOG = new Logger(LocationTrackService.class);
 
-	private LocationBinder binder = new LocationBinder();
+	private static final int STATUS_BAR_NOTIFICATION_ID = Integer.MAX_VALUE;
+
+	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
+
+	private LocationBinder binder;
 
 	private LocationManager getLocationManager() {
 		return (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	}
 
-	private static final int STATUS_BAR_NOTIFICATION_ID = Integer.MAX_VALUE;
-
 	@Nullable
 	@Override
 	public IBinder onBind(Intent intent) {
-		createNotification();
-		return binder;
+		return null;
 	}
 
 	@Override
-	public boolean onUnbind (Intent intent) {
-		LOG.debug("Service unbind");
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		super.onStartCommand(intent, flags, startId);
 
-		return super.onUnbind(intent);
+		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
+		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
+			throw new IllegalArgumentException("Calendar id for service is incorrect or not passed");
+		}
+
+		binder = new LocationBinder(calendarId);
+
+		createNotification();
+		return START_STICKY;
 	}
 
 	/**
@@ -95,34 +105,17 @@ public class LocationTrackService extends Service {
 	}
 
 	public class LocationBinder extends Binder implements SharedPreferences.OnSharedPreferenceChangeListener {
-		// TODO: make list of locationListeners because LocationTrackService always
-		// returns first created IBinder object.
+
 		private EventsLocationListener locationListener;
 
-		public void setup(EventsSource eventsSource, Notifier notifier) throws SecurityException {
-			locationListener = new EventsLocationListener(eventsSource, notifier);
+		public LocationBinder(long calendarId) throws SecurityException {
+			if (locationListener != null) {
+				getLocationManager().removeUpdates(locationListener);
+			}
 
+			locationListener = new EventsLocationListener(new EventsSource(LocationTrackService.this, calendarId), new Notifier(LocationTrackService.this));
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			updateDistanceToAlarm(settings);
 			setupLocationListenerUpdateParameters(settings);
-
-			settings.registerOnSharedPreferenceChangeListener(this);
-		}
-
-		public void disable() throws SecurityException {
-			LocationTrackService.this.getLocationManager().removeUpdates(locationListener);
-
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			settings.unregisterOnSharedPreferenceChangeListener(this);
-
-			locationListener = null;
-
-			LOG.debug("Geo listening disabled");
-		}
-
-		private void updateDistanceToAlarm(SharedPreferences settings) {
-			float distanceToAlarm = Float.parseFloat(settings.getString(getString(R.string.pref_alarm_distance), Settings.DEFAULT_DISTANCE_TO_ALARM.toString()));
-			locationListener.setDistanceToAlarm(distanceToAlarm);
 		}
 
 		@Override
@@ -131,12 +124,17 @@ public class LocationTrackService extends Service {
 				updateDistanceToAlarm(sharedPreferences);
 			} if (key.equals(getString(R.string.pref_location_update_min_distance)) || key.equals(getString(R.string.pref_location_update_min_time))) {
 				setupLocationListenerUpdateParameters(sharedPreferences);
-				LocationTrackService.this.getLocationManager().removeUpdates(locationListener);
+				getLocationManager().removeUpdates(locationListener);
 			}
 		}
 
+		private void updateDistanceToAlarm(SharedPreferences settings) {
+			float distanceToAlarm = Float.parseFloat(settings.getString(getString(R.string.pref_alarm_distance), Settings.DEFAULT_DISTANCE_TO_ALARM.toString()));
+			locationListener.setDistanceToAlarm(distanceToAlarm);
+		}
+
 		private void setupLocationListenerUpdateParameters(SharedPreferences sharedPreferences) throws SecurityException {
-			LocationManager locationManager = LocationTrackService.this.getLocationManager();
+			LocationManager locationManager = getLocationManager();
 
 			float minDistance = Float.parseFloat(sharedPreferences.getString(getString(R.string.pref_location_update_min_distance), EventsLocationListener.MIN_DISTANCE.toString()));
 			long minTime = Long.parseLong(sharedPreferences.getString(getString(R.string.pref_location_update_min_time), EventsLocationListener.MIN_TIME.toString()));
@@ -151,8 +149,6 @@ public class LocationTrackService extends Service {
 			locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener);
 
 			LOG.debug("Geo listening enabled via {0}", provider);
-
-			Toast.makeText(LocationTrackService.this, MessageFormat.format("Geo listening enabled via {0}", provider), Toast.LENGTH_SHORT).show();
 		}
 	}
 }
