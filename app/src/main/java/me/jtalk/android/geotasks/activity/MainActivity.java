@@ -244,14 +244,14 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 			startService(intent);
 
 			geoTrackMenuItem.setChecked(true);
-			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_black_48dp);
+			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
 
 			Toast.makeText(this, R.string.main_toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
 		} else {
 			stopService(intent);
 
 			geoTrackMenuItem.setChecked(false);
-			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_black_48dp);
+			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
 
 			Toast.makeText(this, R.string.main_toast_geolistening_disabled, Toast.LENGTH_SHORT).show();
 		}
