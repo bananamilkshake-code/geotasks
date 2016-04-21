@@ -46,8 +46,7 @@
             android:process=":error_report"
             android:theme="@android:style/Theme.Material.Dialog"/>
         <activity
-            android:name=".activity.ShowLocationActivity"
-            android:label="@string/title_activity_show_location">
+            android:name=".activity.ShowLocationActivity">
         </activity>
 
         <service
