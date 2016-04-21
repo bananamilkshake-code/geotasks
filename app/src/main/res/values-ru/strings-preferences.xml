@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_label_settings">Настройки</string>
+
+    <string name="pref_title_geo_listening">Геопозиционирование</string>
+    <string name="pref_summary_geo_listening">Отслеживать текущую локацию для проверки близости событий</string>
+
+    <string name="pref_title_alarm_distance">Дистанция для сигнала</string>
+    <string name="pref_summary_alarm_distance">Появится уведомлене, если расстояние до события будет меньше этого значения</string>
+
+    <string name="pref_title_location_update_min_distance">Расстояние для проверки позиции</string>
+    <string name="pref_summary_location_update_min_distance">Минимальное изменение растояние, которое нужно пройти, чтобы геопозиционирование обновило текущую локацию (работает вместе с параметром \"Время для проверки позиции\")</string>
+
+    <string name="pref_title_location_update_min_time">Время для проверки позиции</string>
+    <string name="pref_summary_location_update_min_time">Минимальное время, которе должно пройти, чтобы геопозиционирование обновило текущую локацию (работает вместе с параметром \"Расстояние для проверки позиции\")</string>
+
+    <string name="pref_title_crash_report_status">Отправка отчета об ошибке</string>
+    <string name="pref_summary_crash_report_status">Возможность отправлять отчет при возникновении ошибки в приложении</string>
+</resources>

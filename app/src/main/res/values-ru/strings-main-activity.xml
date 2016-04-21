@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_menu_settings">Настройки</string>
+    <string name="main_menu_add_event">Добавить событие…</string>
+    <string name="main_menu_enable_geo_listening">Включить геопозиционирование</string>
+
+    <string name="main_dialog_delete_event_text">Удалить событие "{0}"?</string>
+    <string name="main_dialog_delete_event_title">Удаление события</string>
+    <string name="main_dialog_delete_event_yes">Принять</string>
+    <string name="main_dialog_delete_event_no">Отмена</string>
+
+    <string name="main_dialog_no_permission_for_calendar_creation_title">Нет разрешения</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_message">Нельзя создать календарь для приложения. Приложению необходимо выдать разрешение изменять календари.</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_button">Закрыть</string>
+
+    <string name="main_toast_geolistening_disabled">Геопозиционирование отключено</string>
+    <string name="main_toast_geolistening_enabled">Геопозиционирование включено</string>
+
+    <string name="main_event_element_reminder_toggler_desc">Переключатель напоминания</string>
+    <string name="main_event_element_start_time">Начать с {0}</string>
+    <string name="main_event_element_end_time">Закончить в {0}</string>
+</resources>

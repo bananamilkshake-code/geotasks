@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_add_event">Новое событие</string>
+
+    <string name="make_task_menu_save">Сохранить</string>
+
+    <string name="make_task_field_title">Название</string>
+    <string name="make_task_field_description">Описание</string>
+    <string name="make_task_field_location">Место</string>
+    <string name="make_task_field_start_date">Дата начала</string>
+    <string name="make_task_field_start_time">Время начала</string>
+    <string name="make_task_field_end_date">Дата конца</string>
+    <string name="make_task_field_end_time">Время конца</string>
+
+    <string name="make_task_dialog_button_time_clear">Очистить</string>
+
+    <string name="make_task_error_title_is_empty">Не может быть пустым</string>
+
+    <string name="make_task_toast_event_creation_no_permission">У приложение нет разрешения создавать события</string>
+</resources>

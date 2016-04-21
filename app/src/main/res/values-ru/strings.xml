@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">GeoTasks</string>
+
+    <!-- Notification -->
+    <string name="notification_event_is_near_title_arg_1">{} недалеко</string>
+    <string name="notification_event_is_near_text_arg_1">Осталось пройти {0} meters</string>
+
+    <!-- Crash report -->
+    <string name="crash_toast_text">Критическая ошибка</string>
+    <string name="crash_dialog_text">Если хотите помочь нам, пришлите нам информацию об этой ошибке.\n\n В отчете будет содержаться следующая информация: информация об ошибке, лог приложения, модель телефона, текущее состояние приложения (если выдано разрешение на получение дампа), настройки устройства.\n\n Вы можете включить/отключить отправление отчетов в настройках.</string>
+    <string name="crash_dialog_ok_toast">Большое спасибо!</string>
+    <string name="crash_positive_button">Отправить</string>
+    <string name="crash_dialog_title">GeoTasks сломалось</string>
+
+    <string name="title_activity_show_location">Координаты \"{0}\"</string>
+</resources>
