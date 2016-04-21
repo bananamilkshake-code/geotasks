@@ -12,5 +12,5 @@
     <string name="crash_positive_button">Send</string>
     <string name="crash_dialog_title">GeoTasks crashed</string>
 
-    <string name="title_activity_show_location">"{0}" coordinates</string>
+    <string name="title_activity_show_location">\"{0}\" coordinates</string>
 </resources>

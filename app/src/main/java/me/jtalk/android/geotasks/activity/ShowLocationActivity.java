@@ -72,7 +72,7 @@ public class ShowLocationActivity extends Activity {
 
 		event = retrieveEvent(eventId);
 
-		setTitle(MessageFormat.format("\"{0}\" coordinates", event.getTitle()));
+		setTitle(MessageFormat.format(getString(R.string.title_activity_show_location), event.getTitle()));
 
 		eventPosition = createMarker(R.drawable.ic_place_black_48dp, event.getCoordinates());
 		currentPosition = createMarker(R.drawable.ic_person_pin_black_48dp, position);
