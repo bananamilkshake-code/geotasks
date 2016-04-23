@@ -6,4 +6,5 @@
     <string name="pref_alarm_distance">pref_alarm_distance</string>
     <string name="pref_location_update_min_distance">pref_location_update_min_distance</string>
     <string name="pref_location_update_min_time">pref_location_update_min_time</string>
+    <string name="pref_alarm_sound">pref_alarm_sound</string>
 </resources>

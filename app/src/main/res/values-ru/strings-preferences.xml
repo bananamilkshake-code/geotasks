@@ -16,4 +16,6 @@
 
     <string name="pref_title_crash_report_status">Отправка отчета об ошибке</string>
     <string name="pref_summary_crash_report_status">Возможность отправлять отчет при возникновении ошибки в приложении</string>
+
+    <string name="pref_title_alarm_sound">Звук уведомления</string>
 </resources>

@@ -5,6 +5,8 @@
     <string name="pref_title_geo_listening">Enable geo listening</string>
     <string name="pref_summary_geo_listening">Track current location to check events occurrence</string>
 
+    <string name="pref_title_alarm_sound">Alarm sound</string>
+
     <string name="pref_title_alarm_distance">Alarm distance</string>
     <string name="pref_summary_alarm_distance">If distance to even will be less notification will be shown</string>
 

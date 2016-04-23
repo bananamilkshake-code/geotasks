@@ -7,6 +7,10 @@
         android:summary="@string/pref_summary_geo_listening"
         android:title="@string/pref_title_geo_listening"/>
 
+    <RingtonePreference
+        android:title="@string/pref_title_alarm_sound"
+        android:key="@string/pref_alarm_sound"/>
+
     <ListPreference
         android:defaultValue="Ask"
         android:entries="@array/crash_report_status"

@@ -23,9 +23,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.text.MessageFormat;
@@ -61,7 +64,7 @@ public class Notifier {
 				.setContentText(getNotificationText(distance))
 				.setAutoCancel(true)
 				.setVibrate(VIBRATION_PATTERN)
-				.setSound(RingtoneManager.getDefaultUri(Notification.DEFAULT_SOUND))
+				.setSound(getSound())
 				.setContentIntent(openLocationIntent);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -82,6 +85,12 @@ public class Notifier {
 	@TargetApi(Build.VERSION_CODES.M)
 	private Icon getLargeIcon() {
 		return Icon.createWithResource(context, R.drawable.treasure_map_colour_50);
+	}
+
+	private Uri getSound() {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+		String alarm = settings.getString(context.getString(R.string.pref_alarm_sound), RingtoneManager.getDefaultUri(Notification.DEFAULT_SOUND).toString());
+		return Uri.parse(alarm);
 	}
 
 	private int getNotificationId(Event event) {
