@@ -28,7 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CursorTreeAdapter;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -47,7 +46,6 @@ import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
 
-import static me.jtalk.android.geotasks.R.string.pref_is_geolistening_enabled;
 import static me.jtalk.android.geotasks.application.TaskChainHandler.makeTask;
 
 public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -119,9 +117,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * @param menuItem
 	 * @return
 	 */
-	public boolean openAddEventIntent(MenuItem menuItem) {
+	public void openAddEventIntent(MenuItem menuItem) {
 		startActivity(new Intent(this, MakeTaskActivity.class));
-		return true;
 	}
 
 	/**
@@ -130,16 +127,15 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * @param menuItem
 	 * @return
 	 */
-	public boolean toggleGeoListeningClick(MenuItem menuItem) {
+	public void toggleGeoListeningClick(MenuItem menuItem) {
 		boolean isChecked = !menuItem.isChecked();
 
 		LOG.debug("Toggling geolistening: make checked {0}", isChecked);
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putBoolean(getString(pref_is_geolistening_enabled), isChecked);
+		editor.putBoolean(getString(R.string.pref_is_geolistening_enabled), isChecked);
 		editor.commit();
-		return true;
 	}
 
 	/**
@@ -148,9 +144,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * @param menuItem
 	 * @return
 	 */
-	public boolean openSettingsActivity(MenuItem menuItem) {
+	public void openSettingsActivity(MenuItem menuItem) {
 		startActivity(new Intent(this, SettingsActivity.class));
-		return true;
 	}
 
 	public boolean sendReports(MenuItem menuItem) {
@@ -245,15 +240,11 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 			geoTrackMenuItem.setChecked(true);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
-
-			Toast.makeText(this, R.string.main_toast_geolistening_enabled, Toast.LENGTH_SHORT).show();
 		} else {
 			stopService(intent);
 
 			geoTrackMenuItem.setChecked(false);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
-
-			Toast.makeText(this, R.string.main_toast_geolistening_disabled, Toast.LENGTH_SHORT).show();
 		}
 	}
 }
