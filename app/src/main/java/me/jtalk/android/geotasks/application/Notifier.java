@@ -55,6 +55,8 @@ public class Notifier {
 	 * @param event
 	 */
 	public void onEventIsNear(long calendarId, Event event, TaskCoordinates currentPosition, double distance) {
+		final int notificationId = getNotificationId(event);
+
 		Intent intent = new Intent(context, ShowLocationActivity.class);
 		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_EVENT_ID, event.getId());
 		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
@@ -68,7 +70,7 @@ public class Notifier {
 				.setSound(getSound())
 				.setContentIntent(openLocationIntent)
 				.setCategory(Notification.CATEGORY_REMINDER)
-				.addAction(createDisableAction(calendarId, event.getId()));
+				.addAction(createDisableAction(calendarId, event.getId(), notificationId));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			builder.setSmallIcon(getSmallIcon());
@@ -77,16 +79,17 @@ public class Notifier {
 
 		NotificationManager notificationManager =
 				(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(getNotificationId(event), builder.build());
+		notificationManager.notify(notificationId, builder.build());
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)
-	private Notification.Action createDisableAction(long calendarId, long eventId) {
+	private Notification.Action createDisableAction(long calendarId, long eventId, int notificationId) {
 		final Icon icon = getDisableActionIcon();
 		final String title = context.getString(R.string.notification_action_disable);
 		final Intent intent = new Intent(context, EventOperationService.class);
 		intent.putExtra(EventOperationService.INTENT_EXTRA_CALENDAR_ID, calendarId);
 		intent.putExtra(EventOperationService.INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(EventOperationService.INTENT_EXTRA_NOTIFICATION_ID, notificationId);
 		PendingIntent pendingIntent = PendingIntent.getService(context, EventOperationService.INTENT_DISABLE_EVENT, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		return new Notification.Action.Builder(icon, title, pendingIntent).build();
 	}

@@ -18,6 +18,8 @@
 package me.jtalk.android.geotasks.application.service;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 
 import me.jtalk.android.geotasks.source.EventsSource;
@@ -28,6 +30,7 @@ public class EventOperationService extends IntentService {
 
 	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
 	public static final String INTENT_EXTRA_EVENT_ID = "event-id";
+	public static final String INTENT_EXTRA_NOTIFICATION_ID = "notification-id";
 
 	public EventOperationService() {
 		super(EventOperationService.class.getName());
@@ -37,6 +40,7 @@ public class EventOperationService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
 		long eventId = intent.getLongExtra(INTENT_EXTRA_EVENT_ID, EventsSource.NO_TASK);
+		int notificationId = intent.getIntExtra(INTENT_EXTRA_NOTIFICATION_ID, 0);
 
 		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
 			throw new IllegalArgumentException("Calendar id for service is incorrect or not passed");
@@ -48,5 +52,8 @@ public class EventOperationService extends IntentService {
 
 		EventsSource eventsSource = new EventsSource(this, calendarId);
 		eventsSource.disable(eventId);
+
+		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancel(notificationId);
 	}
 }
