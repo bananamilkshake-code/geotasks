@@ -4,6 +4,7 @@
     <!-- Notification -->
     <string name="notification_event_is_near_title_arg_1">{} is near</string>
     <string name="notification_event_is_near_text_arg_1">Distance to it: {0} meters</string>
+    <string name="notification_action_disable">Disable</string>
 
     <!-- Crash report -->
     <string name="crash_toast_text">Application crashed</string>

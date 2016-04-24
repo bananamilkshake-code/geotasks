@@ -237,6 +237,14 @@ public class EventsSource {
 	}
 
 	/**
+	 * Marks event inactive to prevent notifications from it.
+	 * @param id
+	 */
+	public void disable(long id) {
+		LOG.info("Event {0} from calendar {1} disabled", id, calendarId);
+	}
+
+	/**
 	 * Selects events that must happen around current time or which time
 	 * is not set.
 	 *

@@ -54,6 +54,11 @@
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.ACCESS_COARSE_LOCATION"/>
+        <service
+            android:name=".application.service.EventOperationService"
+            android:enabled="true"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

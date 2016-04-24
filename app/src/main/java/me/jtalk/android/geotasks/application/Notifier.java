@@ -37,6 +37,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.ShowLocationActivity;
+import me.jtalk.android.geotasks.application.service.EventOperationService;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 
@@ -53,7 +54,7 @@ public class Notifier {
 	 *
 	 * @param event
 	 */
-	public void onEventIsNear(Event event, TaskCoordinates currentPosition, double distance) {
+	public void onEventIsNear(long calendarId, Event event, TaskCoordinates currentPosition, double distance) {
 		Intent intent = new Intent(context, ShowLocationActivity.class);
 		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_EVENT_ID, event.getId());
 		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
@@ -65,7 +66,9 @@ public class Notifier {
 				.setAutoCancel(true)
 				.setVibrate(VIBRATION_PATTERN)
 				.setSound(getSound())
-				.setContentIntent(openLocationIntent);
+				.setContentIntent(openLocationIntent)
+				.setCategory(Notification.CATEGORY_REMINDER)
+				.addAction(createDisableAction(calendarId, event.getId()));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			builder.setSmallIcon(getSmallIcon());
@@ -78,6 +81,17 @@ public class Notifier {
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)
+	private Notification.Action createDisableAction(long calendarId, long eventId) {
+		final Icon icon = getDisableActionIcon();
+		final String title = context.getString(R.string.notification_action_disable);
+		final Intent intent = new Intent(context, EventOperationService.class);
+		intent.putExtra(EventOperationService.INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(EventOperationService.INTENT_EXTRA_EVENT_ID, eventId);
+		PendingIntent pendingIntent = PendingIntent.getService(context, EventOperationService.INTENT_DISABLE_EVENT, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		return new Notification.Action.Builder(icon, title, pendingIntent).build();
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
 	private Icon getSmallIcon() {
 		return Icon.createWithResource(context, R.drawable.ic_beenhere_black_18dp);
 	}
@@ -85,6 +99,11 @@ public class Notifier {
 	@TargetApi(Build.VERSION_CODES.M)
 	private Icon getLargeIcon() {
 		return Icon.createWithResource(context, R.drawable.treasure_map_colour_50);
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
+	private Icon getDisableActionIcon() {
+		return Icon.createWithResource(context, R.drawable.ic_alarm_off_black_18dp);
 	}
 
 	private Uri getSound() {

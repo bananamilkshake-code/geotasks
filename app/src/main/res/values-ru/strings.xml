@@ -4,6 +4,7 @@
     <!-- Notification -->
     <string name="notification_event_is_near_title_arg_1">{} недалеко</string>
     <string name="notification_event_is_near_text_arg_1">Осталось пройти {0} meters</string>
+    <string name="notification_action_disable">Выключить</string>
 
     <!-- Crash report -->
     <string name="crash_toast_text">Критическая ошибка</string>
