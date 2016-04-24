@@ -123,7 +123,10 @@ public class ShowLocationActivity extends Activity {
 			throw new IllegalStateException("No calendar is created for application");
 		}
 
-		return new EventsSource(this, calendarId).get(id);
+		EventsSource eventsSource = new EventsSource(this, calendarId);
+		eventsSource.disable(id);
+
+		return eventsSource.get(id);
 	}
 
 	public void setupPosition(TaskCoordinates position) {
