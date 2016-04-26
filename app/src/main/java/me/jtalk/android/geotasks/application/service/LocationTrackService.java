@@ -26,15 +26,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
 import android.location.LocationManager;
-import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
-
-import java.text.MessageFormat;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MainActivity;
@@ -44,7 +39,7 @@ import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
-public class LocationTrackService extends Service {
+public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	private static final Logger LOG = new Logger(LocationTrackService.class);
 
@@ -52,7 +47,7 @@ public class LocationTrackService extends Service {
 
 	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
 
-	private LocationBinder binder;
+	private EventsLocationListener locationListener;
 
 	private LocationManager getLocationManager() {
 		return (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -73,10 +68,20 @@ public class LocationTrackService extends Service {
 			throw new IllegalArgumentException("Calendar id for service is incorrect or not passed");
 		}
 
-		binder = new LocationBinder(calendarId);
-
+		setupListener(calendarId);
 		createNotification();
+
 		return START_STICKY;
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) throws SecurityException {
+		if (key.equals(getString(R.string.pref_alarm_distance))) {
+			updateDistanceToAlarm(sharedPreferences);
+		} if (key.equals(getString(R.string.pref_location_update_min_distance)) || key.equals(getString(R.string.pref_location_update_min_time))) {
+			setupLocationListenerUpdateParameters(sharedPreferences);
+			getLocationManager().removeUpdates(locationListener);
+		}
 	}
 
 	/**
@@ -104,51 +109,36 @@ public class LocationTrackService extends Service {
 		return Icon.createWithResource(this, R.drawable.treasure_map_colour_50);
 	}
 
-	public class LocationBinder extends Binder implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-		private EventsLocationListener locationListener;
-
-		public LocationBinder(long calendarId) throws SecurityException {
-			if (locationListener != null) {
-				getLocationManager().removeUpdates(locationListener);
-			}
-
-			locationListener = new EventsLocationListener(new EventsSource(LocationTrackService.this, calendarId), new Notifier(LocationTrackService.this));
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			setupLocationListenerUpdateParameters(settings);
+	private void setupListener(long calendarId) throws SecurityException {
+		if (locationListener != null) {
+			getLocationManager().removeUpdates(locationListener);
 		}
 
-		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) throws SecurityException {
-			if (key.equals(getString(R.string.pref_alarm_distance))) {
-				updateDistanceToAlarm(sharedPreferences);
-			} if (key.equals(getString(R.string.pref_location_update_min_distance)) || key.equals(getString(R.string.pref_location_update_min_time))) {
-				setupLocationListenerUpdateParameters(sharedPreferences);
-				getLocationManager().removeUpdates(locationListener);
-			}
+		locationListener = new EventsLocationListener(new EventsSource(LocationTrackService.this, calendarId), new Notifier(LocationTrackService.this));
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		setupLocationListenerUpdateParameters(settings);
+	}
+
+	private void updateDistanceToAlarm(SharedPreferences settings) {
+		float distanceToAlarm = Float.parseFloat(settings.getString(getString(R.string.pref_alarm_distance), Settings.DEFAULT_DISTANCE_TO_ALARM.toString()));
+		locationListener.setDistanceToAlarm(distanceToAlarm);
+	}
+
+	private void setupLocationListenerUpdateParameters(SharedPreferences sharedPreferences) throws SecurityException {
+		LocationManager locationManager = getLocationManager();
+
+		float minDistance = Float.parseFloat(sharedPreferences.getString(getString(R.string.pref_location_update_min_distance), EventsLocationListener.MIN_DISTANCE.toString()));
+		long minTime = Long.parseLong(sharedPreferences.getString(getString(R.string.pref_location_update_min_time), EventsLocationListener.MIN_TIME.toString()));
+
+		String provider = LocationManager.PASSIVE_PROVIDER;
+		if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) {
+			provider = LocationManager.NETWORK_PROVIDER;
+		} else if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
+			provider = LocationManager.GPS_PROVIDER;
 		}
 
-		private void updateDistanceToAlarm(SharedPreferences settings) {
-			float distanceToAlarm = Float.parseFloat(settings.getString(getString(R.string.pref_alarm_distance), Settings.DEFAULT_DISTANCE_TO_ALARM.toString()));
-			locationListener.setDistanceToAlarm(distanceToAlarm);
-		}
+		locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener);
 
-		private void setupLocationListenerUpdateParameters(SharedPreferences sharedPreferences) throws SecurityException {
-			LocationManager locationManager = getLocationManager();
-
-			float minDistance = Float.parseFloat(sharedPreferences.getString(getString(R.string.pref_location_update_min_distance), EventsLocationListener.MIN_DISTANCE.toString()));
-			long minTime = Long.parseLong(sharedPreferences.getString(getString(R.string.pref_location_update_min_time), EventsLocationListener.MIN_TIME.toString()));
-
-			String provider = LocationManager.PASSIVE_PROVIDER;
-			if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) {
-				provider = LocationManager.NETWORK_PROVIDER;
-			} else if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
-				provider = LocationManager.GPS_PROVIDER;
-			}
-
-			locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener);
-
-			LOG.debug("Geo listening enabled via {0}", provider);
-		}
+		LOG.debug("Geo listening enabled via {0}", provider);
 	}
 }
