@@ -33,7 +33,7 @@ public class NotifierTest extends AndroidTestCase {
 
 		long calendarId = 1;
 
-		Event event = new Event(0, "TestEvent", "Description", null, null, currentPosition);
+		Event event = new Event(0, "TestEvent", "Description", null, null, currentPosition, true);
 
 		notifier.onEventIsNear(calendarId, event, currentPosition, 100);
 	}

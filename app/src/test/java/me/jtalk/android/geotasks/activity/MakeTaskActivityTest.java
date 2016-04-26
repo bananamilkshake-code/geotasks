@@ -91,7 +91,7 @@ public class MakeTaskActivityTest {
 		String date = "";
 		TaskCoordinates coordinates = new TaskCoordinates(10.223, 23.232);
 
-		Event event = new Event(eventId, title, description, null, null, coordinates);
+		Event event = new Event(eventId, title, description, null, null, coordinates, true);
 
 		EventsSource mockEventSource = Mockito.mock(EventsSource.class);
 		when(mockEventSource.get(eq(eventId))).thenReturn(event);

@@ -46,6 +46,17 @@ public class CursorHelper {
 	}
 
 	/**
+	 * Wrapper method to get boolean field value from cursor.
+	 *
+	 * @param cursor cursor to retrieve value from
+	 * @param field  field to retrieve value from
+	 * @return value of the field in cursor
+	 */
+	public static boolean getBoolean(Cursor cursor, String field) {
+		return cursor.getInt(cursor.getColumnIndex(field)) != 0;
+	}
+
+	/**
 	 * Wrapper method to get long field value from cursor.
 	 *
 	 * @param cursor cursor to retrieve value from

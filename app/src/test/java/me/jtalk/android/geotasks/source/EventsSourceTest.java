@@ -79,11 +79,12 @@ public class EventsSourceTest {
 		expectedValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 		expectedValues.put(CalendarContract.Events.DTSTART, startTime.getTimeInMillis());
 		expectedValues.put(CalendarContract.Events.DTEND, endTime.getTimeInMillis());
+		expectedValues.put(CalendarContract.Events.HAS_ALARM, true);
 
 		when(mockedContentResolver.insert(CalendarContract.Events.CONTENT_URI, expectedValues))
 				.thenReturn(new Uri.Builder().build());
 
-		Event event = new Event(-1, title, description, startTime, endTime, coordinates);
+		Event event = new Event(-1, title, description, startTime, endTime, coordinates, true);
 		eventsSource.add(event);
 
 		verify(mockedContext).getContentResolver();
@@ -115,9 +116,9 @@ public class EventsSourceTest {
 
 		final Calendar eventEndTime = Calendar.getInstance();
 		eventEndTime.set(2015, 11, 12);
-		Event event1 = new Event(1, "Title1", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(1, 1));
-		Event event2 = new Event(2, "Title2", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(2, 2));
-		Event event3 = new Event(3, "Title3", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(3, 3));
+		Event event1 = new Event(1, "Title1", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(1, 1), true);
+		Event event2 = new Event(2, "Title2", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(2, 2), true);
+		Event event3 = new Event(3, "Title3", "Description1", eventStartTime, eventEndTime, new TaskCoordinates(3, 3), true);
 
 		Cursor cursor = createCursor(event1, event2, event3);
 

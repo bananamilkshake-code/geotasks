@@ -37,9 +37,9 @@ public class EventsLocationListenerTest {
 		when(coordinates2.distanceTo(asTaskCoordinates)).thenReturn(10.0);
 		when(coordinates3.distanceTo(asTaskCoordinates)).thenReturn(10.0);
 
-		Event event1 = new Event(1, "Event1", "Desc1", Calendar.getInstance(), null, coordinates1);
-		Event event2 = new Event(2, "Event2", "Desc2", Calendar.getInstance(), null, coordinates2);
-		Event event3 = new Event(3, "Event3", "Desc3", Calendar.getInstance(), null, coordinates3);
+		Event event1 = new Event(1, "Event1", "Desc1", Calendar.getInstance(), null, coordinates1, true);
+		Event event2 = new Event(2, "Event2", "Desc2", Calendar.getInstance(), null, coordinates2, true);
+		Event event3 = new Event(3, "Event3", "Desc3", Calendar.getInstance(), null, coordinates3, true);
 
 		List<Event> activeEvents = new ArrayList<>();
 		activeEvents.add(event1);

@@ -52,6 +52,10 @@ public class Event {
 	@Getter
 	private TaskCoordinates coordinates;
 
+	@Setter
+	@Getter
+	private boolean hasAlarms = true;
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -66,7 +70,7 @@ public class Event {
 	}
 
 	public boolean isActive(Calendar currentTime) {
-		return endTime == null || endTime.getTimeInMillis() >= currentTime.getTimeInMillis();
+		return hasAlarms && (endTime == null || endTime.getTimeInMillis() >= currentTime.getTimeInMillis());
 	}
 
 	static public Event copyOf(final Event event) {
@@ -80,7 +84,8 @@ public class Event {
 				event.getDescription(),
 				event.getStartTime(),
 				event.getEndTime(),
-				event.getCoordinates());
+				event.getCoordinates(),
+				event.isHasAlarms());
 	}
 
 	static public Event createEmpty() {

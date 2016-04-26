@@ -86,6 +86,7 @@ public class EventsSource {
 			Events.EVENT_LOCATION,
 			Events.DTSTART,
 			Events.DTEND,
+			Events.HAS_ALARM,
 			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), EVENT_LATITUDE),
 			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), EVENT_LONGITUDE)
 	};
@@ -105,8 +106,9 @@ public class EventsSource {
 		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
 		Calendar startTime = extractTime(cursor, Events.DTSTART);
 		Calendar endTime = extractTime(cursor, Events.DTEND);
+		boolean hasAlarms = CursorHelper.getBoolean(cursor, Events.HAS_ALARM);
 		TaskCoordinates geoPoint = extractCoordinates(cursor);
-		return new Event(id, title, description, startTime, endTime, geoPoint);
+		return new Event(id, title, description, startTime, endTime, geoPoint, hasAlarms);
 	}
 
 	/**
@@ -286,6 +288,7 @@ public class EventsSource {
 
 	private final String ACTIVE_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
+			+ "AND " + Events.HAS_ALARM + " == 1 "
 			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
 			+ "AND (" + Events.DTSTART + " == -1 OR " + Events.DTSTART + " >= ?) "
 			+ "AND (" + Events.DTEND + " == -1 OR " + Events.DTEND + " < ?)";
