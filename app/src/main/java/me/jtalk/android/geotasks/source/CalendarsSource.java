@@ -44,7 +44,8 @@ public class CalendarsSource {
 		Uri uri = CalendarContract.Calendars.CONTENT_URI.buildUpon()
 				.appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, Boolean.TRUE.toString())
 				.appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, "GeoTasks account")
-				.appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL).build();
+				.appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL)
+				.build();
 
 		Uri inserted = context.getContentResolver().insert(uri, values);
 
