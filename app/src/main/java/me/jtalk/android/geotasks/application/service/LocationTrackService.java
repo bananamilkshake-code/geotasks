@@ -63,6 +63,11 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 
+		if (intent == null) {
+			stopSelf();
+			return START_NOT_STICKY;
+		}
+
 		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
 		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
 			throw new IllegalArgumentException("Calendar id for service is incorrect or not passed");
