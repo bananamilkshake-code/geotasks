@@ -25,6 +25,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.Events;
 
 import java.util.ArrayList;
@@ -192,7 +193,11 @@ public class EventsSource {
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
 
-		LOG.debug("New event was created. Uri: {0}", created.toString());
+		long id = Long.valueOf(created.getLastPathSegment());
+
+		LOG.debug("New event was created. Uri: {0}, id {1}", created.toString(), id);
+
+		enable(id);
 	}
 
 	/**
@@ -239,11 +244,36 @@ public class EventsSource {
 	}
 
 	/**
-	 * Marks event inactive to prevent notifications from it.
+	 * Makes event active to enable notifications from it.
 	 * @param id
 	 */
-	public void disable(long id) {
-		LOG.info("Event {0} from calendar {1} disabled", id, calendarId);
+	public void enable(long id) throws SecurityException {
+		// No need to update HAS_ALARMS in CalendarProvider: this field
+		// is changed automatically ith reminders adding/deleting.
+		ContentValues reminder = new ContentValues();
+		reminder.put(Reminders.MINUTES, -1);
+		reminder.put(Reminders.EVENT_ID, id);
+		reminder.put(Reminders.METHOD, Reminders.METHOD_DEFAULT);
+		Uri createdReminder = this.context.getContentResolver().insert(Reminders.CONTENT_URI, reminder);
+
+		LOG.debug("Reminder for event {0} created: uri {1}. Event is active now.", id, createdReminder.toString());
+	}
+
+	private static final String REMOVE_EVENT_REMINDERS = "Reminders.EVENT_ID = ?";
+
+	/**
+	 * Makes event inactive to prevent notifications from it.
+	 * @param id
+	 */
+	public void disable(long id) throws SecurityException {
+		// No need to update HAS_ALARMS in CalendarProvider: this field
+		// is changed automatically ith reminders adding/deleting.
+		this.context.getContentResolver().delete(
+				Reminders.CONTENT_URI,
+				REMOVE_EVENT_REMINDERS,
+				new String[] { String.valueOf(id)});
+
+		LOG.debug("Reminders for event {0} from calendar {1} removed. Event is inactive now.", id, calendarId);
 	}
 
 	/**
