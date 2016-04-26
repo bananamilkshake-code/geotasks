@@ -19,6 +19,8 @@ package me.jtalk.android.geotasks.application;
 
 import android.app.Application;
 import android.content.Context;
+
+import org.acra.sender.HttpSender;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
 import android.preference.PreferenceManager;
 
@@ -42,7 +44,10 @@ import me.jtalk.android.geotasks.util.Logger;
 		resDialogText = R.string.crash_dialog_text,
 		resDialogOkToast = R.string.crash_dialog_ok_toast,
 		resDialogPositiveButtonText = R.string.crash_positive_button,
-		sharedPreferencesMode = Context.MODE_PRIVATE
+		sharedPreferencesMode = Context.MODE_PRIVATE,
+		reportType = HttpSender.Type.JSON,
+		formUriBasicAuthLogin = BuildConfig.JACRA_LOGIN,
+		formUriBasicAuthPassword = BuildConfig.JACRA_PASSWORD
 )
 public class GeoTasksApplication extends Application {
 	private static final Logger LOG = new Logger(GeoTasksApplication.class);
