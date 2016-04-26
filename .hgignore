@@ -8,3 +8,4 @@ GeoTasks.iml
 local.properties
 build/*
 *.iml
+app/gradle.properties
