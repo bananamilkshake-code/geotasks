@@ -203,8 +203,8 @@ public class EventsSource {
 	/**
 	 * Selects event with id {@id}.
 	 *
-	 * @param id
-	 * @return
+	 * @param id id of event to retrieve
+	 * @return retrieved event
 	 */
 	public Event get(long id) {
 		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
@@ -245,7 +245,7 @@ public class EventsSource {
 
 	/**
 	 * Makes event active to enable notifications from it.
-	 * @param id
+	 * @param id id of event to enable
 	 */
 	public void enable(long id) throws SecurityException {
 		// No need to update HAS_ALARMS in CalendarProvider: this field
@@ -263,7 +263,7 @@ public class EventsSource {
 
 	/**
 	 * Makes event inactive to prevent notifications from it.
-	 * @param id
+	 * @param id id of event to disable
 	 */
 	public void disable(long id) throws SecurityException {
 		// No need to update HAS_ALARMS in CalendarProvider: this field
