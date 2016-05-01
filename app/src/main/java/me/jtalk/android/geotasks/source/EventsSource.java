@@ -330,7 +330,6 @@ public class EventsSource {
 			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
 			+ "AND (" + Events.DTSTART + " == -1 OR " + Events.DTSTART + " >= ?) "
 			+ "AND (" + Events.DTEND + " == -1 OR " + Events.DTEND + " < ?)";
-	;
 
 	private static String[] buildSelectionArgsForNearEvents(long calendarId, Calendar currentTime) {
 		return new String[]{
