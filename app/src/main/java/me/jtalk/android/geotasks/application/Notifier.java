@@ -29,7 +29,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 
 import java.text.MessageFormat;
 
@@ -40,9 +39,14 @@ import me.jtalk.android.geotasks.activity.ShowLocationActivity;
 import me.jtalk.android.geotasks.application.service.EventOperationService;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.util.Logger;
+
+//TODO: move this class logic to Notifier service
 
 @AllArgsConstructor
 public class Notifier {
+
+	private static final Logger LOG = new Logger(Notifier.class);
 
 	private static final long[] VIBRATION_PATTERN = new long[]{1000, 0};
 
@@ -51,8 +55,10 @@ public class Notifier {
 
 	/**
 	 * Creates and displays notification about near event.
-	 *
-	 * @param event
+	 * @param calendarId calendar event witch event belongs to
+	 * @param event event to notify about
+	 * @param currentPosition location where notification is fired
+	 * @param distance calculated distance to event
 	 */
 	public void onEventIsNear(long calendarId, Event event, TaskCoordinates currentPosition, double distance) {
 		final int notificationId = getNotificationId(event);
@@ -62,24 +68,53 @@ public class Notifier {
 		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
 		PendingIntent openLocationIntent = PendingIntent.getActivity(context, ShowLocationActivity.SHOW_CURRENT, intent, 0);
 
+		final String title = MessageFormat.format(context.getString(R.string.notification_event_is_near_title_arg_1), event.getTitle());
+		final String contentText = MessageFormat.format(context.getString(R.string.notification_event_is_near_text_arg_1), distance);
+
+		Notification.Builder builder =
+				createNotificationBuilder(calendarId, event.getId(), notificationId, title, contentText)
+				.setContentIntent(openLocationIntent);
+
+		getNotificationManager().notify(notificationId, builder.build());
+	}
+
+	/**
+	 * Creates and displays notification about timing event.
+	 * @param calendarId calendar event witch event belongs to
+	 * @param event event to notify about
+	 */
+	public void onEventAlarm(long calendarId, Event event) {
+		LOG.debug("Notify about timing event {0} from calendar {1}", event.getId(), calendarId);
+
+		final int notificationId = getNotificationId(event);
+
+		final String title = MessageFormat.format(context.getString(R.string.notification_event_reminder_title), event.getTitle());
+		final String contentText = event.getDescription() != null ? MessageFormat.format(context.getString(R.string.notification_event_reminder_text), event.getDescription()) : null;
+
+		Notification.Builder builder = createNotificationBuilder(calendarId, event.getId(), notificationId, title, contentText);
+
+		getNotificationManager().notify(notificationId, builder.build());
+	}
+
+	private Notification.Builder createNotificationBuilder(long calendarId, long eventId, int notificationId, String title, String contentText) {
 		Notification.Builder builder = new Notification.Builder(context)
-				.setContentTitle(getNotificationTitle(event))
-				.setContentText(getNotificationText(distance))
+				.setContentTitle(title)
 				.setAutoCancel(true)
 				.setVibrate(VIBRATION_PATTERN)
 				.setSound(getSound())
-				.setContentIntent(openLocationIntent)
-				.setCategory(Notification.CATEGORY_REMINDER)
-				.addAction(createDisableAction(calendarId, event.getId(), notificationId));
+				.addAction(createDisableAction(calendarId, eventId, notificationId));
+
+		if (contentText != null) {
+			builder.setContentText(contentText);
+		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			builder.setSmallIcon(getSmallIcon());
 			builder.setLargeIcon(getLargeIcon());
+			builder.setCategory(Notification.CATEGORY_REMINDER);
 		}
 
-		NotificationManager notificationManager =
-				(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(notificationId, builder.build());
+		return builder;
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)
@@ -119,23 +154,7 @@ public class Notifier {
 		return (int) event.getId();
 	}
 
-	/**
-	 * Creates formatted title for event notification.
-	 *
-	 * @param event
-	 * @return title string
-	 */
-	private String getNotificationTitle(@NonNull Event event) {
-		return MessageFormat.format(context.getString(R.string.notification_event_is_near_title_arg_1), event.getTitle());
-	}
-
-	/**
-	 * Creates formatted text for event notification.
-	 *
-	 * @param distance in meters to event
-	 * @return text string
-	 */
-	private String getNotificationText(double distance) {
-		return MessageFormat.format(context.getString(R.string.notification_event_is_near_text_arg_1), distance);
+	private NotificationManager getNotificationManager() {
+		return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 }
