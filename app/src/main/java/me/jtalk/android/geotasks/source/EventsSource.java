@@ -250,13 +250,11 @@ public class EventsSource {
 	public void enable(long id) throws SecurityException {
 		// No need to update HAS_ALARMS in CalendarProvider: this field
 		// is changed automatically ith reminders adding/deleting.
-		ContentValues reminder = new ContentValues();
-		reminder.put(Reminders.MINUTES, -1);
-		reminder.put(Reminders.EVENT_ID, id);
-		reminder.put(Reminders.METHOD, Reminders.METHOD_DEFAULT);
+
+		ContentValues reminder = createReminderContentValues(id);
 		Uri createdReminder = this.context.getContentResolver().insert(Reminders.CONTENT_URI, reminder);
 
-		LOG.debug("Reminder for event {0} created: uri {1}. Event is active now.", id, createdReminder.toString());
+		LOG.debug("Reminder for event {0} created: uri {1}. Event is active now.", id, createdReminder);
 	}
 
 	private static final String REMOVE_EVENT_REMINDERS = "Reminders.EVENT_ID = ?";
@@ -313,6 +311,16 @@ public class EventsSource {
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 		values.put(Events.DTSTART, getMillis(event.getStartTime()));
 		values.put(Events.DTEND, getMillis(event.getEndTime()));
+		return values;
+	}
+
+	private static final int MINUTES_BEFORE_START = 1;
+
+	private ContentValues createReminderContentValues(long eventId) {
+		ContentValues values = new ContentValues();
+		values.put(Reminders.MINUTES, MINUTES_BEFORE_START);
+		values.put(Reminders.EVENT_ID, eventId);
+		values.put(Reminders.METHOD, Reminders.METHOD_ALERT);
 		return values;
 	}
 
