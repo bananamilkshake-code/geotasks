@@ -324,7 +324,7 @@ public class EventsSource {
 		return values;
 	}
 
-	private final String ACTIVE_EVENTS_SELECTION =
+	private static final String ACTIVE_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
 			+ "AND " + Events.HAS_ALARM + " == 1 "
 			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
