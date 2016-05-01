@@ -222,7 +222,7 @@ public class EventsSource {
 	/**
 	 * Update event
 	 *
-	 * @param event          event to update
+	 * @param event event to update
 	 * @throws SecurityException is thrown if Calendar permission is not granted for application.
 	 */
 	public void edit(Event event) {
@@ -261,6 +261,7 @@ public class EventsSource {
 
 	/**
 	 * Makes event inactive to prevent notifications from it.
+	 *
 	 * @param id id of event to disable
 	 */
 	public void disable(long id) throws SecurityException {
