@@ -34,7 +34,6 @@ import me.jtalk.android.geotasks.BuildConfig;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.CrashReportsStatusChangeListener;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.Logger;
 
 @ReportsCrashes(
 		formUri = "https://as.jtalk.me/jacra-submit/report",
@@ -50,7 +49,6 @@ import me.jtalk.android.geotasks.util.Logger;
 		formUriBasicAuthPassword = BuildConfig.JACRA_PASSWORD
 )
 public class GeoTasksApplication extends Application {
-	private static final Logger LOG = new Logger(GeoTasksApplication.class);
 
 	@Setter
 	@Getter

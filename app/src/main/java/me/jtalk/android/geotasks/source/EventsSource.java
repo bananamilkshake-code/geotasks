@@ -21,6 +21,7 @@ import android.Manifest;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import lombok.Getter;
@@ -45,6 +47,20 @@ import static me.jtalk.android.geotasks.util.CoordinatesFormat.POINT_ACCURACY;
 
 public class EventsSource {
 	public static final Logger LOG = new Logger(EventsSource.class);
+
+	/**
+	 * This action will be broadcasted when event has been added, edited or removed.
+	 */
+	public static final String ACTION_EVENT_CHANGED = "me.jtalk.geotasks.ACTION_EVENT_CHANGED";
+
+	public static final String INTENT_EXTRA_ACTION = "action";
+	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
+	public static final String INTENT_EXTRA_EVENT_ID = "event-id";
+
+	public static final int ACTION_NONE = 0;
+	public static final int ACTION_ADD = 1;
+	public static final int ACTION_EDIT = 2;
+	public static final int ACTION_REMOVED = 3;
 
 	public static final long DEFAULT_CALENDAR = -1;
 	public static final long DEFAULT_TIME_VALUE = -1;
@@ -79,7 +95,7 @@ public class EventsSource {
 	@Getter
 	private long calendarId;
 
-	public static final String[] PROJECTION_EVENTS = new String[] {
+	public static final String[] PROJECTION_EVENTS = new String[]{
 			Events._ID,
 			Events.CALENDAR_ID,
 			Events.TITLE,
@@ -92,7 +108,7 @@ public class EventsSource {
 			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), EVENT_LONGITUDE)
 	};
 
-	private static String SORT_ORDER = ACTIVE + " DESC";
+	private static final String SORT_ORDER = ACTIVE + " DESC";
 
 	/**
 	 * Extracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
@@ -197,6 +213,8 @@ public class EventsSource {
 
 		LOG.debug("New event was created. Uri: {0}, id {1}", created.toString(), id);
 
+		sendBroadcast(ACTION_ADD, calendarId, id);
+
 		enable(id);
 	}
 
@@ -210,8 +228,12 @@ public class EventsSource {
 		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
 
 		Cursor cursor = this.context.getContentResolver().query(uri, PROJECTION_EVENTS, null, null, null);
-		cursor.moveToFirst();
+		if (cursor == null || cursor.isAfterLast()) {
+			LOG.info("There is no event with id {0}", id);
+			return null;
+		}
 
+		cursor.moveToFirst();
 		Event event = extractEvent(cursor);
 
 		cursor.close();
@@ -231,6 +253,8 @@ public class EventsSource {
 		ContentValues values = createContentValues(event);
 
 		this.context.getContentResolver().update(uri, values, null, null);
+
+		sendBroadcast(ACTION_EDIT, calendarId, event.getId());
 	}
 
 	/**
@@ -241,10 +265,12 @@ public class EventsSource {
 	public void remove(long id) {
 		Uri deleteUri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
 		this.context.getContentResolver().delete(deleteUri, null, null);
+		sendBroadcast(ACTION_REMOVED, calendarId, id);
 	}
 
 	/**
 	 * Makes event active to enable notifications from it.
+	 *
 	 * @param id id of event to enable
 	 */
 	public void enable(long id) throws SecurityException {
@@ -270,9 +296,11 @@ public class EventsSource {
 		this.context.getContentResolver().delete(
 				Reminders.CONTENT_URI,
 				REMOVE_EVENT_REMINDERS,
-				new String[] { String.valueOf(id)});
+				new String[]{String.valueOf(id)});
 
 		LOG.debug("Reminders for event {0} from calendar {1} removed. Event is inactive now.", id, calendarId);
+
+		sendBroadcast(ACTION_EDIT, calendarId, id);
 	}
 
 	/**
@@ -294,12 +322,48 @@ public class EventsSource {
 				null);
 
 		List<Event> events = new ArrayList<>();
-		while (cursor.moveToNext()) {
-			events.add(extractEvent(cursor));
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				events.add(extractEvent(cursor));
+			}
+			cursor.close();
 		}
 
-		cursor.close();
+		return events;
+	}
 
+	private static final String ACTIVE_TIMING_EVENTS_SELECTION =
+			Events.CALENDAR_ID + " = ? "
+					+ "AND " + Events.HAS_ALARM + " == 1 "
+					+ "AND " + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0 "
+					+ "AND " + Events.DTSTART + " >= ?";
+
+	/**
+	 * Get events that must be started in future but not in defined location.
+	 *
+	 * @param currentTime time of method call
+	 * @return list of events to notify in special time
+	 */
+	public List<Event> getTimingEvents(Calendar currentTime) throws SecurityException {
+		String[] selectionArgs = new String[]{
+				String.valueOf(calendarId),
+				String.valueOf(currentTime.getTimeInMillis())
+		};
+
+		Cursor cursor = context.getContentResolver().query(
+				Events.CONTENT_URI,
+				PROJECTION_EVENTS,
+				ACTIVE_TIMING_EVENTS_SELECTION,
+				selectionArgs,
+				null);
+
+		List<Event> events = new ArrayList<>();
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				events.add(extractEvent(cursor));
+			}
+			cursor.close();
+		}
 		return events;
 	}
 
@@ -338,5 +402,15 @@ public class EventsSource {
 				, String.valueOf(currentTime.getTimeInMillis())
 				, String.valueOf(currentTime.getTimeInMillis())
 		};
+	}
+
+	private void sendBroadcast(int action, long calendarId, long eventId) {
+		LOG.debug("Notifying about event change: action {0}, calendarId {1}, eventId {2}", action, calendarId, eventId);
+		Intent intent = new Intent(ACTION_EVENT_CHANGED);
+		intent.putExtra(INTENT_EXTRA_ACTION, action);
+		intent.putExtra(INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(INTENT_EXTRA_EVENT_ID, eventId);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.sendBroadcast(intent);
 	}
 }

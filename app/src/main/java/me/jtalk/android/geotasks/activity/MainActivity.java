@@ -20,6 +20,7 @@ package me.jtalk.android.geotasks.activity;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -32,12 +33,15 @@ import android.widget.ExpandableListView;
 import org.acra.ACRA;
 
 import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.List;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.application.TaskChainHandler;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
+import me.jtalk.android.geotasks.application.receiver.EventChangedReceiver;
 import me.jtalk.android.geotasks.application.service.LocationTrackService;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
@@ -176,6 +180,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		}
 
 		setEventsSource(new EventsSource(this, calendarId));
+		setupEventsAlarms();
 	}
 
 	private void initEventsList() {
@@ -246,5 +251,16 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 			geoTrackMenuItem.setChecked(false);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
 		}
+	}
+
+	private void setupEventsAlarms() {
+		LOG.debug("Setup previous events alarms");
+		EventChangedReceiver eventChangesReceiver = new EventChangedReceiver();
+		List<Event> events = getEventsSource().getTimingEvents(Calendar.getInstance());
+		for (Event event : events) {
+			eventChangesReceiver.cancelAlarm(this, getEventsSource().getCalendarId(), event.getId());
+			eventChangesReceiver.setupAlarm(this, getEventsSource().getCalendarId(), event.getId());
+		}
+		registerReceiver(eventChangesReceiver, new IntentFilter(EventsSource.ACTION_EVENT_CHANGED));
 	}
 }

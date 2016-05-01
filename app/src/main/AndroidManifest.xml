@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
@@ -59,6 +58,14 @@
             android:enabled="true"
             android:exported="false"/>
 
+        <receiver
+            android:name=".application.receiver.NotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="me.jtalk.geotasks.NOTIFY_EVENT_ALARM"/>
+                <category
+            </intent-filter>
+        </receiver>
     </application>
-
 </manifest>
