@@ -64,7 +64,6 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="me.jtalk.geotasks.NOTIFY_EVENT_ALARM"/>
-                <category
             </intent-filter>
         </receiver>
     </application>
