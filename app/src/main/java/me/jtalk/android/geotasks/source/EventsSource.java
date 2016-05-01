@@ -278,7 +278,7 @@ public class EventsSource {
 	 * Selects events that must happen around current time or which time
 	 * is not set.
 	 *
-	 * @param currentTime time to check events occurance
+	 * @param currentTime time to check events occurrence
 	 * @return list of selected events
 	 * @throws SecurityException
 	 */
