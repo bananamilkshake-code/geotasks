@@ -35,15 +35,15 @@ import butterknife.ButterKnife;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.MapViewContext;
 
-public class ShowLocationActivity extends Activity {
+public class ShowLocationActivity extends Activity implements EventIntentFields {
 
-	public static int SHOW_CURRENT = 0;
+	public static final int SHOW_CURRENT = 0;
 
-	public static String INTENT_EXTRA_EVENT_ID = "event-id";
-	public static String INTENT_EXTRA_CURRENT_POSITION = "current-position";
+	public static final String INTENT_EXTRA_CURRENT_POSITION = "current-position";
 
 	@Bind(R.id.show_location_map)
 	public MapView mapView;

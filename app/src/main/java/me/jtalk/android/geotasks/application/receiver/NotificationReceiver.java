@@ -23,6 +23,7 @@ import android.content.Intent;
 
 import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
@@ -30,14 +31,11 @@ import me.jtalk.android.geotasks.util.Logger;
  * This class will catch events that must create notifications about
  * theirs occurrence.
  */
-public class NotificationReceiver extends BroadcastReceiver {
+public class NotificationReceiver extends BroadcastReceiver implements EventIntentFields {
 
 	private static final Logger LOG = new Logger(NotificationReceiver.class);
 
 	public static final String ACTION_ALARM = "me.jtalk.geotasks.NOTIFY_EVENT_ALARM";
-
-	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
-	public static final String INTENT_EXTRA_EVENT_ID = "event-id";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

@@ -36,16 +36,15 @@ import me.jtalk.android.geotasks.activity.MainActivity;
 import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
+import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
-public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener, EventIntentFields {
 
 	private static final Logger LOG = new Logger(LocationTrackService.class);
 
 	private static final int STATUS_BAR_NOTIFICATION_ID = Integer.MAX_VALUE;
-
-	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
 
 	private EventsLocationListener locationListener;
 

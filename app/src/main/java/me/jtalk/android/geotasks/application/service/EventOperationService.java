@@ -22,14 +22,13 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 
+import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 
-public class EventOperationService extends IntentService {
+public class EventOperationService extends IntentService implements EventIntentFields {
 
 	public static final int INTENT_DISABLE_EVENT = 0;
 
-	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
-	public static final String INTENT_EXTRA_EVENT_ID = "event-id";
 	public static final String INTENT_EXTRA_NOTIFICATION_ID = "notification-id";
 
 	public EventOperationService() {

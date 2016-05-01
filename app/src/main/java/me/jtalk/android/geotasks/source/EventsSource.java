@@ -45,7 +45,7 @@ import me.jtalk.android.geotasks.util.Logger;
 import static java.lang.String.format;
 import static me.jtalk.android.geotasks.util.CoordinatesFormat.POINT_ACCURACY;
 
-public class EventsSource {
+public class EventsSource implements EventIntentFields {
 	public static final Logger LOG = new Logger(EventsSource.class);
 
 	/**
@@ -54,8 +54,6 @@ public class EventsSource {
 	public static final String ACTION_EVENT_CHANGED = "me.jtalk.geotasks.ACTION_EVENT_CHANGED";
 
 	public static final String INTENT_EXTRA_ACTION = "action";
-	public static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
-	public static final String INTENT_EXTRA_EVENT_ID = "event-id";
 
 	public static final int ACTION_NONE = 0;
 	public static final int ACTION_ADD = 1;
