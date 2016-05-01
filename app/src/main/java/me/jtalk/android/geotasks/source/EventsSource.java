@@ -133,7 +133,7 @@ public class EventsSource {
 
 	public static String[] getCurrentProjectionEvents(Calendar currentTime) {
 		String[] result = Arrays.copyOf(PROJECTION_EVENTS, PROJECTION_EVENTS.length + 1);
-		result[result.length - 1] = String.format(QUERY_ACTIVE_FIELD, currentTime.getTimeInMillis());
+		result[result.length - 1] = String.format(Locale.ENGLISH, QUERY_ACTIVE_FIELD, currentTime.getTimeInMillis());
 		return result;
 	}
 
