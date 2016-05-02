@@ -408,7 +408,6 @@ public class EventsSource implements EventIntentFields {
 		intent.putExtra(INTENT_EXTRA_ACTION, action);
 		intent.putExtra(INTENT_EXTRA_CALENDAR_ID, calendarId);
 		intent.putExtra(INTENT_EXTRA_EVENT_ID, eventId);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.sendBroadcast(intent);
 	}
 }

@@ -58,6 +58,6 @@ public class EventChangedReceiver extends BroadcastReceiver {
 		Intent intent = new Intent(NotificationReceiver.ACTION_ALARM);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CALENDAR_ID, calendarId);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_EVENT_ID, eventId);
-		return PendingIntent.getBroadcast(context, 0, intent, 0);
+		return PendingIntent.getBroadcast(context, (int)eventId, intent, 0);
 	}
 }
