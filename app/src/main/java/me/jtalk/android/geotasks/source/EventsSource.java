@@ -346,7 +346,7 @@ public class EventsSource implements EventIntentFields {
 	 * @param currentTime time of method call
 	 * @return list of events to notify in special time
 	 */
-	public List<Event> getTimingEvents(Calendar currentTime) throws SecurityException {
+	public List<Event> getActiveTimingEvents(Calendar currentTime) throws SecurityException {
 		String[] selectionArgs = new String[]{
 				String.valueOf(calendarId),
 				String.valueOf(currentTime.getTimeInMillis())

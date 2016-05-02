@@ -256,7 +256,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	private void setupEventsAlarms() {
 		LOG.debug("Setup previous events alarms");
 		EventChangedReceiver eventChangesReceiver = new EventChangedReceiver();
-		List<Event> events = getEventsSource().getTimingEvents(Calendar.getInstance());
+		List<Event> events = getEventsSource().getActiveTimingEvents(Calendar.getInstance());
 		for (Event event : events) {
 			eventChangesReceiver.cancelAlarm(this, getEventsSource().getCalendarId(), event.getId());
 			eventChangesReceiver.setupAlarm(this, getEventsSource().getCalendarId(), event.getId());

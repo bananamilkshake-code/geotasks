@@ -59,7 +59,7 @@ public class EventsLocationListener implements LocationListener {
 
 		Calendar currentTime = Calendar.getInstance();
 		TaskCoordinates currentCoordinates = new TaskCoordinates(location);
-		List<Event> events = eventsSource.getActive(currentTime);
+		List<Event> events = eventsSource.getActiveLocationEvents(currentTime);
 
 		LOG.debug("Events for check: {0}", events);
 
