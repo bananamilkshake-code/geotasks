@@ -41,7 +41,7 @@ public class EventChangedReceiver extends BroadcastReceiver {
 	public void setupAlarm(Context context, long calendarId, long eventId) {
 		EventsSource eventsSource = new EventsSource(context, calendarId);
 		Event event = eventsSource.get(eventId);
-		if (event.isHasAlarms()) {
+		if (event != null && event.isHasAlarms()) {
 			LOG.debug("Creating alarm for event {0} in calendar {1}", eventId, calendarId);
 			PendingIntent intent = createEventIntent(context, calendarId, eventId);
 			((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).set(AlarmManager.RTC, event.getStartTime().getTimeInMillis(), intent);
