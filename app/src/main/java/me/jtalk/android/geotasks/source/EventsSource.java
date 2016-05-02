@@ -309,8 +309,12 @@ public class EventsSource implements EventIntentFields {
 	 * @return list of selected events
 	 * @throws SecurityException
 	 */
-	public List<Event> getActive(Calendar currentTime) throws SecurityException {
-		String[] selectionArgs = buildSelectionArgsForNearEvents(calendarId, currentTime);
+	public List<Event> getActiveLocationEvents(Calendar currentTime) throws SecurityException {
+		String[] selectionArgs = new String[]{
+				String.valueOf(calendarId)
+				, String.valueOf(currentTime.getTimeInMillis())
+				, String.valueOf(currentTime.getTimeInMillis())
+		};
 
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,

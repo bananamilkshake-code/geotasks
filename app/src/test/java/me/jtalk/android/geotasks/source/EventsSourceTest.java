@@ -133,7 +133,7 @@ public class EventsSourceTest {
 		final Calendar currentTime = Calendar.getInstance();
 		currentTime.set(2015, 11, 21);
 
-		assertEquals(eventsSource.getActive(currentTime), Arrays.asList(event1, event2, event3));
+		assertEquals(eventsSource.getActiveLocationEvents(currentTime), Arrays.asList(event1, event2, event3));
 	}
 
 	private Cursor createCursor(Event... events) {
