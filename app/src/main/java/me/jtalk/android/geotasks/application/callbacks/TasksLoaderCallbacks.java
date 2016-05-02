@@ -49,17 +49,8 @@ public class TasksLoaderCallbacks implements LoaderManager.LoaderCallbacks<Curso
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		LOG.debug("Created for {0} calendar", calendarId);
-
-		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
-		String[] selectionArgs = new String[] { String.valueOf(calendarId) };
-
-		return new CursorLoader(
-				context,
-				CalendarContract.Events.CONTENT_URI,
-				EventsSource.getCurrentProjectionEvents(Calendar.getInstance()),
-				selection,
-				selectionArgs,
-				EventsSource.getSortOrder());
+		Calendar currentTime = Calendar.getInstance();
+		return EventsSource.createCursorLoader(context, calendarId, currentTime);
 	}
 
 	@Override

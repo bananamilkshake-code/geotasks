@@ -9,6 +9,7 @@ import android.content.Intent;
 import lombok.NoArgsConstructor;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
 @NoArgsConstructor
@@ -44,7 +45,7 @@ public class EventChangedReceiver extends BroadcastReceiver {
 		if (event != null && event.isHasAlarms()) {
 			LOG.debug("Creating alarm for event {0} in calendar {1}", eventId, calendarId);
 			PendingIntent intent = createEventIntent(context, calendarId, eventId);
-			((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).set(AlarmManager.RTC, event.getStartTime().getTimeInMillis(), intent);
+			((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).set(AlarmManager.RTC, CursorHelper.getMillis(event.getStartTime()), intent);
 		}
 	}
 

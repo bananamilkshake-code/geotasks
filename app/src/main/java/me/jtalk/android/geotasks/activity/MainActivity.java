@@ -46,6 +46,7 @@ import me.jtalk.android.geotasks.application.service.LocationTrackService;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.PermissionDependentTask;
 import me.jtalk.android.geotasks.util.TasksChain;
@@ -211,7 +212,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		});
 
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
-			Event event = EventsSource.extractEvent(eventsAdapter.getGroup(position));
+			Event event = CursorHelper.extractEvent(eventsAdapter.getGroup(position));
 			new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.main_dialog_delete_event_title)
 					.setMessage(MessageFormat.format(getString(R.string.main_dialog_delete_event_text), event.getTitle()))

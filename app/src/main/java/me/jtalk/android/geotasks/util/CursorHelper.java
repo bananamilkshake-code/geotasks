@@ -19,14 +19,24 @@ package me.jtalk.android.geotasks.util;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.provider.CalendarContract;
+
+import java.util.Calendar;
 
 import static me.jtalk.android.geotasks.util.Assert.*;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.source.Event;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CursorHelper {
+
+	public static final String EVENT_LATITUDE = "latitude";
+	public static final String EVENT_LONGITUDE = "longitude";
+
+	public static final long DEFAULT_TIME_VALUE = -1;
 
 	private static final String SELECTION_ARGUMENT_APPENDER = "= ?";
 	private static final String SELECTION_STRING_SEPARATOR = SELECTION_ARGUMENT_APPENDER + ") AND (";
@@ -204,5 +214,72 @@ public class CursorHelper {
 		srcCursor.moveToPosition(startPosition);
 
 		return cursor;
+	}
+
+	/**
+	 * Extracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
+	 * and creates Event object from it.
+	 *
+	 * @param cursor cursor that stores event data
+	 * @return Event object that was created from retrieved data.
+	 */
+	public static Event extractEvent(Cursor cursor) {
+		long id = getLong(cursor, CalendarContract.Events._ID);
+		String title = getString(cursor, CalendarContract.Events.TITLE);
+		String description = getString(cursor, CalendarContract.Events.DESCRIPTION);
+		Calendar startTime = extractTime(cursor, CalendarContract.Events.DTSTART, DEFAULT_TIME_VALUE);
+		Calendar endTime = extractTime(cursor, CalendarContract.Events.DTEND, DEFAULT_TIME_VALUE);
+		boolean hasAlarms = getBoolean(cursor, CalendarContract.Events.HAS_ALARM);
+		TaskCoordinates geoPoint = extractCoordinates(cursor);
+		return new Event(id, title, description, startTime, endTime, geoPoint, hasAlarms);
+	}
+
+	/**
+	 * Retrieves location coordinates where event, which data is stored in current cursor,
+	 * must occur. If no location coordinates had been set null will be returned.
+	 *
+	 * @param cursor cursor from which coordinates must be retrieved
+	 * @return TaskCoordinates object that contains information about longitude and latitude.
+	 * Returns null if location for event has not been set.
+	 */
+	private static TaskCoordinates extractCoordinates(Cursor cursor) {
+		String locationValue = getString(cursor, CalendarContract.Events.EVENT_LOCATION);
+		if (locationValue == null || locationValue.isEmpty()) {
+			return null;
+		}
+
+		double lat = getDouble(cursor, EVENT_LATITUDE);
+		double lon = getDouble(cursor, EVENT_LONGITUDE);
+		return new TaskCoordinates(lat, lon);
+	}
+
+	/**
+	 * Retrieves column value from cursor and converts it to calendar.
+	 * If start time value is not been set for that event null will be returned.
+	 *
+	 * @param cursor cursor from which time must be retrieved
+	 * @param timeField field name that contains time value (long)
+	 * @return calendar with start time value or null if time hadn't been set
+	 */
+	public static Calendar extractTime(Cursor cursor, String timeField, long defaultValue) {
+		long timeInMillis = getLong(cursor, timeField);
+		if (timeInMillis == defaultValue) {
+			return null;
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(timeInMillis);
+		return calendar;
+	}
+
+	/**
+	 * Safety retrieves millis from calendar: null calendar means that no time is set
+	 * and {@DEFAULT_TIME_VALUE} must be returned.
+	 *
+	 * @param time Calendar object that contains time value. Can be null.
+	 * @return time in milliseconds or @{DEFAULT_TIME_VALUE} if time is null
+	 */
+	public static long getMillis(Calendar time) {
+		return (time != null) ? time.getTimeInMillis() : DEFAULT_TIME_VALUE;
 	}
 }

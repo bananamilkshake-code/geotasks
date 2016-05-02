@@ -36,7 +36,6 @@ import java.util.Map;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MakeTaskActivity;
 import me.jtalk.android.geotasks.source.Event;
-import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.StringValueExtractor;
 
@@ -77,7 +76,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
-		Event event = EventsSource.extractEvent(cursor);
+		Event event = CursorHelper.extractEvent(cursor);
 		TextView titleView = (TextView) view.findViewById(R.id.item_event_title);
 		titleView.setText(event.getTitle());
 		titleView.setTextColor(getColorFor(event));
@@ -109,7 +108,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
-		Event event = EventsSource.extractEvent(cursor);
+		Event event = CursorHelper.extractEvent(cursor);
 
 		view.setOnClickListener(v -> {
 			Intent intent = new Intent(context, MakeTaskActivity.class);

@@ -21,11 +21,14 @@ import android.Manifest;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.CalendarContract;
 import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.Events;
 
@@ -37,7 +40,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import lombok.Getter;
-import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
@@ -61,11 +63,8 @@ public class EventsSource implements EventIntentFields {
 	public static final int ACTION_REMOVED = 3;
 
 	public static final long DEFAULT_CALENDAR = -1;
-	public static final long DEFAULT_TIME_VALUE = -1;
 
 	public static final long NO_TASK = -1;
-
-	public static final Calendar EMPTY_TIME = null;
 
 	static final String ACTIVE = "active";
 
@@ -85,9 +84,6 @@ public class EventsSource implements EventIntentFields {
 			"ELSE 'FALSE' END) " +
 			"AS " + ACTIVE;
 
-	static final String EVENT_LATITUDE = "latitude";
-	static final String EVENT_LONGITUDE = "longitude";
-
 	private Context context;
 
 	@Getter
@@ -102,87 +98,30 @@ public class EventsSource implements EventIntentFields {
 			Events.DTSTART,
 			Events.DTEND,
 			Events.HAS_ALARM,
-			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), EVENT_LATITUDE),
-			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), EVENT_LONGITUDE)
+			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), CursorHelper.EVENT_LATITUDE),
+			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), CursorHelper.EVENT_LONGITUDE)
 	};
 
 	private static final String SORT_ORDER = ACTIVE + " DESC";
 
-	/**
-	 * Extracts data for event from cursor (projection fields are {@link PROJECTION_EVENTS})
-	 * and creates Event object from it.
-	 *
-	 * @param cursor
-	 * @return Event object that was created from retrieved data.
-	 */
-	public static Event extractEvent(Cursor cursor) {
-		long id = CursorHelper.getLong(cursor, Events._ID);
-		String title = CursorHelper.getString(cursor, Events.TITLE);
-		String description = CursorHelper.getString(cursor, Events.DESCRIPTION);
-		Calendar startTime = extractTime(cursor, Events.DTSTART);
-		Calendar endTime = extractTime(cursor, Events.DTEND);
-		boolean hasAlarms = CursorHelper.getBoolean(cursor, Events.HAS_ALARM);
-		TaskCoordinates geoPoint = extractCoordinates(cursor);
-		return new Event(id, title, description, startTime, endTime, geoPoint, hasAlarms);
-	}
+	public static Loader<Cursor> createCursorLoader(Context context, long calendarId, Calendar currentTime) {
+		List<String> projection = new ArrayList<>(Arrays.asList(PROJECTION_EVENTS));
+		projection.add(String.format(QUERY_ACTIVE_FIELD, currentTime.getTimeInMillis(), currentTime.getTimeInMillis()));
 
-	/**
-	 * Retrieves column value from cursor and converts it to calendar.
-	 * If start time value is not been set for that event null will be returned.
-	 *
-	 * @param cursor
-	 * @param timeField field name that contains time value (long)
-	 * @return calendar with start time value or null if time hadn't been set
-	 */
-	public static Calendar extractTime(Cursor cursor, String timeField) {
-		long timeInMillis = CursorHelper.getLong(cursor, timeField);
-		if (timeInMillis == DEFAULT_TIME_VALUE) {
-			return null;
-		}
+		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
+		String[] selectionArgs = new String[] {
+				String.valueOf(calendarId)
+				//, String.valueOf(currentTime.getTimeInMillis())
+				//, String.valueOf(currentTime.getTimeInMillis())
+		};
 
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(timeInMillis);
-		return calendar;
-	}
-
-	public static String[] getCurrentProjectionEvents(Calendar currentTime) {
-		String[] result = Arrays.copyOf(PROJECTION_EVENTS, PROJECTION_EVENTS.length + 1);
-		result[result.length - 1] = String.format(Locale.ENGLISH, QUERY_ACTIVE_FIELD, currentTime.getTimeInMillis());
-		return result;
-	}
-
-	public static String getSortOrder() {
-		return SORT_ORDER;
-	}
-
-	/**
-	 * Safety retrieves millis from calendar: null calendar means that no time is set
-	 * and {@DEFAULT_TIME_VALUE} must be returned.
-	 *
-	 * @param time
-	 * @return time in milliseconds or @{DEFAULT_TIME_VALUE} if time is null
-	 */
-	private static long getMillis(Calendar time) {
-		return (time != EMPTY_TIME) ? time.getTimeInMillis() : DEFAULT_TIME_VALUE;
-	}
-
-	/**
-	 * Retrieves location coordinates where event, which data is stored in current cursor,
-	 * must occur. If no location coordinates had been set null will be returned.
-	 *
-	 * @param cursor
-	 * @return TaskCoordinates object that contains information about longitude and latitude.
-	 * Returns null if location for event has not been set.
-	 */
-	private static TaskCoordinates extractCoordinates(Cursor cursor) {
-		String locationValue = CursorHelper.getString(cursor, Events.EVENT_LOCATION);
-		if (locationValue == null || locationValue.isEmpty()) {
-			return null;
-		}
-
-		double lat = CursorHelper.getDouble(cursor, EVENT_LATITUDE);
-		double lon = CursorHelper.getDouble(cursor, EVENT_LONGITUDE);
-		return new TaskCoordinates(lat, lon);
+		return new CursorLoader(
+				context,
+				CalendarContract.Events.CONTENT_URI,
+				PROJECTION_EVENTS, //projection.toArray(new String[projection.size()]),
+				selection,
+				selectionArgs,
+				null); //SORT_ORDER_BY_ACTIVE);
 	}
 
 	public EventsSource(Context context, long calendarId) {
@@ -326,7 +265,7 @@ public class EventsSource implements EventIntentFields {
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				events.add(extractEvent(cursor));
+				events.add(CursorHelper.extractEvent(cursor));
 			}
 			cursor.close();
 		}
@@ -362,7 +301,13 @@ public class EventsSource implements EventIntentFields {
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				events.add(extractEvent(cursor));
+				Event event = CursorHelper.extractEvent(cursor);
+				events.add(event);
+				LOG.debug("Active timing event id {0}: start time {1}, current time {2}, diff {3}",
+						event.getId(),
+						CursorHelper.getMillis(event.getStartTime()),
+						currentTime.getTimeInMillis(),
+						CursorHelper.getMillis(event.getStartTime()) - currentTime.getTimeInMillis());
 			}
 			cursor.close();
 		}
@@ -376,8 +321,8 @@ public class EventsSource implements EventIntentFields {
 		values.put(Events.DESCRIPTION, event.getDescription());
 		values.put(Events.EVENT_LOCATION, CoordinatesFormat.formatForDatabase(event.getCoordinates()));
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
-		values.put(Events.DTSTART, getMillis(event.getStartTime()));
-		values.put(Events.DTEND, getMillis(event.getEndTime()));
+		values.put(Events.DTSTART, CursorHelper.getMillis(event.getStartTime()));
+		values.put(Events.DTEND, CursorHelper.getMillis(event.getEndTime()));
 		return values;
 	}
 
