@@ -188,11 +188,8 @@ public class EventsSource implements EventIntentFields {
 	 */
 	public void edit(Event event) {
 		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, event.getId());
-
 		ContentValues values = createContentValues(event);
-
 		this.context.getContentResolver().update(uri, values, null, null);
-
 		sendBroadcast(ACTION_EDIT, calendarId, event.getId());
 	}
 
@@ -215,10 +212,8 @@ public class EventsSource implements EventIntentFields {
 	public void enable(long id) throws SecurityException {
 		// No need to update HAS_ALARMS in CalendarProvider: this field
 		// is changed automatically ith reminders adding/deleting.
-
 		ContentValues reminder = createReminderContentValues(id);
 		Uri createdReminder = this.context.getContentResolver().insert(Reminders.CONTENT_URI, reminder);
-
 		LOG.debug("Reminder for event {0} created: uri {1}. Event is active now.", id, createdReminder);
 	}
 
@@ -232,13 +227,8 @@ public class EventsSource implements EventIntentFields {
 	public void disable(long id) throws SecurityException {
 		// No need to update HAS_ALARMS in CalendarProvider: this field
 		// is changed automatically ith reminders adding/deleting.
-		this.context.getContentResolver().delete(
-				Reminders.CONTENT_URI,
-				REMOVE_EVENT_REMINDERS,
-				new String[]{String.valueOf(id)});
-
+		this.context.getContentResolver().delete(Reminders.CONTENT_URI, REMOVE_EVENT_REMINDERS, new String[]{String.valueOf(id)});
 		LOG.debug("Reminders for event {0} from calendar {1} removed. Event is inactive now.", id, calendarId);
-
 		sendBroadcast(ACTION_EDIT, calendarId, id);
 	}
 
