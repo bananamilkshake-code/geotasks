@@ -145,6 +145,10 @@ public class EventsSource implements EventIntentFields {
 		ContentValues values = createContentValues(event);
 
 		Uri created = this.context.getContentResolver().insert(Events.CONTENT_URI, values);
+		if (created == null) {
+			LOG.warn("Event is not added");
+			return;
+		}
 
 		long id = Long.valueOf(created.getLastPathSegment());
 
