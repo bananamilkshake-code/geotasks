@@ -170,7 +170,6 @@ public class EventsSource implements EventIntentFields {
 
 		Cursor cursor = this.context.getContentResolver().query(uri, PROJECTION_EVENTS, null, null, null);
 		if (cursor == null || cursor.isAfterLast()) {
-			LOG.info("There is no event with id {0}", id);
 			return null;
 		}
 
