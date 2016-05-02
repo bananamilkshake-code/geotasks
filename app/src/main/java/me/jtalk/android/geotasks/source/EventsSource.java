@@ -174,8 +174,7 @@ public class EventsSource implements EventIntentFields {
 		}
 
 		cursor.moveToFirst();
-		Event event = extractEvent(cursor);
-
+		Event event = CursorHelper.extractEvent(cursor);
 		cursor.close();
 
 		return event;
