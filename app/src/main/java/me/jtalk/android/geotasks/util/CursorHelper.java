@@ -154,8 +154,8 @@ public class CursorHelper {
 	/**
 	 * Creates new cursor which data is copied from group cursor.
 	 *
-	 * @param groupCursor
-	 * @return
+	 * @param groupCursor cursor to be copied
+	 * @return new cursor object that contains amount data from srcCursor
 	 */
 	public static Cursor clone(Cursor groupCursor) {
 		return clone(groupCursor, groupCursor.getCount());
@@ -165,43 +165,43 @@ public class CursorHelper {
 	 * Creates new cursor which data is copied from first {@amount}
 	 * elements of group cursor (or less if there is not enough rows).
 	 *
-	 * @param groupCursor
-	 * @param amount
-	 * @return
+	 * @param srcCursor cursor to be copied
+	 * @param amount how much cursors must be copied
+	 * @return new cursor object that contains amount data from srcCursor
 	 */
-	public static Cursor clone(Cursor groupCursor, int amount) {
-		final String[] columns = groupCursor.getColumnNames();
+	public static Cursor clone(Cursor srcCursor, int amount) {
+		final String[] columns = srcCursor.getColumnNames();
 		MatrixCursor cursor = new MatrixCursor(columns, amount);
 
-		int startPosition = groupCursor.getPosition();
+		int startPosition = srcCursor.getPosition();
 
-		for (int i = 0; i < amount && !groupCursor.isAfterLast(); ++i) {
+		for (int i = 0; i < amount && !srcCursor.isAfterLast(); ++i) {
 			MatrixCursor.RowBuilder rowBuilder = cursor.newRow();
 			for (String column : columns) {
-				switch (getType(groupCursor, column)) {
+				switch (getType(srcCursor, column)) {
 					case Cursor.FIELD_TYPE_NULL:
 						rowBuilder.add(column, null);
 						break;
 					case Cursor.FIELD_TYPE_INTEGER:
-						rowBuilder.add(column, getLong(groupCursor, column));
+						rowBuilder.add(column, getLong(srcCursor, column));
 						break;
 					case Cursor.FIELD_TYPE_FLOAT:
-						rowBuilder.add(column, getFloat(groupCursor, column));
+						rowBuilder.add(column, getFloat(srcCursor, column));
 						break;
 					case Cursor.FIELD_TYPE_STRING:
-						rowBuilder.add(column, getString(groupCursor, column));
+						rowBuilder.add(column, getString(srcCursor, column));
 						break;
 					case Cursor.FIELD_TYPE_BLOB:
-						rowBuilder.add(column, getBlob(groupCursor, column));
+						rowBuilder.add(column, getBlob(srcCursor, column));
 						break;
 				}
 			}
 
-			groupCursor.moveToNext();
+			srcCursor.moveToNext();
 		}
 
 		// Restore position.
-		groupCursor.moveToPosition(startPosition);
+		srcCursor.moveToPosition(startPosition);
 
 		return cursor;
 	}
