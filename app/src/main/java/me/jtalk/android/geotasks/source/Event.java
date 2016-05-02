@@ -70,7 +70,10 @@ public class Event {
 	}
 
 	public boolean isActive(Calendar currentTime) {
-		return hasAlarms && (endTime == null || endTime.getTimeInMillis() >= currentTime.getTimeInMillis());
+		boolean active = hasAlarms;
+		active &= startTime == null || startTime.getTimeInMillis() >= currentTime.getTimeInMillis();
+		active &= endTime == null || endTime.getTimeInMillis() >= currentTime.getTimeInMillis();
+		return active;
 	}
 
 	static public Event copyOf(final Event event) {
