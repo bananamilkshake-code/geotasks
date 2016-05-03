@@ -84,7 +84,9 @@ public class EventsSource implements EventIntentFields {
 			"AND (" + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND  +  "  >= ?) ";
 
 	private static final String QUERY_ACTIVE_FIELD =
-			"(CASE WHEN " + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND  +  "  >= %d THEN 'TRUE'" +
+			"(CASE WHEN " +
+					IS_ACTIVE_CONDITION +
+			"THEN 'TRUE'" +
 			"ELSE 'FALSE' END) " +
 			"AS " + ACTIVE;
 
@@ -106,26 +108,26 @@ public class EventsSource implements EventIntentFields {
 			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), CursorHelper.EVENT_LONGITUDE)
 	};
 
-	private static final String SORT_ORDER = ACTIVE + " DESC";
+	private static final String SORT_ORDER_BY_ACTIVE = ACTIVE + " DESC";
 
 	public static Loader<Cursor> createCursorLoader(Context context, long calendarId, Calendar currentTime) {
 		List<String> projection = new ArrayList<>(Arrays.asList(PROJECTION_EVENTS));
-		projection.add(String.format(QUERY_ACTIVE_FIELD, currentTime.getTimeInMillis(), currentTime.getTimeInMillis()));
+		projection.add(QUERY_ACTIVE_FIELD);
 
 		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
 		String[] selectionArgs = new String[] {
+				String.valueOf(currentTime.getTimeInMillis()),
+				String.valueOf(currentTime.getTimeInMillis()),
 				String.valueOf(calendarId)
-				//, String.valueOf(currentTime.getTimeInMillis())
-				//, String.valueOf(currentTime.getTimeInMillis())
 		};
 
 		return new CursorLoader(
 				context,
 				CalendarContract.Events.CONTENT_URI,
-				PROJECTION_EVENTS, //projection.toArray(new String[projection.size()]),
+				projection.toArray(new String[projection.size()]),
 				selection,
 				selectionArgs,
-				null); //SORT_ORDER_BY_ACTIVE);
+				SORT_ORDER_BY_ACTIVE);
 	}
 
 	public EventsSource(Context context, long calendarId) {
