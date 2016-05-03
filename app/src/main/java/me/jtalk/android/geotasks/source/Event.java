@@ -76,6 +76,20 @@ public class Event {
 		return active;
 	}
 
+	/**
+	 * @return true if this event must occur in predefined time otherwise false
+	 */
+	public boolean isTiming() {
+		return coordinates == null;
+	}
+
+	/**
+	 * @return true if this event must occur in predefined position otherwise false
+	 */
+	public boolean isLocation() {
+		return coordinates != null;
+	}
+
 	static public Event copyOf(final Event event) {
 		if (event == null) {
 			return null;
