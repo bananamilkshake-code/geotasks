@@ -5,4 +5,9 @@
         <item>Enable</item>
         <item>Disable</item>
     </string-array>
+    <string-array name="crash_report_status_entry_id">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

@@ -12,7 +12,7 @@
         android:key="@string/pref_alarm_sound"/>
 
     <ListPreference
-        android:defaultValue="Ask"
+        android:defaultValue="0"
         android:entries="@array/crash_report_status"
         android:entryValues="@array/crash_report_status"
         android:key="@string/pref_crash_report_send_status"
