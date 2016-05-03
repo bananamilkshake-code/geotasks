@@ -49,7 +49,7 @@ public class EventsLocationListenerTest {
 		long calendarId = 0;
 
 		EventsSource mockEventsSource = Mockito.mock(EventsSource.class);
-		when(mockEventsSource.getActive(any(Calendar.class))).thenReturn(activeEvents);
+		when(mockEventsSource.getActiveLocationEvents(any(Calendar.class))).thenReturn(activeEvents);
 		when(mockEventsSource.getCalendarId()).thenReturn(calendarId);
 
 		Notifier mockNotifier = Mockito.mock(Notifier.class);
@@ -60,7 +60,7 @@ public class EventsLocationListenerTest {
 
 		eventLocationListener.onLocationChanged(mockCurrentLocation);
 
-		verify(mockEventsSource).getActive(any(Calendar.class));
+		verify(mockEventsSource).getActiveLocationEvents(any(Calendar.class));
 		verifyNoMoreInteractions(mockEventsSource);
 
 		verify(mockNotifier).onEventIsNear(calendarId, event2, any(), 10);
