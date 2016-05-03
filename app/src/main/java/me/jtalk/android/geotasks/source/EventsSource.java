@@ -33,7 +33,6 @@ import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.Events;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -80,15 +79,15 @@ public class EventsSource implements EventIntentFields {
 
 	private static final String IS_ACTIVE_CONDITION =
 			Events.HAS_ALARM + " = 1 " +
-			"AND (" + Events.DTSTART + " == " + DEFAULT_CALENDAR + " OR " + Events.DTSTART  +  "  >= ?) " +
-			"AND (" + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND  +  "  >= ?) ";
+					"AND (" + Events.DTSTART + " == " + DEFAULT_CALENDAR + " OR " + Events.DTSTART + "  >= ?) " +
+					"AND (" + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND + "  >= ?) ";
 
 	private static final String QUERY_ACTIVE_FIELD =
 			"(CASE WHEN " +
 					IS_ACTIVE_CONDITION +
-			"THEN 'TRUE'" +
-			"ELSE 'FALSE' END) " +
-			"AS " + ACTIVE;
+					"THEN 'TRUE' " +
+					"ELSE 'FALSE' END) " +
+					"AS " + ACTIVE;
 
 	private Context context;
 
@@ -105,26 +104,28 @@ public class EventsSource implements EventIntentFields {
 			Events.DTEND,
 			Events.HAS_ALARM,
 			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), CursorHelper.EVENT_LATITUDE),
-			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), CursorHelper.EVENT_LONGITUDE)
+			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), CursorHelper.EVENT_LONGITUDE),
+			QUERY_ACTIVE_FIELD
 	};
 
 	private static final String SORT_ORDER_BY_ACTIVE = ACTIVE + " DESC";
 
-	public static Loader<Cursor> createCursorLoader(Context context, long calendarId, Calendar currentTime) {
-		List<String> projection = new ArrayList<>(Arrays.asList(PROJECTION_EVENTS));
-		projection.add(QUERY_ACTIVE_FIELD);
-
-		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
-		String[] selectionArgs = new String[] {
+	private static String[] createSelectionArgs(long elementId, Calendar currentTime) {
+		return new String[]{
 				String.valueOf(currentTime.getTimeInMillis()),
 				String.valueOf(currentTime.getTimeInMillis()),
-				String.valueOf(calendarId)
+				String.valueOf(elementId)
 		};
+	}
+
+	public static Loader<Cursor> createCursorLoader(Context context, long calendarId, Calendar currentTime) {
+		String selection = CursorHelper.buildProjection(CalendarContract.Events.CALENDAR_ID);
+		String[] selectionArgs = createSelectionArgs(calendarId, currentTime);
 
 		return new CursorLoader(
 				context,
 				CalendarContract.Events.CONTENT_URI,
-				projection.toArray(new String[projection.size()]),
+				PROJECTION_EVENTS,
 				selection,
 				selectionArgs,
 				SORT_ORDER_BY_ACTIVE);
@@ -169,10 +170,15 @@ public class EventsSource implements EventIntentFields {
 	 * @param id id of event to retrieve
 	 * @return retrieved event
 	 */
-	public Event get(long id) {
-		Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, id);
-
-		Cursor cursor = this.context.getContentResolver().query(uri, PROJECTION_EVENTS, null, null, null);
+	public Event get(long id) throws SecurityException {
+		String selection = CursorHelper.buildProjection(Events._ID);
+		String[] selectionArgs = createSelectionArgs(id, Calendar.getInstance());
+		Cursor cursor = this.context.getContentResolver().query(
+				Events.CONTENT_URI,
+				PROJECTION_EVENTS,
+				selection,
+				selectionArgs,
+				null);
 		if (cursor == null || cursor.isAfterLast()) {
 			return null;
 		}
@@ -239,8 +245,8 @@ public class EventsSource implements EventIntentFields {
 
 	private static final String ACTIVE_LOCATION_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
-			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
-			+ "AND " + IS_ACTIVE_CONDITION;
+					+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
+					+ "AND " + ACTIVE + " = 1";
 
 	/**
 	 * Selects events that must happen around current time or which time
@@ -251,12 +257,7 @@ public class EventsSource implements EventIntentFields {
 	 * @throws SecurityException
 	 */
 	public List<Event> getActiveLocationEvents(Calendar currentTime) throws SecurityException {
-		String[] selectionArgs = new String[]{
-				String.valueOf(calendarId)
-				, String.valueOf(currentTime.getTimeInMillis())
-				, String.valueOf(currentTime.getTimeInMillis())
-		};
-
+		String[] selectionArgs = createSelectionArgs(calendarId, currentTime);
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,
 				PROJECTION_EVENTS,
@@ -267,11 +268,7 @@ public class EventsSource implements EventIntentFields {
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				Event event = CursorHelper.extractEvent(cursor);
-				events.add(event);
-				LOG.debug("Active location event id {0}: coordinates {1}",
-						event.getId(),
-						event.getCoordinates());
+				events.add(CursorHelper.extractEvent(cursor));
 			}
 			cursor.close();
 		}
@@ -281,8 +278,8 @@ public class EventsSource implements EventIntentFields {
 
 	private static final String ACTIVE_TIMING_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
-			+ "AND (" + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0) "
-			+ "AND " + IS_ACTIVE_CONDITION;
+					+ "AND (" + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0) "
+					+ "AND " + ACTIVE + " = 1";
 
 	/**
 	 * Get events that must be started in future but not in defined location.
@@ -291,11 +288,7 @@ public class EventsSource implements EventIntentFields {
 	 * @return list of events to notify in special time
 	 */
 	public List<Event> getActiveTimingEvents(Calendar currentTime) throws SecurityException {
-		String[] selectionArgs = new String[]{
-				String.valueOf(calendarId),
-				String.valueOf(currentTime.getTimeInMillis())
-		};
-
+		String[] selectionArgs = createSelectionArgs(calendarId, currentTime);
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,
 				PROJECTION_EVENTS,
@@ -306,13 +299,7 @@ public class EventsSource implements EventIntentFields {
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				Event event = CursorHelper.extractEvent(cursor);
-				events.add(event);
-				LOG.debug("Active timing event id {0}: start time {1}, current time {2}, diff {3}",
-						event.getId(),
-						CursorHelper.getMillis(event.getStartTime()),
-						currentTime.getTimeInMillis(),
-						CursorHelper.getMillis(event.getStartTime()) - currentTime.getTimeInMillis());
+				events.add(CursorHelper.extractEvent(cursor));
 			}
 			cursor.close();
 		}
