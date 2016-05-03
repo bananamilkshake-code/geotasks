@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import lombok.Getter;
@@ -78,6 +77,11 @@ public class EventsSource implements EventIntentFields {
 					"THEN CAST(substr(" + Events.EVENT_LOCATION + ", %s) AS REAL) " +
 					"ELSE NULL END) " +
 					"AS %s";
+
+	private static final String IS_ACTIVE_CONDITION =
+			Events.HAS_ALARM + " = 1 " +
+			"AND (" + Events.DTSTART + " == " + DEFAULT_CALENDAR + " OR " + Events.DTSTART  +  "  >= ?) " +
+			"AND (" + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND  +  "  >= ?) ";
 
 	private static final String QUERY_ACTIVE_FIELD =
 			"(CASE WHEN " + Events.DTEND + " == " + DEFAULT_CALENDAR + " OR " + Events.DTEND  +  "  >= %d THEN 'TRUE'" +
@@ -232,6 +236,11 @@ public class EventsSource implements EventIntentFields {
 		sendBroadcast(ACTION_EDIT, calendarId, id);
 	}
 
+	private static final String ACTIVE_LOCATION_EVENTS_SELECTION =
+			Events.CALENDAR_ID + " = ? "
+			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
+			+ "AND " + IS_ACTIVE_CONDITION;
+
 	/**
 	 * Selects events that must happen around current time or which time
 	 * is not set.
@@ -250,14 +259,18 @@ public class EventsSource implements EventIntentFields {
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,
 				PROJECTION_EVENTS,
-				ACTIVE_EVENTS_SELECTION,
+				ACTIVE_LOCATION_EVENTS_SELECTION,
 				selectionArgs,
 				null);
 
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				events.add(CursorHelper.extractEvent(cursor));
+				Event event = CursorHelper.extractEvent(cursor);
+				events.add(event);
+				LOG.debug("Active location event id {0}: coordinates {1}",
+						event.getId(),
+						event.getCoordinates());
 			}
 			cursor.close();
 		}
@@ -267,9 +280,8 @@ public class EventsSource implements EventIntentFields {
 
 	private static final String ACTIVE_TIMING_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
-					+ "AND " + Events.HAS_ALARM + " == 1 "
-					+ "AND " + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0 "
-					+ "AND " + Events.DTSTART + " >= ?";
+			+ "AND (" + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0) "
+			+ "AND " + IS_ACTIVE_CONDITION;
 
 	/**
 	 * Get events that must be started in future but not in defined location.
@@ -326,21 +338,6 @@ public class EventsSource implements EventIntentFields {
 		values.put(Reminders.EVENT_ID, eventId);
 		values.put(Reminders.METHOD, Reminders.METHOD_ALERT);
 		return values;
-	}
-
-	private static final String ACTIVE_EVENTS_SELECTION =
-			Events.CALENDAR_ID + " = ? "
-			+ "AND " + Events.HAS_ALARM + " == 1 "
-			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
-			+ "AND (" + Events.DTSTART + " == -1 OR " + Events.DTSTART + " >= ?) "
-			+ "AND (" + Events.DTEND + " == -1 OR " + Events.DTEND + " < ?)";
-
-	private static String[] buildSelectionArgsForNearEvents(long calendarId, Calendar currentTime) {
-		return new String[]{
-				String.valueOf(calendarId)
-				, String.valueOf(currentTime.getTimeInMillis())
-				, String.valueOf(currentTime.getTimeInMillis())
-		};
 	}
 
 	private void sendBroadcast(int action, long calendarId, long eventId) {
