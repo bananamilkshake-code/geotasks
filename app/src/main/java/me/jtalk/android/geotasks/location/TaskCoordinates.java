@@ -98,11 +98,11 @@ public class TaskCoordinates implements Parcelable {
 
 	public static TaskCoordinates search(@NonNull Context context, @NonNull String addressText) {
 		try {
-			Geocoder geocoder = new Geocoder(context);
-			if (!geocoder.isPresent()) {
+			if (!Geocoder.isPresent()) {
 				return null;
 			}
 
+			Geocoder geocoder = new Geocoder(context);
 			List<Address> searched = geocoder.getFromLocationName(addressText, 1);
 			if (searched.isEmpty()) {
 				return null;
