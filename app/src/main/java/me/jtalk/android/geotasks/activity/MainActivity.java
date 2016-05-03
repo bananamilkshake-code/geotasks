@@ -177,7 +177,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putLong(getString(R.string.pref_calendar_id), calendarId);
-			editor.commit();
+			editor.apply();
 		}
 
 		setEventsSource(new EventsSource(this, calendarId));
