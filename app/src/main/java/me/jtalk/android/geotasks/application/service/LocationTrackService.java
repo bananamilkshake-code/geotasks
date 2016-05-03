@@ -30,11 +30,13 @@ import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MainActivity;
 import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
+import me.jtalk.android.geotasks.application.TaskChainHandler;
 import me.jtalk.android.geotasks.application.listeners.EventsLocationListener;
 import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
@@ -128,7 +130,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 		locationListener.setDistanceToAlarm(distanceToAlarm);
 	}
 
-	private void setupLocationListenerUpdateParameters(SharedPreferences sharedPreferences) throws SecurityException {
+	private void setupLocationListenerUpdateParameters(SharedPreferences sharedPreferences) {
 		LocationManager locationManager = getLocationManager();
 
 		float minDistance = Float.parseFloat(sharedPreferences.getString(getString(R.string.pref_location_update_min_distance), EventsLocationListener.MIN_DISTANCE.toString()));
@@ -141,8 +143,13 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 			provider = LocationManager.GPS_PROVIDER;
 		}
 
-		locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener);
-
-		LOG.debug("Geo listening enabled via {0}", provider);
+		try {
+			locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener);
+			LOG.info("Geo listening enabled via {0}", provider);
+		} catch (SecurityException exception) {
+			Toast.makeText(this, R.string.location_service_toast_no_permission_errror, Toast.LENGTH_LONG).show();
+			LOG.error("Geo listening cannot be enabled due o lack of permission: {0}", exception.getMessage());
+			stopSelf();
+		}
 	}
 }

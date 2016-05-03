@@ -16,4 +16,5 @@
     <string name="crash_dialog_title">GeoTasks crashed</string>
 
     <string name="title_activity_show_location">\"{0}\" coordinates</string>
+    <string name="location_service_toast_no_permission_errror">Not enough permission to listen position updates</string>
 </resources>
