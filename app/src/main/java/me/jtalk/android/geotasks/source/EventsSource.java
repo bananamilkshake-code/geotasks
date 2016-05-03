@@ -158,8 +158,6 @@ public class EventsSource implements EventIntentFields {
 
 		LOG.debug("New event was created. Uri: {0}, id {1}", created.toString(), id);
 
-		sendBroadcast(ACTION_ADD, calendarId, id);
-
 		enable(id);
 	}
 
@@ -219,6 +217,7 @@ public class EventsSource implements EventIntentFields {
 		ContentValues reminder = createReminderContentValues(id);
 		Uri createdReminder = this.context.getContentResolver().insert(Reminders.CONTENT_URI, reminder);
 		LOG.debug("Reminder for event {0} created: uri {1}. Event is active now.", id, createdReminder);
+		sendBroadcast(ACTION_ADD, calendarId, id);
 	}
 
 	private static final String REMOVE_EVENT_REMINDERS = "Reminders.EVENT_ID = ?";
