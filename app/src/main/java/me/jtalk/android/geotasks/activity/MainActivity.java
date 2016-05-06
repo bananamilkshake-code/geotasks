@@ -118,9 +118,6 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	/**
 	 * This method is called on menu.menu_action_enable_geolistening click.
-	 *
-	 * @param menuItem
-	 * @return
 	 */
 	public void openAddEventIntent(MenuItem menuItem) {
 		startActivity(new Intent(this, MakeTaskActivity.class));
@@ -128,9 +125,6 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	/**
 	 * This method is called on menu.menu_action_add_event click.
-	 *
-	 * @param menuItem
-	 * @return
 	 */
 	public void toggleGeoListeningClick(MenuItem menuItem) {
 		boolean isChecked = !menuItem.isChecked();
@@ -145,9 +139,6 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	/**
 	 * This method is called on menu.menu_action_settings click.
-	 *
-	 * @param menuItem
-	 * @return
 	 */
 	public void openSettingsActivity(MenuItem menuItem) {
 		startActivity(new Intent(this, SettingsActivity.class));
