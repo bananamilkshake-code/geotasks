@@ -140,7 +140,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putBoolean(getString(R.string.pref_is_geolistening_enabled), isChecked);
-		editor.commit();
+		editor.apply();
 	}
 
 	/**
