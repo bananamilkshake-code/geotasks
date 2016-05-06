@@ -105,7 +105,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] values) {
 		chainHandler.processPermissionRequestResult(requestCode, permissions, values);
 	}
 
