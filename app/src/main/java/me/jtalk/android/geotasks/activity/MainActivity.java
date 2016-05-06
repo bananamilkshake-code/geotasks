@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key == getString(R.string.pref_is_geolistening_enabled)) {
+		if (key.equals(getString(R.string.pref_is_geolistening_enabled))) {
 			chainHandler.processChain(toggleGeoListenChainId);
 		}
 	}
