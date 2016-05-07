@@ -25,6 +25,7 @@ import java.util.TimeZone;
 import me.jtalk.android.geotasks.BuildConfig;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
+import me.jtalk.android.geotasks.util.CursorHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -145,8 +146,8 @@ public class EventsSourceTest {
 				CalendarContract.Events.EVENT_LOCATION,
 				CalendarContract.Events.DTSTART,
 				CalendarContract.Events.DTEND,
-				EventsSource.EVENT_LATITUDE,
-				EventsSource.EVENT_LONGITUDE},
+				CursorHelper.EVENT_LATITUDE,
+				CursorHelper.EVENT_LONGITUDE},
 				rowNumber);
 
 		for (Event event : events) {
@@ -157,8 +158,8 @@ public class EventsSourceTest {
 					.add(CalendarContract.Events.EVENT_LOCATION, CoordinatesFormat.prettyFormat(event.getCoordinates()))
 					.add(CalendarContract.Events.DTSTART, event.getStartTime().getTimeInMillis())
 					.add(CalendarContract.Events.DTEND, event.getEndTime().getTimeInMillis())
-					.add(EventsSource.EVENT_LATITUDE, event.getCoordinates().getLatitude())
-					.add(EventsSource.EVENT_LONGITUDE, event.getCoordinates().getLongitude());
+					.add(CursorHelper.EVENT_LATITUDE, event.getCoordinates().getLatitude())
+					.add(CursorHelper.EVENT_LONGITUDE, event.getCoordinates().getLongitude());
 		}
 
 		return cursor;
