@@ -245,8 +245,8 @@ public class EventsSource implements EventIntentFields {
 
 	private static final String ACTIVE_LOCATION_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
-					+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
-					+ "AND " + ACTIVE + " = 1";
+			+ "AND " + Events.EVENT_LOCATION + " IS NOT NULL AND length(" + Events.EVENT_LOCATION + ") <> 0 "
+			+ "AND " + ACTIVE + " = 'TRUE'";
 
 	/**
 	 * Selects events that must happen around current time or which time
@@ -278,8 +278,8 @@ public class EventsSource implements EventIntentFields {
 
 	private static final String ACTIVE_TIMING_EVENTS_SELECTION =
 			Events.CALENDAR_ID + " = ? "
-					+ "AND (" + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0) "
-					+ "AND " + ACTIVE + " = 1";
+			+ "AND (" + Events.EVENT_LOCATION + " IS NULL OR length(" + Events.EVENT_LOCATION + ") == 0) "
+			+ "AND " + ACTIVE + " = 'TRUE'";
 
 	/**
 	 * Get events that must be started in future but not in defined location.
