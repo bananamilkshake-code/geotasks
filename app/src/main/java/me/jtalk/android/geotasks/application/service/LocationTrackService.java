@@ -41,8 +41,8 @@ import java.util.List;
 import lombok.Setter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MainActivity;
-import me.jtalk.android.geotasks.application.Notifier;
 import me.jtalk.android.geotasks.application.Settings;
+import me.jtalk.android.geotasks.application.receiver.NotificationReceiver;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventIntentFields;
@@ -119,7 +119,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 			if (distance <= distanceToAlarm) {
 				LOG.debug("Notify about event {0} (distance {1}, current coordinates {2})",
 						event.getTitle(), distance, currentCoordinates);
-				new Notifier(this).onEventIsNear(eventsSource.getCalendarId(), event, currentCoordinates, distance);
+				sendBroadcast(createIntent(eventsSource.getCalendarId(), event.getId(), currentCoordinates, distance));
 			}
 		}
 	}
@@ -134,6 +134,15 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 
 	@Override
 	public void onProviderDisabled(String provider) {
+	}
+
+	private Intent createIntent(long calendarId, long eventId, TaskCoordinates currentPosition, double distance) {
+		Intent intent = new Intent(NotificationReceiver.ACTION_ALARM);
+		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(NotificationReceiver.INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
+		intent.putExtra(NotificationReceiver.INTENT_EXTRA_DISTANCE, distance);
+		return intent;
 	}
 
 	/**
