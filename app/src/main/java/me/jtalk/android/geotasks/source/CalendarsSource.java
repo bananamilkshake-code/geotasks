@@ -36,7 +36,7 @@ public class CalendarsSource {
 	 *
 	 * @return id of created calendar
 	 */
-	public long addCalendar() {
+	public long add() {
 		ContentValues values = new ContentValues();
 		values.put(CalendarContract.Calendars.NAME, "GeoTasks calendar");
 		values.put(CalendarContract.Calendars.VISIBLE, true);

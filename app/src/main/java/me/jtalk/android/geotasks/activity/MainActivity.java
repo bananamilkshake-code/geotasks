@@ -163,7 +163,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 
 		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
-			calendarId = new CalendarsSource(this).addCalendar();
+			calendarId = new CalendarsSource(this).add();
 
 			LOG.info("No calendar was defined in settings. Created calendar {0}", calendarId);
 
