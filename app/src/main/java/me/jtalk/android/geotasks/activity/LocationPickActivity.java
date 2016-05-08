@@ -18,7 +18,14 @@
 package me.jtalk.android.geotasks.activity;
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.text.InputFilter;
@@ -51,6 +58,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
+import me.jtalk.android.geotasks.application.listeners.SimpleLocationListener;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
@@ -178,8 +186,6 @@ public class LocationPickActivity extends Activity {
 
 		GestureDetector gestureDetector = new GestureDetector(this, new MapGestureDetector(this));
 
-		TaskCoordinates startPoint = extractStartCoordinates(getIntent());
-
 		mapViewContext = new MapViewContext(mapView, this);
 
 		mapView.setClickable(true);
@@ -188,9 +194,10 @@ public class LocationPickActivity extends Activity {
 		mapView.getModel().mapViewPosition.setZoomLevel(DEFAULT_ZOOM);
 		mapView.getModel().mapViewPosition.setZoomLevelMin(MIN_ZOOM);
 		mapView.getModel().mapViewPosition.setZoomLevelMax(MAX_ZOOM);
-		mapView.getModel().mapViewPosition.setCenter(startPoint.toLatLong());
 		mapView.getLayerManager().getLayers().add(mapViewContext.getTileDownloadLayer());
 		mapView.getLayerManager().getLayers().add(marker);
+
+		updateCenter(getIntent());
 	}
 
 	private void initSearchEditText() {
@@ -275,8 +282,8 @@ public class LocationPickActivity extends Activity {
 			validator = new Validator(this);
 			validator.setValidationListener(this);
 
-			latitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-90.0, 90.0, format) });
-			longitudeText.setFilters(new InputFilter[] { new NumericValueFilter(-180.0, 180.0, format) });
+			latitudeText.setFilters(new InputFilter[]{new NumericValueFilter(-90.0, 90.0, format)});
+			longitudeText.setFilters(new InputFilter[]{new NumericValueFilter(-180.0, 180.0, format)});
 
 			if (pickedLocation != null) {
 				latitudeText.setText(format.format(pickedLocation.getLatitude()));
@@ -299,7 +306,7 @@ public class LocationPickActivity extends Activity {
 
 			TaskCoordinates coordinates = new TaskCoordinates(latitude, longitude);
 			LocationPickActivity.this.onLocationPick(coordinates);
-			LocationPickActivity.this.mapView.getModel().mapViewPosition.setCenter(coordinates.toLatLong());
+			LocationPickActivity.this.setupCenter(coordinates);
 
 			dialog.dismiss();
 		}
@@ -324,30 +331,81 @@ public class LocationPickActivity extends Activity {
 		if (searched == null) {
 			searchEditText.setError(getString(R.string.location_pick_incorrect_address));
 		} else {
-			mapView.getModel().mapViewPosition.setCenter(searched.toLatLong());
+			setupCenter(searched);
 		}
 	}
 
 	/**
-	 * Retrieves and returns start coordinates from provided intent ({@INTENT_EXTRA_COORDINATES}.
+	 * Retrieves and setups as map center start coordinates from provided intent ({@INTENT_EXTRA_COORDINATES}.
 	 * If no data was provided {@DEFAULT_COORDINATES} values will be used.
-	 * If intent has {@INTENT_EXTRA_EDIT} extra retrieved coordinates will be set up
+	 * If intent has {@INTENT_EXTRA_EDIT} extra  and coordinates were passed retrieved coordinates will be set up
 	 * as picked location.
 	 *
 	 * @param intent Intent, that can contain start coordinates data.
-	 * @return retrieved coordinates
 	 */
-	private TaskCoordinates extractStartCoordinates(Intent intent) {
-		TaskCoordinates startCoordinates = intent.getParcelableExtra(INTENT_EXTRA_COORDINATES);
-		if (startCoordinates == null) {
-			return DEFAULT_COORDINATES;
+	private void updateCenter(Intent intent) {
+		TaskCoordinates coordinates = intent.getParcelableExtra(INTENT_EXTRA_COORDINATES);
+		if (coordinates == null) {
+			getCurrentCoordinates();
+			return;
 		}
 
 		if (intent.hasExtra(INTENT_EXTRA_EDIT)) {
-			onLocationPick(startCoordinates);
+			setupCenter(coordinates);
+			onLocationPick(coordinates);
 		}
+	}
 
-		return startCoordinates;
+	private static final String SINGLE_LOCATION_UPDATE_ACTION = "me.jtalk.geotasks.SINGLE_LOCATION_UPDATE";
+
+	/**
+	 * Requests current location from LocationManager and updates
+	 * map center with it (when location is received).
+	 */
+	private void getCurrentCoordinates() {
+		BroadcastReceiver singleUpdateReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LOG.debug("Received new request");
+				Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+				TaskCoordinates coordinates = new TaskCoordinates(location);
+				setupCenter(coordinates);
+				context.unregisterReceiver(this);
+			}
+		};
+
+		registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION ));
+
+		Intent updateIntent = new Intent(SINGLE_LOCATION_UPDATE_ACTION);
+		PendingIntent singleUpdatePendingIntent = PendingIntent.getBroadcast(this, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_LOW);
+
+		String locationProvider = locationManager.getBestProvider(criteria, true);
+
+		try {
+			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+			LOG.debug("Last known location is {0}. Provider is {1}", lastKnownLocation, locationProvider);
+			LOG.debug("Trying to obtain current position");
+			locationManager.requestSingleUpdate(criteria, singleUpdatePendingIntent);
+			locationManager.requestSingleUpdate(criteria,
+					new SimpleLocationListener() {
+						@Override
+						public void onLocationChanged(Location location) {
+							setupCenter(new TaskCoordinates(location));
+						}
+					},
+					null);
+		} catch (SecurityException exception) {
+			LOG.error("No permission to get current location");
+			setupCenter(DEFAULT_COORDINATES);
+		}
+	}
+
+	private void setupCenter(TaskCoordinates coordinates) {
+		mapView.getModel().mapViewPosition.setCenter(coordinates.toLatLong());
 	}
 
 	/**

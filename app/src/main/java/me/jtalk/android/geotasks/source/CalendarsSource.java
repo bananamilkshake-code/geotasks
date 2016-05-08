@@ -48,6 +48,10 @@ public class CalendarsSource {
 				.build();
 
 		Uri inserted = context.getContentResolver().insert(uri, values);
+		if (inserted == null) {
+			LOG.error("Calendar is failed to create");
+			return -1;
+		}
 
 		long id = Long.valueOf(inserted.getLastPathSegment());
 
