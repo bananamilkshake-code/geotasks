@@ -137,8 +137,6 @@ public class LocationPickActivity extends Activity {
 
 	/**
 	 * This method is called on menu_location_pick.menu_action_location_pick_save.
-	 *
-	 * @param item
 	 */
 	public void onPickClick(MenuItem item) {
 		Intent result = new Intent();
@@ -152,8 +150,6 @@ public class LocationPickActivity extends Activity {
 
 	/**
 	 * This method is called on activity_location_pick.zoom_in click.
-	 *
-	 * @param view
 	 */
 	public void onZoomInClick(View view) {
 		mapView.getModel().mapViewPosition.zoomIn();
@@ -161,8 +157,6 @@ public class LocationPickActivity extends Activity {
 
 	/**
 	 * This method is called on activity_location_pick.zoom_out click.
-	 *
-	 * @param view
 	 */
 	public void onZoomOutClick(View view) {
 		mapView.getModel().mapViewPosition.zoomOut();
@@ -170,6 +164,7 @@ public class LocationPickActivity extends Activity {
 
 	/**
 	 * Remember {@coordiates} as picked location and draw marker on map.
+	 *
 	 * @param coordinates
 	 */
 	public void onLocationPick(TaskCoordinates coordinates) {
