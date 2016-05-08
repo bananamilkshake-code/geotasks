@@ -71,6 +71,7 @@ public class Event {
 
 	public boolean isActive(Calendar currentTime) {
 		boolean active = hasAlarms;
+		active &= startTime != null || endTime != null || coordinates != null;
 		active &= startTime == null || startTime.getTimeInMillis() >= currentTime.getTimeInMillis();
 		active &= endTime == null || endTime.getTimeInMillis() >= currentTime.getTimeInMillis();
 		return active;
