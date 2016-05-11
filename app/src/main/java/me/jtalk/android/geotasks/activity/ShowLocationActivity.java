@@ -37,9 +37,12 @@ import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.MapViewContext;
 
 public class ShowLocationActivity extends Activity implements EventIntentFields {
+
+	private static final Logger LOG = new Logger(ShowLocationActivity.class);
 
 	public static final int SHOW_CURRENT = 0;
 
@@ -71,6 +74,11 @@ public class ShowLocationActivity extends Activity implements EventIntentFields 
 		TaskCoordinates position = getIntent().getParcelableExtra(INTENT_EXTRA_CURRENT_POSITION);
 
 		event = retrieveEvent(eventId);
+		if (event == null) {
+			LOG.info("Event with id {0} does not exist", eventId);
+			finish();
+			return;
+		}
 
 		setTitle(MessageFormat.format(getString(R.string.title_activity_show_location), event.getTitle()));
 
