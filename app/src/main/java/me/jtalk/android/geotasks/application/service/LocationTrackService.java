@@ -82,6 +82,10 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 		setupListener(calendarId);
 		createNotification();
 
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		settings.registerOnSharedPreferenceChangeListener(this);
+		updateDistanceToAlarm(settings);
+
 		return START_STICKY;
 	}
 
@@ -90,7 +94,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 		if (key.equals(getString(R.string.pref_alarm_distance))) {
 			updateDistanceToAlarm(sharedPreferences);
 		} if (key.equals(getString(R.string.pref_location_update_min_distance)) || key.equals(getString(R.string.pref_location_update_min_time))) {
-			setupLocationListenerUpdateParameters(sharedPreferences);
+			setupLocationListeningWithParameters(sharedPreferences);
 			getLocationManager().removeUpdates(this);
 		}
 	}
@@ -174,8 +178,9 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 		getLocationManager().removeUpdates(this);
 
 		eventsSource = new EventsSource(this, calendarId);
+
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		setupLocationListenerUpdateParameters(settings);
+		setupLocationListeningWithParameters(settings);
 	}
 
 	private void updateDistanceToAlarm(SharedPreferences settings) {
@@ -183,7 +188,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 		setDistanceToAlarm(distanceToAlarm);
 	}
 
-	private void setupLocationListenerUpdateParameters(SharedPreferences sharedPreferences) {
+	private void setupLocationListeningWithParameters(SharedPreferences sharedPreferences) {
 		LocationManager locationManager = getLocationManager();
 
 		float minDistance = Float.parseFloat(sharedPreferences.getString(getString(R.string.pref_location_update_min_distance), Settings.DEFAULT_MIN_DISTANCE.toString()));
