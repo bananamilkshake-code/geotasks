@@ -34,7 +34,7 @@ public class EventChangedReceiver extends BroadcastReceiver {
 			case EventsSource.ACTION_EDIT:
 				cancelAlarm(context, calendarId, eventId);
 				setupAlarm(context, calendarId, eventId);
-				break;
+			 	break;
 			case EventsSource.ACTION_REMOVED:
 				cancelAlarm(context, calendarId, eventId);
 				break;

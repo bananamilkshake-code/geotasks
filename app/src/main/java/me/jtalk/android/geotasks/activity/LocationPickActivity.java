@@ -369,7 +369,7 @@ public class LocationPickActivity extends Activity {
 			}
 		};
 
-		registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION ));
+		registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
 
 		Intent updateIntent = new Intent(SINGLE_LOCATION_UPDATE_ACTION);
 		PendingIntent singleUpdatePendingIntent = PendingIntent.getBroadcast(this, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
