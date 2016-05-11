@@ -137,7 +137,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 	}
 
 	private Intent createIntent(long calendarId, long eventId, TaskCoordinates currentPosition, double distance) {
-		Intent intent = new Intent(NotificationReceiver.ACTION_ALARM);
+		Intent intent = new Intent(NotificationReceiver.ACTION_LOCATION);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CALENDAR_ID, calendarId);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_EVENT_ID, eventId);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
