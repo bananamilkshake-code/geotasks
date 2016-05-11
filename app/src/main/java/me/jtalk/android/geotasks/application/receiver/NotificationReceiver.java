@@ -32,9 +32,11 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 import java.text.MessageFormat;
+import java.util.Calendar;
 
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.ShowLocationActivity;
+import me.jtalk.android.geotasks.application.service.DelayedNotificationCreatorService;
 import me.jtalk.android.geotasks.application.service.EventOperationService;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
@@ -56,13 +58,23 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 	public static final String INTENT_EXTRA_CURRENT_POSITION = "coordinates";
 	public static final String INTENT_EXTRA_DISTANCE = "distance";
 
+	public static final String INTENT_EXTRA_DELAY_CURRENT_TIME = "current-time";
+	public static final String INTENT_EXTRA_DELAY_TIME = "delay-time-millis";
+	public static final String INTENT_EXTRA_NOTIFICATION_ID = "notification-id";
+
+	public  static final long MILLIS_IN_MINUTE = 60 * 1000;
+
+	private static final long DELAY_MINUTES_5 = 5 * MILLIS_IN_MINUTE;
+	private static final long DELAY_MINUTES_10 = 10 * MILLIS_IN_MINUTE;
+	private static final long DELAY_MINUTES_15 = 15 * MILLIS_IN_MINUTE;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		String acton = intent.getAction();
 		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
 		long eventId = intent.getLongExtra(INTENT_EXTRA_EVENT_ID, EventsSource.NO_TASK);
 
-		LOG.debug("NotificationReceiver called with action {0}, calendarId {1}, eventId {2}", acton, calendarId, eventId);
+		LOG.debug("Called with action {0}, calendarId {1}, eventId {2}", acton, calendarId, eventId);
 
 		EventsSource eventsSource = new EventsSource(context, calendarId);
 		Event event = eventsSource.get(eventId);
@@ -101,8 +113,9 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 		final String title = MessageFormat.format(context.getString(R.string.notification_event_is_near_title_arg_1), event.getTitle());
 		final String contentText = MessageFormat.format(context.getString(R.string.notification_event_is_near_text_arg_1), distance);
 
+		final Intent delayData = createLocationEventDelayData(context, calendarId, event.getId(), notificationId, currentPosition, distance);
 		Notification.Builder builder =
-				createNotificationBuilder(context, calendarId, event.getId(), notificationId, title, contentText)
+				createNotificationBuilder(context, calendarId, event.getId(), notificationId, title, contentText, delayData)
 						.setContentIntent(openLocationIntent);
 
 		getNotificationManager(context).notify(notificationId, builder.build());
@@ -121,18 +134,43 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 		final String title = MessageFormat.format(context.getString(R.string.notification_event_reminder_title), event.getTitle());
 		final String contentText = event.getDescription() != null ? MessageFormat.format(context.getString(R.string.notification_event_reminder_text), event.getDescription()) : null;
 
-		Notification.Builder builder = createNotificationBuilder(context, calendarId, event.getId(), notificationId, title, contentText);
+		final Intent delayData = createTimingEventDelayData(context, calendarId, event.getId(), notificationId);
+		Notification.Builder builder = createNotificationBuilder(context, calendarId, event.getId(), notificationId, title, contentText, delayData);
 
 		getNotificationManager(context).notify(notificationId, builder.build());
 	}
 
-	private Notification.Builder createNotificationBuilder(Context context, long calendarId, long eventId, int notificationId, String title, String contentText) {
+	private Intent createLocationEventDelayData(Context context, long calendarId, long eventId, int notificationId, TaskCoordinates currentPosition, double distance) {
+		Intent delayIntent = createBaseDelayData(context, calendarId, eventId, notificationId, ACTION_LOCATION);
+		delayIntent.putExtra(INTENT_EXTRA_CURRENT_POSITION, currentPosition);
+		delayIntent.putExtra(INTENT_EXTRA_DISTANCE, distance);
+		return delayIntent;
+	}
+
+	private Intent createTimingEventDelayData(Context context, long calendarId, long eventId, int notificationId) {
+		return createBaseDelayData(context, calendarId, eventId, notificationId, ACTION_LOCATION);
+	}
+
+	private Intent createBaseDelayData(Context context, long calendarId, long eventId, int notificationId, String action) {
+		Intent intent = new Intent(context, DelayedNotificationCreatorService.class);
+		intent.setAction(action);
+		intent.putExtra(INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(INTENT_EXTRA_NOTIFICATION_ID, notificationId);
+		return intent;
+	}
+
+	private Notification.Builder createNotificationBuilder(Context context, long calendarId, long eventId, int notificationId, String title, String contentText, Intent delayData) {
 		Notification.Builder builder = new Notification.Builder(context)
 				.setContentTitle(title)
 				.setAutoCancel(true)
 				.setVibrate(VIBRATION_PATTERN)
 				.setSound(getSound(context))
+				.addAction(createDelayAction(context, delayData, DELAY_MINUTES_5))
+				.addAction(createDelayAction(context, delayData, DELAY_MINUTES_10))
+				.addAction(createDelayAction(context, delayData, DELAY_MINUTES_15))
 				.addAction(createDisableAction(context, calendarId, eventId, notificationId));
+		;
 
 		if (contentText != null) {
 			builder.setContentText(contentText);
@@ -145,6 +183,29 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 		}
 
 		return builder;
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
+	private Notification.Action createDelayAction(Context context, Intent delayData, long delayTimeMinutes) {
+		final Icon icon = getDelayActionIcon(context, delayTimeMinutes);
+		final String title = context.getString(R.string.notification_action_delay);
+		delayData.putExtra(INTENT_EXTRA_DELAY_CURRENT_TIME, Calendar.getInstance().getTimeInMillis());
+		delayData.putExtra(INTENT_EXTRA_DELAY_TIME, delayTimeMinutes);
+		PendingIntent pendingIntent = PendingIntent.getService(context, 1, delayData, PendingIntent.FLAG_ONE_SHOT);
+		return new Notification.Action.Builder(icon, null, pendingIntent).build();
+	}
+
+	@TargetApi(Build.VERSION_CODES.M)
+	private Icon getDelayActionIcon(Context context, long delayTime) {
+		if (delayTime == DELAY_MINUTES_5) {
+			return Icon.createWithResource(context, R.drawable.delay_notification_plus_5_18);
+		} else if (delayTime == DELAY_MINUTES_10) {
+			return Icon.createWithResource(context, R.drawable.delay_notification_plus_10_18);
+		} else if (delayTime == DELAY_MINUTES_15) {
+			return Icon.createWithResource(context, R.drawable.delay_notification_plus_15_18);
+		}
+
+		return null;
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)

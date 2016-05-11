@@ -17,4 +17,5 @@
 
     <string name="title_activity_show_location">\"{0}\" coordinates</string>
     <string name="location_service_toast_no_permission_errror">Not enough permission to listen position updates</string>
+    <string name="notification_action_delay">Delay</string>
 </resources>

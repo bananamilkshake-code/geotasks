@@ -57,6 +57,10 @@
             android:name=".application.service.EventOperationService"
             android:enabled="true"
             android:exported="false"/>
+        <service
+            android:name=".application.service.DelayedNotificationCreatorService"
+            android:enabled="true"
+            android:exported="false"/>
 
         <receiver
             android:name=".application.receiver.NotificationReceiver"
@@ -67,6 +71,9 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="me.jtalk.geotasks.NOTIFY_EVENT_LOCATION"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="me.jtalk.geotasks.DELAYED_EVENT_NOTIFICATION"/>
             </intent-filter>
         </receiver>
     </application>
