@@ -121,9 +121,8 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 			double distance = event.getCoordinates().distanceTo(currentCoordinates);
 			LOG.debug("Event {0} is checked. Distance {1}", event.getTitle(), distance);
 			if (distance <= distanceToAlarm) {
-				LOG.debug("Notify about event {0} (distance {1}, current coordinates {2})",
-						event.getTitle(), distance, currentCoordinates);
-				sendBroadcast(createIntent(eventsSource.getCalendarId(), event.getId(), currentCoordinates, distance));
+				LOG.debug("Notify about event {0} (distance {1}, current coordinates {2})", event.getTitle(), distance, currentCoordinates);
+				sendBroadcast(createNotificationIntent(eventsSource.getCalendarId(), event.getId(), currentCoordinates, distance));
 			}
 		}
 	}
@@ -140,7 +139,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 	public void onProviderDisabled(String provider) {
 	}
 
-	private Intent createIntent(long calendarId, long eventId, TaskCoordinates currentPosition, double distance) {
+	private Intent createNotificationIntent(long calendarId, long eventId, TaskCoordinates currentPosition, double distance) {
 		Intent intent = new Intent(NotificationReceiver.ACTION_LOCATION);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CALENDAR_ID, calendarId);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_EVENT_ID, eventId);
