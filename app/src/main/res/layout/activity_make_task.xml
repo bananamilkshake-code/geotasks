@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="@dimen/activity_horizontal_margin"
     android:weightSum="1"
-    tools:context="me.jtalk.android.geotasks.activity.MakeTaskActivity">
+    tools:context=".activity.MakeTaskActivity">
 
     <EditText
         android:id="@+id/make_task_name"
