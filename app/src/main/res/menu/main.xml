@@ -2,13 +2,6 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
     <item
-        android:id="@+id/menu_action_enable_geolistening"
-        android:checkable="true"
-        android:icon="@drawable/ic_gps_off_white_48dp"
-        android:onClick="toggleGeoListeningClick"
-        android:showAsAction="always"
-        android:title="@string/main_menu_enable_geo_listening"/>
-    <item
         android:id="@+id/action_add_event"
         android:icon="@drawable/ic_add_circle_white_48dp"
         android:onClick="openAddEventIntent"
@@ -16,11 +9,18 @@
         android:showAsAction="always"
         android:title="@string/main_menu_add_event"/>
     <item
+        android:id="@+id/menu_action_enable_geolistening"
+        android:checkable="true"
+        android:icon="@drawable/ic_gps_off_white_48dp"
+        android:onClick="toggleGeoListeningClick"
+        android:showAsAction="ifRoom"
+        android:title="@string/main_menu_enable_geo_listening"/>
+    <item
         android:id="@+id/menu_action_settings"
         android:icon="@drawable/ic_settings_white_48dp"
         android:onClick="openSettingsActivity"
         android:orderInCategory="100"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/main_menu_settings"/>
     <item
         android:onClick="sendReports"
