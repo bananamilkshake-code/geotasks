@@ -16,7 +16,7 @@
         android:name=".application.GeoTasksApplication"
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/PurpleMaterialLight">
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name">

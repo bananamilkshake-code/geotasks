@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:navigationBarColor">@color/ui_theme_dark_colour</item>
-        <item name="android:statusBarColor">@color/ui_theme_dark_colour</item>
-    </style>
-
-    <style name="AppTheme.ActionBar" parent="android:Widget.Holo.ActionBar.Solid">
-        <item name="android:background">@color/ui_theme_dark_colour</item>
-        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.TitleText</item>
-    </style>
-
-    <style name="AppTheme.ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/ui_theme_dark_text_colour</item>
+    <style name="PurpleMaterialLight" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorPrimary">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/primary_dark</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorPrimaryInverse">@color/icons</item>
+        <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:textColorSecondaryInverse">@color/icons</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
 </resources>
