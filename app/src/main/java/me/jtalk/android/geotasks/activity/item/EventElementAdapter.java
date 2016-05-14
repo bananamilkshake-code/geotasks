@@ -25,12 +25,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorTreeAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import me.jtalk.android.geotasks.R;
@@ -44,18 +48,24 @@ import static me.jtalk.android.geotasks.util.CoordinatesFormat.prettyFormat;
 import static me.jtalk.android.geotasks.util.TimeFormat.formatDateTime;
 
 public class EventElementAdapter extends CursorTreeAdapter {
-	private final int INACTIVE_EVENT_COLOUR;
+	private final int ACTIVE_EVENT_PRIMARY_COLOR;
 	private final int ACTIVE_EVENT_COLOUR;
+
+	private final int INACTIVE_EVENT_COLOUR;
 
 	public EventElementAdapter(Context context) {
 		super(null, context, true);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			INACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.inactive_event, context.getTheme());
-			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.active_event, context.getTheme());
+
+			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.secondary_text, context.getTheme());
+			ACTIVE_EVENT_PRIMARY_COLOR = context.getResources().getColor(R.color.primary_text, context.getTheme());
 		} else {
 			INACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.inactive_event);
-			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.active_event);
+
+			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.secondary_text);
+			ACTIVE_EVENT_PRIMARY_COLOR = context.getResources().getColor(R.color.primary_text);
 		}
 	}
 
@@ -79,7 +89,39 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		Event event = CursorHelper.extractEvent(cursor);
 		TextView titleView = (TextView) view.findViewById(R.id.item_event_title);
 		titleView.setText(event.getTitle());
-		titleView.setTextColor(getColorFor(event));
+		titleView.setTextColor(getColorFor(event, true));
+
+		TextView descriptionView = (TextView) view.findViewById(R.id.item_event_description);
+		descriptionView.setText(event.getDescription());
+		descriptionView.setTextColor(getColorFor(event, true));
+
+		ImageView imageView = (ImageView) view.findViewById(R.id.item_event_alarm);
+		if (event.isActive(Calendar.getInstance())) {
+			imageView.setImageDrawable(context.getDrawable(R.drawable.ic_alarm_on_black_48dp));
+		} else {
+			imageView.setImageDrawable(context.getDrawable(R.drawable.ic_alarm_off_black_48dp));
+		}
+		imageView.getDrawable().setTint(getColorFor(event, true));
+
+		TextView textView = (TextView) view.findViewById(R.id.item_event_time);
+		textView.setText(getTimePeriod(context, event));
+		textView.setTextColor(getColorFor(event, false));
+	}
+
+	private String getTimePeriod(Context context, Event event) {
+		if (event.getStartTime() != null && event.getEndTime() != null) {
+			return MessageFormat.format("{0} - {1}", getFormattedTime(context, event.getStartTime()), getFormattedTime(context, event.getEndTime()));
+		} else if (event.getStartTime() != null) {
+			return MessageFormat.format("{0}", getFormattedTime(context, event.getStartTime()));
+		} else if (event.getEndTime() != null) {
+			return MessageFormat.format("now - {0}", getFormattedTime(context, event.getEndTime()));
+		} else {
+			return null;
+		}
+	}
+
+	private String getFormattedTime(Context context, Calendar startTime) {
+		return new SimpleDateFormat("d, LLL yyyy", context.getResources().getConfiguration().locale).format(new Date(startTime.getTimeInMillis()));
 	}
 
 	@Override
@@ -121,9 +163,9 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		}
 	}
 
-	private int getColorFor(Event event) {
+	private int getColorFor(Event event, boolean isPrimary) {
 		if (event.isActive(Calendar.getInstance())) {
-			return ACTIVE_EVENT_COLOUR;
+			return isPrimary ? ACTIVE_EVENT_PRIMARY_COLOR : ACTIVE_EVENT_COLOUR;
 		} else {
 			return INACTIVE_EVENT_COLOUR;
 		}
@@ -134,11 +176,10 @@ public class EventElementAdapter extends CursorTreeAdapter {
 		String text = valueGetter.apply(event);
 		if (text == null || text.isEmpty()) {
 			view.setVisibility(View.GONE);
-			return;
 		} else {
 			view.setVisibility(View.VISIBLE);
 			view.setText(text);
-			view.setTextColor(getColorFor(event));
+			view.setTextColor(getColorFor(event, true));
 		}
 	}
 }
