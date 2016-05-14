@@ -225,13 +225,14 @@ public class CursorHelper {
 	 */
 	public static Event extractEvent(Cursor cursor) {
 		long id = getLong(cursor, CalendarContract.Events._ID);
+		long calendarId = getLong(cursor, CalendarContract.Events.CALENDAR_ID);
 		String title = getString(cursor, CalendarContract.Events.TITLE);
 		String description = getString(cursor, CalendarContract.Events.DESCRIPTION);
 		Calendar startTime = extractTime(cursor, CalendarContract.Events.DTSTART, DEFAULT_TIME_VALUE);
 		Calendar endTime = extractTime(cursor, CalendarContract.Events.DTEND, DEFAULT_TIME_VALUE);
 		boolean hasAlarms = getBoolean(cursor, CalendarContract.Events.HAS_ALARM);
 		TaskCoordinates geoPoint = extractCoordinates(cursor);
-		return new Event(id, title, description, startTime, endTime, geoPoint, hasAlarms);
+		return new Event(id, calendarId, title, description, startTime, endTime, geoPoint, hasAlarms);
 	}
 
 	/**

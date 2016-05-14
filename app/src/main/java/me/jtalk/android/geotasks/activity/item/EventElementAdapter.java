@@ -40,6 +40,7 @@ import java.util.Map;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MakeTaskActivity;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.StringValueExtractor;
 
@@ -102,6 +103,14 @@ public class EventElementAdapter extends CursorTreeAdapter {
 			imageView.setImageDrawable(context.getDrawable(R.drawable.ic_alarm_off_black_48dp));
 		}
 		imageView.getDrawable().setTint(getColorFor(event, true));
+		imageView.setOnClickListener(v -> {
+			EventsSource eventsSource = new EventsSource(context, event.getCalendarId());
+			if (event.isHasAlarms()) {
+				eventsSource.disable(event.getId());
+			} else {
+				eventsSource.enable(event.getId());
+			}
+		});
 
 		TextView textView = (TextView) view.findViewById(R.id.item_event_time);
 		textView.setText(getTimePeriod(context, event));

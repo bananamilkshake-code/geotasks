@@ -32,6 +32,9 @@ public class Event {
 	@Getter
 	private long id;
 
+	@Getter
+	private long calendarId;
+
 	@Setter
 	@Getter
 	private String title;
@@ -58,15 +61,7 @@ public class Event {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-
-		if (obj instanceof Event) {
-			return this.id == ((Event) obj).getId();
-		}
-
-		return false;
+		return obj != null && obj instanceof Event && this.id == ((Event) obj).getId();
 	}
 
 	public boolean isActive(Calendar currentTime) {
@@ -98,6 +93,7 @@ public class Event {
 
 		return new Event(
 				event.getId(),
+				event.getCalendarId(),
 				event.getTitle(),
 				event.getDescription(),
 				event.getStartTime(),
