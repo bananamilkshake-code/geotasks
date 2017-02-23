@@ -204,8 +204,8 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 			locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 			LOG.info("Geo listening enabled via {0}", provider);
 		} catch (SecurityException exception) {
-			Toast.makeText(this, R.string.location_service_toast_no_permission_errror, Toast.LENGTH_LONG).show();
-			LOG.error("Geo listening cannot be enabled due o lack of permission: {0}", exception.getMessage());
+			Toast.makeText(this, R.string.location_service_toast_no_permission_error, Toast.LENGTH_LONG).show();
+			LOG.error("Geo listening cannot be enabled due to insufficient permissions: {0}", exception);
 			stopSelf();
 		}
 	}
