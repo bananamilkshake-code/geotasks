@@ -23,7 +23,6 @@ import java.util.List;
 import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
 
 public class TasksChain <T extends TasksChain.Task> {
-	private boolean pause;
 
 	public static abstract class Task {
 		public abstract void process() throws Exception;
@@ -51,8 +50,7 @@ public class TasksChain <T extends TasksChain.Task> {
 	}
 
 	public void startProcessing() throws Exception {
-		pause = false;
-		while (!pause && currentTask < tasks.size()) {
+		while (currentTask < tasks.size()) {
 			try {
 				tasks.get(currentTask).process();
 
@@ -61,19 +59,12 @@ public class TasksChain <T extends TasksChain.Task> {
 				throw exception;
 			}
 		}
-
-		if (!pause) {
-			reset();
-		}
+		reset();
 	}
 
 	public void startProcessingFrom(int taskId) throws Exception {
 		this.currentTask = taskId;
 		startProcessing();
-	}
-
-	public void pause() {
-		pause = true;
 	}
 
 	public int getCurrentTaskId() {
