@@ -370,9 +370,6 @@ public class LocationPickActivity extends Activity {
 
 		registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
 
-		Intent updateIntent = new Intent(SINGLE_LOCATION_UPDATE_ACTION);
-		PendingIntent singleUpdatePendingIntent = PendingIntent.getBroadcast(this, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -385,7 +382,11 @@ public class LocationPickActivity extends Activity {
 			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 			LOG.debug("Last known location is {0}. Provider is {1}", lastKnownLocation, locationProvider);
 			LOG.debug("Trying to obtain current position");
-			setupCenter(new TaskCoordinates(lastKnownLocation));
+			if (lastKnownLocation == null) {
+				setupCenter(DEFAULT_COORDINATES);
+			} else {
+				setupCenter(new TaskCoordinates(lastKnownLocation));
+			}
 			locationManager.requestSingleUpdate(criteria,
 					new SimpleLocationListener() {
 						@Override
