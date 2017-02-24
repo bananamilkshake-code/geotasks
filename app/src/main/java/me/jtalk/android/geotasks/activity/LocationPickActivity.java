@@ -375,7 +375,9 @@ public class LocationPickActivity extends Activity {
 
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_LOW);
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		criteria.setHorizontalAccuracy(Criteria.ACCURACY_LOW);
 
 		String locationProvider = locationManager.getBestProvider(criteria, true);
 
