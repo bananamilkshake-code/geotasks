@@ -67,7 +67,7 @@ import me.jtalk.android.geotasks.util.MapViewContext;
 public class LocationPickActivity extends Activity {
 	private static final Logger LOG = new Logger(LocationPickActivity.class);
 
-	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(48.8583, 2.2944);
+	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(59.94, 30.314);
 
 	private static final byte DEFAULT_ZOOM = 9;
 	private static final byte MIN_ZOOM = 0;
@@ -143,7 +143,6 @@ public class LocationPickActivity extends Activity {
 		if (pickedLocation != null) {
 			result.putExtra(INTENT_EXTRA_COORDINATES, pickedLocation);
 		}
-
 		setResult(RESULT_OK, result);
 		finish();
 	}
@@ -371,12 +370,11 @@ public class LocationPickActivity extends Activity {
 
 		registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
 
-		Intent updateIntent = new Intent(SINGLE_LOCATION_UPDATE_ACTION);
-		PendingIntent singleUpdatePendingIntent = PendingIntent.getBroadcast(this, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_LOW);
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		criteria.setHorizontalAccuracy(Criteria.ACCURACY_LOW);
 
 		String locationProvider = locationManager.getBestProvider(criteria, true);
 
@@ -384,7 +382,11 @@ public class LocationPickActivity extends Activity {
 			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 			LOG.debug("Last known location is {0}. Provider is {1}", lastKnownLocation, locationProvider);
 			LOG.debug("Trying to obtain current position");
-			locationManager.requestSingleUpdate(criteria, singleUpdatePendingIntent);
+			if (lastKnownLocation == null) {
+				setupCenter(DEFAULT_COORDINATES);
+			} else {
+				setupCenter(new TaskCoordinates(lastKnownLocation));
+			}
 			locationManager.requestSingleUpdate(criteria,
 					new SimpleLocationListener() {
 						@Override

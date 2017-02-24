@@ -37,4 +37,17 @@ public class Assert {
 			throw new IllegalArgumentException(message);
 		}
 	}
+
+	public static void verifyState(boolean expression, String message) {
+		if (!expression) {
+			throw new IllegalStateException(message);
+		}
+	}
+
+	public static void verifyState(boolean expression, String format, Object... args) {
+		if (!expression) {
+			String message = MessageFormat.format(format, args);
+			throw new IllegalStateException(message);
+		}
+	}
 }

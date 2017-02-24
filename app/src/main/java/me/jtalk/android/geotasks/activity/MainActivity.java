@@ -17,7 +17,6 @@
  */
 package me.jtalk.android.geotasks.activity;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -30,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CursorTreeAdapter;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -38,83 +38,49 @@ import java.util.Calendar;
 import java.util.List;
 
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
-import me.jtalk.android.geotasks.application.TaskChainHandler;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
 import me.jtalk.android.geotasks.application.receiver.EventChangedReceiver;
 import me.jtalk.android.geotasks.application.service.LocationTrackService;
+import me.jtalk.android.geotasks.application.service.Permission;
+import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
-import me.jtalk.android.geotasks.util.PermissionDependentTask;
-import me.jtalk.android.geotasks.util.TasksChain;
 
-import static me.jtalk.android.geotasks.application.TaskChainHandler.makeTask;
+public class MainActivity extends BaseActivity {
 
-public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 	private static final Logger LOG = new Logger(MainActivity.class);
 
 	private static final int LOADER_EVENTS_ID = 0;
 
-	private int initChainId;
-	private int toggleGeoListenChainId;
-
 	private MenuItem geoTrackMenuItem;
 
-	private TaskChainHandler chainHandler = new TaskChainHandler(this) {
-		@Override
-		protected void onNeededPermissionDenied() {
-			new AlertDialog.Builder(MainActivity.this)
-					.setTitle(R.string.main_dialog_no_permission_for_calendar_creation_title)
-					.setMessage(R.string.main_dialog_no_permission_for_calendar_creation_message)
-					.setPositiveButton(R.string.main_dialog_no_permission_for_calendar_creation_button, (dialog, which) -> {
-						dialog.dismiss();
-						MainActivity.this.finish();
-					})
-					.show();
-		}
-	};
-
-	{
-		initChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::initEventsSource, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR))
-				.add(makeTask(this::initEventsList, Manifest.permission.READ_CALENDAR)));
-
-		toggleGeoListenChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::setupGeoListening, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)));
-	}
+	private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::showPermissionAlert);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		chainHandler.processChain(initChainId);
-
- 		PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-				.registerOnSharedPreferenceChangeListener(this);
+		initCalendar();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.geoTrackMenuItem = menu.findItem(R.id.menu_action_enable_geolistening);
-		chainHandler.processChain(toggleGeoListenChainId);
+		if (preferences.getBoolean(getString(R.string.pref_is_geolistening_enabled), false)) {
+			permissionAwareRunner.withPermissions(Permission.TRACK_LOCATION, this::enableGeoListening);
+		}
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] values) {
-		chainHandler.processPermissionRequestResult(requestCode, permissions, values);
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals(getString(R.string.pref_is_geolistening_enabled))) {
-			chainHandler.processChain(toggleGeoListenChainId);
-		}
+		permissionAwareRunner.onPermissionUpdate(permissions, values, requestCode);
 	}
 
 	/**
@@ -128,14 +94,14 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	 * This method is called on menu.menu_action_add_event click.
 	 */
 	public void toggleGeoListeningClick(MenuItem menuItem) {
-		boolean isChecked = !menuItem.isChecked();
-
-		LOG.debug("Toggling geolistening: make checked {0}", isChecked);
-
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putBoolean(getString(R.string.pref_is_geolistening_enabled), isChecked);
-		editor.apply();
+		boolean isChecked = menuItem.isChecked();
+		if (isChecked) {
+			LOG.debug("Disabling GeoListening");
+			disableGeoListening();
+		} else {
+			LOG.debug("Enabling GeoListening");
+			permissionAwareRunner.withPermissions(Permission.TRACK_LOCATION, this::enableGeoListening);
+		}
 	}
 
 	/**
@@ -148,6 +114,36 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 	public boolean sendReports(MenuItem menuItem) {
 		ACRA.getErrorReporter().handleSilentException(new Exception());
 		return true;
+	}
+
+	private void showPermissionAlert(Permission failedPermission) {
+		switch (failedPermission) {
+			case MANAGE_CALENDAR:
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle(R.string.main_dialog_no_permission_for_calendar_creation_title)
+						.setMessage(R.string.main_dialog_no_permission_for_calendar_creation_message)
+						.setPositiveButton(R.string.main_dialog_no_permission_for_calendar_creation_retry_button, (dialog, which) -> {
+							dialog.dismiss();
+							initCalendar();
+						})
+						.setNegativeButton(R.string.main_dialog_no_permission_for_calendar_creation_close_button, (dialog, which) -> {
+							dialog.dismiss();
+							MainActivity.this.finish();
+						})
+						.show();
+				break;
+			default:
+				Toast.makeText(this, failedPermission.getErrorMessageId(), Toast.LENGTH_LONG)
+						.show();
+				break;
+		}
+	}
+
+	private void initCalendar() {
+		permissionAwareRunner.withPermissions(Permission.MANAGE_CALENDAR, () -> {
+			initEventsSource();
+			initEventsList();
+		});
 	}
 
 	/**
@@ -219,31 +215,27 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
 				new TasksLoaderCallbacks(this, eventsAdapter, getEventsSource().getCalendarId()));
 	}
 
-	/**
-	 * Enables or disables geo listening based on value stored in shared preferences
-	 * (pref_is_geolistening_enabled).
-	 *
-	 * @throws SecurityException if geolistening cannot be enabled because permission
-	 *                           is denied.
-	 */
-	private void setupGeoListening() throws SecurityException {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		boolean isEnabled = settings.getBoolean(getString(R.string.pref_is_geolistening_enabled), Settings.DEFAULT_GEO_LISTENING);
-
+	private void enableGeoListening() throws SecurityException {
 		Intent intent = new Intent(this, LocationTrackService.class);
+		intent.putExtra(LocationTrackService.INTENT_EXTRA_CALENDAR_ID, getEventsSource().getCalendarId());
+		startService(intent);
+		geoTrackMenuItem.setChecked(true);
+		geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
+		PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext())
+				.edit()
+				.putBoolean(getString(R.string.pref_is_geolistening_enabled), true)
+				.apply();
+	}
 
-		if (isEnabled) {
-			intent.putExtra(LocationTrackService.INTENT_EXTRA_CALENDAR_ID, getEventsSource().getCalendarId());
-			startService(intent);
-
-			geoTrackMenuItem.setChecked(true);
-			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
-		} else {
-			stopService(intent);
-
-			geoTrackMenuItem.setChecked(false);
-			geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
-		}
+	private void disableGeoListening() throws SecurityException {
+		Intent intent = new Intent(this, LocationTrackService.class);
+		stopService(intent);
+		geoTrackMenuItem.setChecked(false);
+		geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
+		PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext())
+				.edit()
+				.putBoolean(getString(R.string.pref_is_geolistening_enabled), false)
+				.apply();
 	}
 
 	private void setupEventsAlarms() {

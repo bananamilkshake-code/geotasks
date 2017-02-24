@@ -11,7 +11,7 @@
 
     <string name="main_dialog_no_permission_for_calendar_creation_title">Нет разрешения</string>
     <string name="main_dialog_no_permission_for_calendar_creation_message">Нельзя создать календарь для приложения. Приложению необходимо выдать разрешение изменять календари.</string>
-    <string name="main_dialog_no_permission_for_calendar_creation_button">Закрыть</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_close_button">Закрыть</string>
 
     <string name="main_toast_geolistening_disabled">Геопозиционирование отключено</string>
     <string name="main_toast_geolistening_enabled">Геопозиционирование включено</string>

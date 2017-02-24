@@ -11,7 +11,8 @@
 
     <string name="main_dialog_no_permission_for_calendar_creation_title">No permission</string>
     <string name="main_dialog_no_permission_for_calendar_creation_message">Calendar for application cannot be created. Grant this application a permission to write a calendar.</string>
-    <string name="main_dialog_no_permission_for_calendar_creation_button">Close</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_retry_button">Retry</string>
+    <string name="main_dialog_no_permission_for_calendar_creation_close_button">Close</string>
 
     <string name="main_toast_geolistening_disabled">Geo listening disabled</string>
     <string name="main_toast_geolistening_enabled">Geo listening enabled</string>

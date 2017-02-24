@@ -17,7 +17,6 @@
  */
 package me.jtalk.android.geotasks.activity;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
@@ -40,18 +39,15 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import me.jtalk.android.geotasks.R;
-import me.jtalk.android.geotasks.application.TaskChainHandler;
+import me.jtalk.android.geotasks.application.service.Permission;
+import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
-import me.jtalk.android.geotasks.util.PermissionDependentTask;
-import me.jtalk.android.geotasks.util.TasksChain;
 import me.jtalk.android.geotasks.util.TextUpdater;
 import me.jtalk.android.geotasks.util.TimeFormat;
-
-import static me.jtalk.android.geotasks.application.TaskChainHandler.makeTask;
 
 public class MakeTaskActivity extends BaseActivity implements Validator.ValidationListener {
 	private static final Logger LOG = new Logger(MakeTaskActivity.class);
@@ -82,24 +78,13 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	private Validator validator;
 
-	private int saveEventChainId;
-	private int openLocationPickActivityChainId;
-
+	private boolean isNewEvent;
 	private Event event;
 
-	private TaskChainHandler chainHandler = new TaskChainHandler(this) {
-		@Override
-		protected void onNeededPermissionDenied() {
-			Toast.makeText(MakeTaskActivity.this, R.string.make_task_toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
-		}
-	};
+	private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::noPermission);
 
-	{
-		openLocationPickActivityChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
-				.add(makeTask(this::openLocationPickActivity,
-						Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
-						Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,
-						Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE)));
+	private void noPermission(Permission permission) {
+		Toast.makeText(this, R.string.make_task_toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 	}
 
 	@Override
@@ -113,32 +98,22 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		validator.setValidationListener(this);
 
 		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, EventsSource.NO_TASK);
-		if (eventId == EventsSource.NO_TASK) {
+		isNewEvent = eventId == EventsSource.NO_TASK;
+		if (isNewEvent) {
 			event = Event.createEmpty();
-			saveEventChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
-					.add(makeTask(this::addEvent, Manifest.permission.WRITE_CALENDAR)));
 		} else {
 			LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
-
 			event = Event.copyOf(getEventsSource().get(eventId));
-
 			titleText.setText(event.getTitle());
 			descriptionText.setText(event.getDescription());
 			setLocationText();
 			setTimeViews();
-
-			saveEventChainId = chainHandler.addTaskChain(new TasksChain<PermissionDependentTask>()
-					.add(makeTask(this::editEvent, Manifest.permission.WRITE_CALENDAR)));
 		}
 
 		titleText.addTextChangedListener(new TextUpdater((value) -> event.setTitle(value)));
 		descriptionText.addTextChangedListener(new TextUpdater((value) -> event.setDescription(value)));
 	}
 
-
-	private void setLocationText() {
-		locationText.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,12 +136,16 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		chainHandler.processPermissionRequestResult(requestCode, permissions, values);
+		permissionAwareRunner.onPermissionUpdate(permissions, values, requestCode);
 	}
 
 	@Override
 	public void onValidationSucceeded() {
-		chainHandler.processChain(saveEventChainId);
+		if (isNewEvent) {
+			permissionAwareRunner.withPermissions(Permission.MANAGE_CALENDAR, this::addEvent);
+		} else {
+			permissionAwareRunner.withPermissions(Permission.MANAGE_CALENDAR, this::editEvent);
+		}
 	}
 
 	@Override
@@ -196,7 +175,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @param view
 	 */
 	public void showLocationActivity(View view) {
-		chainHandler.processChain(openLocationPickActivityChainId);
+		permissionAwareRunner.withPermissions(Permission.PICK_LOCATION, this::openLocationPickActivity);
 	}
 
 	/**
@@ -228,6 +207,10 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 		datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.make_task_dialog_button_time_clear), (dialog, which) -> setTimeByView(view, null));
 		datePickerDialog.show();
+	}
+
+	private void setLocationText() {
+		locationText.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
 	}
 
 	private void setTimeViews() {
