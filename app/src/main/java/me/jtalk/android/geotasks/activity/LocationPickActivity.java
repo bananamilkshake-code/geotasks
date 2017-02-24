@@ -17,8 +17,9 @@
  */
 package me.jtalk.android.geotasks.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,11 +28,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.app.Activity;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -41,7 +38,6 @@ import android.widget.TextView;
 
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
-import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory;
@@ -49,12 +45,10 @@ import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.overlay.Marker;
 
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
@@ -63,6 +57,7 @@ import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.MapViewContext;
+import me.jtalk.android.geotasks.validation.DecimalRange;
 
 public class LocationPickActivity extends Activity {
 	private static final Logger LOG = new Logger(LocationPickActivity.class);
@@ -77,6 +72,10 @@ public class LocationPickActivity extends Activity {
 
 	public static final String INTENT_EXTRA_EDIT = "extra-is-edit";
 	public static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
+
+	static {
+		Validator.registerAnnotation(DecimalRange.class);
+	}
 
 	@Getter
 	@Bind(R.id.location_pick_map)
@@ -224,60 +223,28 @@ public class LocationPickActivity extends Activity {
 		textLocationCoordinates.setOnClickListener(new LocationDialogViewOnClickListener());
 	}
 
-	@AllArgsConstructor
-	private class NumericValueFilter implements InputFilter {
-		private double min;
-		private double max;
-
-		private NumberFormat format;
-
-		@Override
-		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-			String newValue = dest.subSequence(0, dstart).toString() + source.subSequence(start, end) + dest.subSequence(dend, dest.length()).toString();
-			if (newValue.length() == 0) {
-				return null;
-			}
-
-			try {
-				Double newNumericValue = format.parse(newValue).doubleValue();
-				if (min <= newNumericValue && newNumericValue <= max) {
-					return null;
-				}
-			} catch (ParseException exception) {
-				LOG.warn(exception, "String {0} cannot be parsed to float in NumericValueFilter", newValue);
-			}
-
-			return dest.subSequence(dstart, dend);
-		}
-	}
-
 	public class LocationDialogViewOnClickListener implements View.OnClickListener, Validator.ValidationListener {
-		@NotEmpty
+
 		@Bind(R.id.dialog_location_latitude)
+		@DecimalRange(min = -90, max = 90, messageResId = R.string.location_pick_dialog_location_wrong_latitude)
 		TextView latitudeText;
 
-		@NotEmpty
 		@Bind(R.id.dialog_location_longitude)
+		@DecimalRange(min = -180, max = 180, messageResId = R.string.location_pick_dialog_location_wrong_longiture)
 		TextView longitudeText;
-
-		private Validator validator;
 
 		private AlertDialog dialog;
 
-		private NumberFormat format = CoordinatesFormat.getFormatForCoordinate(LocationPickActivity.this);
+		private NumberFormat format = CoordinatesFormat.getFormatForCoordinate(getResources().getConfiguration().locale);
 
 		@Override
 		public void onClick(View view) {
-			LayoutInflater inflater = LocationPickActivity.this.getLayoutInflater();
-			View dialogView = inflater.inflate(R.layout.dialog_location, null);
 
+			View dialogView = getLayoutInflater().inflate(R.layout.dialog_location, null);
 			ButterKnife.bind(this, dialogView);
 
-			validator = new Validator(this);
+			Validator validator = new Validator(this);
 			validator.setValidationListener(this);
-
-			latitudeText.setFilters(new InputFilter[]{new NumericValueFilter(-90.0, 90.0, format)});
-			longitudeText.setFilters(new InputFilter[]{new NumericValueFilter(-180.0, 180.0, format)});
 
 			if (pickedLocation != null) {
 				latitudeText.setText(format.format(pickedLocation.getLatitude()));
@@ -287,10 +254,15 @@ public class LocationPickActivity extends Activity {
 			AlertDialog.Builder builder =
 					new AlertDialog.Builder(LocationPickActivity.this)
 							.setView(dialogView)
-							.setNeutralButton(R.string.location_pick_dialog_location_setup, (d, w) -> validator.validate())
-							.setNegativeButton(R.string.location_pick_dialog_location_cancel, null);
+							.setPositiveButton(android.R.string.ok, null)
+							.setNegativeButton(android.R.string.cancel, null);
 			dialog = builder.create();
-			dialog.show();
+            dialog.setOnShowListener(dialog -> {
+                ((AlertDialog) dialog)
+                        .getButton(Dialog.BUTTON_POSITIVE)
+                        .setOnClickListener(v -> validator.validate());
+            });
+            dialog.show();
 		}
 
 		@Override
@@ -299,8 +271,8 @@ public class LocationPickActivity extends Activity {
 			Float longitude = Float.parseFloat(longitudeText.getText().toString());
 
 			TaskCoordinates coordinates = new TaskCoordinates(latitude, longitude);
-			LocationPickActivity.this.onLocationPick(coordinates);
-			LocationPickActivity.this.setupCenter(coordinates);
+			onLocationPick(coordinates);
+			setupCenter(coordinates);
 
 			dialog.dismiss();
 		}
@@ -309,8 +281,9 @@ public class LocationPickActivity extends Activity {
 		public void onValidationFailed(List<ValidationError> errors) {
 			for (ValidationError error : errors) {
 				View errorView = error.getView();
-				if (errorView == latitudeText || errorView == longitudeText) {
-					((TextView) errorView).setError(getString(R.string.location_pick_dialog_location_error));
+				if (errorView instanceof TextView) {
+					String errorMsg = error.getCollatedErrorMessage(LocationPickActivity.this);
+					((TextView) errorView).setError(errorMsg);
 				}
 			}
 		}

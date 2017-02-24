@@ -76,8 +76,8 @@ public class CoordinatesFormat {
 				GEO_FORMAT.format(taskCoordinates.getLongitude()));
 	}
 
-	public static NumberFormat getFormatForCoordinate(Context context) {
-		NumberFormat format = NumberFormat.getInstance(context.getResources().getConfiguration().locale);
+	public static NumberFormat getFormatForCoordinate(Locale locale) {
+		NumberFormat format = NumberFormat.getInstance(locale);
 		format.setMaximumFractionDigits(FRACTION_DIGITS_COUNT);
 		return format;
 	}

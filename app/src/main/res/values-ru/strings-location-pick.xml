@@ -7,7 +7,6 @@
     <string name="location_pick_dialog_location_setup">Принять</string>
     <string name="location_pick_dialog_location_cancel">Отмена</string>
     <string name="location_pick_dialog_location_title">Введите координаты</string>
-    <string name="location_pick_dialog_location_error">Не должно быть пустым</string>
 
     <string name="location_pick_search_text_edit">Поиск</string>
     <string name="location_pick_incorrect_address">Не найдено</string>
