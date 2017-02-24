@@ -385,7 +385,7 @@ public class LocationPickActivity extends Activity {
 			Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 			LOG.debug("Last known location is {0}. Provider is {1}", lastKnownLocation, locationProvider);
 			LOG.debug("Trying to obtain current position");
-			locationManager.requestSingleUpdate(criteria, singleUpdatePendingIntent);
+			setupCenter(new TaskCoordinates(lastKnownLocation));
 			locationManager.requestSingleUpdate(criteria,
 					new SimpleLocationListener() {
 						@Override
