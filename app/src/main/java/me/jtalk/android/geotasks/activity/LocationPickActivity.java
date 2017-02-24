@@ -143,7 +143,6 @@ public class LocationPickActivity extends Activity {
 		if (pickedLocation != null) {
 			result.putExtra(INTENT_EXTRA_COORDINATES, pickedLocation);
 		}
-
 		setResult(RESULT_OK, result);
 		finish();
 	}

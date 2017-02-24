@@ -17,7 +17,6 @@ import me.jtalk.android.geotasks.util.Consumer;
 import me.jtalk.android.geotasks.util.Logger;
 
 import static me.jtalk.android.geotasks.util.ArrayHelper.arrayOf;
-import static me.jtalk.android.geotasks.util.ArrayHelper.indexOf;
 import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
 
 @RequiredArgsConstructor
