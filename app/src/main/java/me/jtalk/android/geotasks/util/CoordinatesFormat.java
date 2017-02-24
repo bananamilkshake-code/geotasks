@@ -32,7 +32,7 @@ public class CoordinatesFormat {
 	private static final String FORMAT_COORDINATES_SIMPLE = "{0}" + SPLITTER + "{1}";
 
 	private static final int INTEGER_DIGITS_COUNT = 3;
-	private static final int FRACTION_DIGITS_COUNT = 16;
+	private static final int FRACTION_DIGITS_COUNT = 6;
 	private static final NumberFormat GEO_FORMAT;
 
 	/**
