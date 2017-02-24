@@ -67,7 +67,7 @@ import me.jtalk.android.geotasks.util.MapViewContext;
 public class LocationPickActivity extends Activity {
 	private static final Logger LOG = new Logger(LocationPickActivity.class);
 
-	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(48.8583, 2.2944);
+	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(59.94, 30.314);
 
 	private static final byte DEFAULT_ZOOM = 9;
 	private static final byte MIN_ZOOM = 0;
