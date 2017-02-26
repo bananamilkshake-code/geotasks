@@ -132,12 +132,6 @@ public class LocationPickActivity extends Activity {
 		mapView.destroyAll();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu_location_pick, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
 	/**
 	 * This method is called on menu_location_pick.menu_action_location_pick_save.
 	 */
