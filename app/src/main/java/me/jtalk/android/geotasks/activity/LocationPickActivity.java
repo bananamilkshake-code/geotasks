@@ -30,12 +30,10 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -59,12 +57,13 @@ import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.MapViewContext;
+import me.jtalk.android.geotasks.util.UiUtils;
 import me.jtalk.android.geotasks.validation.DecimalRange;
 
 public class LocationPickActivity extends Activity {
 	private static final Logger LOG = new Logger(LocationPickActivity.class);
 
-	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(59.94, 30.314);
+	private static final TaskCoordinates DEFAULT_COORDINATES = new TaskCoordinates(59.940384, 30.313847);
 
 	private static final byte DEFAULT_ZOOM = 9;
 	private static final byte MIN_ZOOM = 0;
@@ -88,6 +87,9 @@ public class LocationPickActivity extends Activity {
 
 	@Bind(R.id.location_pick_coordinates)
 	TextView textLocationCoordinates;
+
+	@Bind(R.id.location_pick_confirm_button)
+	ImageButton applyButton;
 
 	/**
 	 * Coordinate that will be returned from this activity.
@@ -139,7 +141,7 @@ public class LocationPickActivity extends Activity {
 	/**
 	 * This method is called on menu_location_pick.menu_action_location_pick_save.
 	 */
-	public void onPickClick(MenuItem item) {
+	public void onPickClick(View source) {
 		Intent result = new Intent();
 		if (pickedLocation != null) {
 			result.putExtra(INTENT_EXTRA_COORDINATES, pickedLocation);
@@ -200,6 +202,8 @@ public class LocationPickActivity extends Activity {
 		mapView.getLayerManager().getLayers().add(marker);
 
 		updateCenter(getIntent());
+
+		applyButton.setOnClickListener(this::onPickClick);
 	}
 
 	private void initSearchEditText() {

@@ -5,4 +5,5 @@
 
     <color name="inactive_event">#818181</color>
     <color name="active_event">#000000</color>
+    <color name="map.button.background">#ffffff</color>
 </resources>
