@@ -28,19 +28,21 @@
             android:nestedScrollingEnabled="false"
             android:padding="9sp"
             android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:maxLines="1"/>
 
         <TextView
             android:id="@+id/location_pick_coordinates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="48dp"
+            android:padding="9sp"
             android:background="@color/ui_theme_dark_text_colour"
             android:elevation="5sp"
             android:gravity="center_horizontal"
-            android:padding="9sp"
-            android:text="Location coordinates"
+            android:text="@string/location_pick_map_coordinates_box"
             android:textColor="@android:color/tertiary_text_light"
             android:textSize="20sp"/>
 
@@ -49,8 +51,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         android:orientation="vertical">
 
         <ImageView
@@ -60,7 +62,7 @@
             android:onClick="onZoomInClick"
             android:padding="5dp"
             android:src="@drawable/ic_zoom_in_black_48dp"
-            />
+            android:contentDescription="@string/location_pick_map_zoom_in_desc"/>
 
         <ImageView
             android:id="@+id/location_pick_zoom_out"
@@ -68,6 +70,8 @@
             android:layout_height="wrap_content"
             android:onClick="onZoomOutClick"
             android:padding="5dp"
-            android:src="@drawable/ic_zoom_out_black_48dp"/>
+            android:src="@drawable/ic_zoom_out_black_48dp"
+            android:contentDescription="@string/location_pick_map_zoom_out_desc"/>
+
     </LinearLayout>
 </RelativeLayout>
