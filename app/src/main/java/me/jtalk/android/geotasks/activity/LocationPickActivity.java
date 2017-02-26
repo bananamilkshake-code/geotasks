@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -109,6 +110,9 @@ public class LocationPickActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location_pick);
+		if (getResources().getBoolean(R.bool.pref_location_pick_screen_orientation_portrait)) {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
 
 		coordinatesFormat = CoordinatesFormat.getInstance(this);
 
