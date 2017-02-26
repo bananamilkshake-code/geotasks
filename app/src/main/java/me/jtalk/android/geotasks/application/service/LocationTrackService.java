@@ -35,10 +35,12 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
 import lombok.Setter;
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MainActivity;
 import me.jtalk.android.geotasks.application.Settings;
@@ -108,6 +110,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 	private float distanceToAlarm = Settings.DEFAULT_DISTANCE_TO_ALARM;
 
 	@Override
+	@SneakyThrows(ParseException.class)
 	public void onLocationChanged(Location location) {
 		LOG.debug("Location update ({0})", location);
 

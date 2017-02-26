@@ -21,20 +21,19 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.provider.CalendarContract;
 
+import java.text.ParseException;
 import java.util.Calendar;
 
 import static me.jtalk.android.geotasks.util.Assert.*;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CursorHelper {
-
-	public static final String EVENT_LATITUDE = "latitude";
-	public static final String EVENT_LONGITUDE = "longitude";
 
 	public static final long DEFAULT_TIME_VALUE = -1;
 
@@ -223,14 +222,15 @@ public class CursorHelper {
 	 * @param cursor cursor that stores event data
 	 * @return Event object that was created from retrieved data.
 	 */
-	public static Event extractEvent(Cursor cursor) {
+	@SneakyThrows(ParseException.class)
+	public static Event extractEvent(Cursor cursor, CoordinatesFormat coordinatesFormat) {
 		long id = getLong(cursor, CalendarContract.Events._ID);
 		String title = getString(cursor, CalendarContract.Events.TITLE);
 		String description = getString(cursor, CalendarContract.Events.DESCRIPTION);
 		Calendar startTime = extractTime(cursor, CalendarContract.Events.DTSTART, DEFAULT_TIME_VALUE);
 		Calendar endTime = extractTime(cursor, CalendarContract.Events.DTEND, DEFAULT_TIME_VALUE);
 		boolean hasAlarms = getBoolean(cursor, CalendarContract.Events.HAS_ALARM);
-		TaskCoordinates geoPoint = extractCoordinates(cursor);
+		TaskCoordinates geoPoint = extractCoordinates(cursor, coordinatesFormat);
 		return new Event(id, title, description, startTime, endTime, geoPoint, hasAlarms);
 	}
 
@@ -242,15 +242,12 @@ public class CursorHelper {
 	 * @return TaskCoordinates object that contains information about longitude and latitude.
 	 * Returns null if location for event has not been set.
 	 */
-	private static TaskCoordinates extractCoordinates(Cursor cursor) {
+	private static TaskCoordinates extractCoordinates(Cursor cursor, CoordinatesFormat coordinatesFormat) throws ParseException {
 		String locationValue = getString(cursor, CalendarContract.Events.EVENT_LOCATION);
 		if (locationValue == null || locationValue.isEmpty()) {
 			return null;
 		}
-
-		double lat = getDouble(cursor, EVENT_LATITUDE);
-		double lon = getDouble(cursor, EVENT_LONGITUDE);
-		return new TaskCoordinates(lat, lon);
+		return coordinatesFormat.parseFromDatabase(locationValue);
 	}
 
 	/**

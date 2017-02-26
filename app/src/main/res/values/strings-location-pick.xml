@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_activity_location_pick">Choose location…</string>
-
-    <string name="location_pick_menu_save">Pick</string>
+    <string name="location.pick.activity.title">Pick location</string>
 
     <string name="location_pick_dialog_location_title">Enter coordinates</string>
     <string name="location_pick_dialog_location_wrong_latitude">Must be within -90..90</string>
     <string name="location_pick_dialog_location_wrong_longiture">Must be within -180..180</string>
+
+    <string name="location.pick.coordinates.format.short">lat: {0}; lon: {1}</string>
+    <string name="location.pick.coordinates.format.long">latitude: {0}; longitude: {1}</string>
 
     <string name="location_pick_map_zoom_in_desc">Zoom in</string>
     <string name="location_pick_map_zoom_out_desc">Zoom out</string>

@@ -32,8 +32,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.Calendar;
 
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.ShowLocationActivity;
 import me.jtalk.android.geotasks.application.service.DelayedNotificationCreatorService;
@@ -69,6 +71,7 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 	private static final long DELAY_MINUTES_15 = 15 * MILLIS_IN_MINUTE;
 
 	@Override
+	@SneakyThrows(ParseException.class)
 	public void onReceive(Context context, Intent intent) {
 		String acton = intent.getAction();
 		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);

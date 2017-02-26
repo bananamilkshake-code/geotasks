@@ -32,9 +32,11 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.Events;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import lombok.Getter;
@@ -43,7 +45,6 @@ import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
 import static java.lang.String.format;
-import static me.jtalk.android.geotasks.util.CoordinatesFormat.POINT_ACCURACY;
 
 public class EventsSource implements EventIntentFields {
 	public static final Logger LOG = new Logger(EventsSource.class);
@@ -66,17 +67,6 @@ public class EventsSource implements EventIntentFields {
 
 	static final String ACTIVE = "active";
 
-	/**
-	 * First argument - value range in location string value
-	 * Second argument - column name
-	 */
-	private static final String QUERY_COORDINATES_FORMAT =
-			"(CASE WHEN " + Events.EVENT_LOCATION + " IS NOT NULL " +
-					"OR length(" + Events.EVENT_LOCATION + ") = 0 " +
-					"THEN CAST(substr(" + Events.EVENT_LOCATION + ", %s) AS REAL) " +
-					"ELSE NULL END) " +
-					"AS %s";
-
 	private static final String IS_ACTIVE_CONDITION =
 			Events.HAS_ALARM + " = 1 " +
 					"AND (" + Events.DTSTART + " == " + DEFAULT_CALENDAR + " OR " + Events.DTSTART + "  >= ?) " +
@@ -89,10 +79,11 @@ public class EventsSource implements EventIntentFields {
 					"ELSE 'FALSE' END) " +
 					"AS " + ACTIVE;
 
-	private Context context;
+	private final Context context;
+	private final CoordinatesFormat coordinatesFormat;
 
 	@Getter
-	private long calendarId;
+	private final long calendarId;
 
 	public static final String[] PROJECTION_EVENTS = new String[]{
 			Events._ID,
@@ -103,8 +94,6 @@ public class EventsSource implements EventIntentFields {
 			Events.DTSTART,
 			Events.DTEND,
 			Events.HAS_ALARM,
-			format(QUERY_COORDINATES_FORMAT, format("0, %d", POINT_ACCURACY), CursorHelper.EVENT_LATITUDE),
-			format(QUERY_COORDINATES_FORMAT, format("%d + 1", POINT_ACCURACY), CursorHelper.EVENT_LONGITUDE),
 			QUERY_ACTIVE_FIELD
 	};
 
@@ -139,6 +128,7 @@ public class EventsSource implements EventIntentFields {
 		}
 
 		this.context = context;
+		this.coordinatesFormat = CoordinatesFormat.getInstance(context);
 		this.calendarId = calendarId;
 	}
 
@@ -170,7 +160,7 @@ public class EventsSource implements EventIntentFields {
 	 * @param id id of event to retrieve
 	 * @return retrieved event
 	 */
-	public Event get(long id) throws SecurityException {
+	public Event get(long id) throws SecurityException, ParseException {
 		String selection = CursorHelper.buildProjection(Events._ID);
 		String[] selectionArgs = createSelectionArgs(id, Calendar.getInstance());
 		Cursor cursor = this.context.getContentResolver().query(
@@ -184,7 +174,7 @@ public class EventsSource implements EventIntentFields {
 		}
 
 		cursor.moveToFirst();
-		Event event = CursorHelper.extractEvent(cursor);
+		Event event = CursorHelper.extractEvent(cursor, coordinatesFormat);
 		cursor.close();
 
 		return event;
@@ -256,7 +246,7 @@ public class EventsSource implements EventIntentFields {
 	 * @return list of selected events
 	 * @throws SecurityException
 	 */
-	public List<Event> getActiveLocationEvents(Calendar currentTime) throws SecurityException {
+	public List<Event> getActiveLocationEvents(Calendar currentTime) throws SecurityException, ParseException {
 		String[] selectionArgs = createSelectionArgs(calendarId, currentTime);
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,
@@ -268,7 +258,7 @@ public class EventsSource implements EventIntentFields {
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				events.add(CursorHelper.extractEvent(cursor));
+				events.add(CursorHelper.extractEvent(cursor, coordinatesFormat));
 			}
 			cursor.close();
 		}
@@ -287,7 +277,7 @@ public class EventsSource implements EventIntentFields {
 	 * @param currentTime time of method call
 	 * @return list of events to notify in special time
 	 */
-	public List<Event> getActiveTimingEvents(Calendar currentTime) throws SecurityException {
+	public List<Event> getActiveTimingEvents(Calendar currentTime) throws SecurityException, ParseException {
 		String[] selectionArgs = createSelectionArgs(calendarId, currentTime);
 		Cursor cursor = context.getContentResolver().query(
 				Events.CONTENT_URI,
@@ -299,7 +289,7 @@ public class EventsSource implements EventIntentFields {
 		List<Event> events = new ArrayList<>();
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
-				events.add(CursorHelper.extractEvent(cursor));
+				events.add(CursorHelper.extractEvent(cursor, coordinatesFormat));
 			}
 			cursor.close();
 		}
@@ -311,7 +301,7 @@ public class EventsSource implements EventIntentFields {
 		values.put(Events.CALENDAR_ID, calendarId);
 		values.put(Events.TITLE, event.getTitle());
 		values.put(Events.DESCRIPTION, event.getDescription());
-		values.put(Events.EVENT_LOCATION, CoordinatesFormat.formatForDatabase(event.getCoordinates()));
+		values.put(Events.EVENT_LOCATION, coordinatesFormat.formatForDatabase(event.getCoordinates()));
 		values.put(Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
 		values.put(Events.DTSTART, CursorHelper.getMillis(event.getStartTime()));
 		values.put(Events.DTEND, CursorHelper.getMillis(event.getEndTime()));

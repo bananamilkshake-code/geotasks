@@ -29,9 +29,11 @@ import org.mapsforge.map.android.view.MapView;
 import org.mapsforge.map.layer.overlay.Marker;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
@@ -66,6 +68,7 @@ public class ShowLocationActivity extends Activity implements EventIntentFields 
 	private Event event;
 
 	@Override
+	@SneakyThrows(ParseException.class)
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_show_location);
@@ -124,7 +127,7 @@ public class ShowLocationActivity extends Activity implements EventIntentFields 
 		return new Marker(startCoordinates.toLatLong(), bitmap, 0, -bitmap.getHeight() / 2);
 	}
 
-	private Event retrieveEvent(long id) {
+	private Event retrieveEvent(long id) throws ParseException {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		if (calendarId == EventsSource.DEFAULT_CALENDAR) {

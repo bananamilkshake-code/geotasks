@@ -6,9 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.text.ParseException;
 import java.util.Calendar;
 
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
@@ -41,6 +43,7 @@ public class EventChangedReceiver extends BroadcastReceiver {
 		}
 	}
 
+	@SneakyThrows(ParseException.class)
 	public void setupAlarm(Context context, long calendarId, long eventId) {
 		EventsSource eventsSource = new EventsSource(context, calendarId);
 		Event event = eventsSource.get(eventId);

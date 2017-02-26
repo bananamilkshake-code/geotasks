@@ -29,7 +29,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -50,6 +49,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.listeners.MapGestureDetector;
 import me.jtalk.android.geotasks.application.listeners.SimpleLocationListener;
@@ -101,13 +101,16 @@ public class LocationPickActivity extends Activity {
 	 * This marker is draw at picked location.
 	 */
 	private Marker marker;
-
 	private MapViewContext mapViewContext;
+
+	private CoordinatesFormat coordinatesFormat;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location_pick);
+
+		coordinatesFormat = CoordinatesFormat.getInstance(this);
 
 		initMapView();
 		initSearchEditText();
@@ -225,9 +228,10 @@ public class LocationPickActivity extends Activity {
 	}
 
 	private void initLocationCoordinatesText() {
-		textLocationCoordinates.setOnClickListener(new LocationDialogViewOnClickListener());
+		textLocationCoordinates.setOnClickListener(new LocationDialogViewOnClickListener(coordinatesFormat));
 	}
 
+	@RequiredArgsConstructor
 	public class LocationDialogViewOnClickListener implements View.OnClickListener, Validator.ValidationListener {
 
 		@Bind(R.id.dialog_location_latitude)
@@ -238,9 +242,9 @@ public class LocationPickActivity extends Activity {
 		@DecimalRange(min = -180, max = 180, messageResId = R.string.location_pick_dialog_location_wrong_longiture)
 		TextView longitudeText;
 
-		private AlertDialog dialog;
+		private final CoordinatesFormat coordinatesFormat;
 
-		private NumberFormat format = CoordinatesFormat.getFormatForCoordinate(getResources().getConfiguration().locale);
+		private AlertDialog dialog;
 
 		@Override
 		public void onClick(View view) {
@@ -252,8 +256,8 @@ public class LocationPickActivity extends Activity {
 			validator.setValidationListener(this);
 
 			if (pickedLocation != null) {
-				latitudeText.setText(format.format(pickedLocation.getLatitude()));
-				longitudeText.setText(format.format(pickedLocation.getLongitude()));
+				latitudeText.setText(coordinatesFormat.formatSingleCoordinate(pickedLocation.getLatitude()));
+				longitudeText.setText(coordinatesFormat.formatSingleCoordinate(pickedLocation.getLongitude()));
 			}
 
 			AlertDialog.Builder builder =
@@ -335,19 +339,6 @@ public class LocationPickActivity extends Activity {
 	 * map center with it (when location is received).
 	 */
 	private void getCurrentCoordinates() {
-		BroadcastReceiver singleUpdateReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				LOG.debug("Received new request");
-				Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-				TaskCoordinates coordinates = new TaskCoordinates(location);
-				onLocationPick(coordinates);
-				setupCenter(coordinates);
-				context.unregisterReceiver(this);
-			}
-		};
-
-		registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
 
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Criteria criteria = new Criteria();
@@ -393,8 +384,7 @@ public class LocationPickActivity extends Activity {
 	 * @param coordinates where marker must be drawn
 	 */
 	private void updateCurrentLocation(TaskCoordinates coordinates) {
-		textLocationCoordinates.setText(CoordinatesFormat.prettyFormat(coordinates));
-
+		textLocationCoordinates.setText(coordinatesFormat.prettyFormatShort(coordinates));
 		marker.setLatLong(coordinates.toLatLong());
 		marker.requestRedraw();
 	}

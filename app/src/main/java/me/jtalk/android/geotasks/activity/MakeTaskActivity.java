@@ -33,11 +33,13 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.service.Permission;
 import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
@@ -82,18 +84,21 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	private Event event;
 
 	private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::noPermission);
+	private CoordinatesFormat coordinatesFormat;
 
 	private void noPermission(Permission permission) {
 		Toast.makeText(this, R.string.make_task_toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 	}
 
 	@Override
+	@SneakyThrows(ParseException.class)
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_make_task);
 
 		ButterKnife.bind(this);
 
+		coordinatesFormat = CoordinatesFormat.getInstance(this);
 		validator = new Validator(this);
 		validator.setValidationListener(this);
 
@@ -210,7 +215,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private void setLocationText() {
-		locationText.setText(CoordinatesFormat.prettyFormat(event.getCoordinates()));
+		locationText.setText(coordinatesFormat.prettyFormatLong(event.getCoordinates()));
 	}
 
 	private void setTimeViews() {

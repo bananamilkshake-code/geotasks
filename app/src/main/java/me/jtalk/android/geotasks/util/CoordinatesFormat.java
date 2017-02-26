@@ -19,66 +19,93 @@ package me.jtalk.android.geotasks.util;
 
 import android.content.Context;
 
-import java.text.MessageFormat;
+import com.google.common.base.Splitter;
+
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Locale;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 
+import static java.text.MessageFormat.format;
+import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
+
 public class CoordinatesFormat {
-	private static final String SPLITTER = " ";
 
-	private static final String FORMAT_COORDINATES = "lat: {0}; lon: {1}";
-	private static final String FORMAT_COORDINATES_SIMPLE = "{0}" + SPLITTER + "{1}";
+	private static final String DB_SPLITTER = " ";
+	private static final String DB_FORMAT = "{0}" + DB_SPLITTER + "{1}";
 
-	private static final int INTEGER_DIGITS_COUNT = 3;
+	private static final int INTEGRAL_DIGITS_COUNT = 3;
 	private static final int FRACTION_DIGITS_COUNT = 6;
-	private static final NumberFormat GEO_FORMAT;
 
-	/**
-	 * Specifies length of coordinates formatted string.
-	 */
-	public static final int POINT_ACCURACY = INTEGER_DIGITS_COUNT + SPLITTER.length() + FRACTION_DIGITS_COUNT;
+	private final Context context;
+	private final NumberFormat uiFormat;
+	private final NumberFormat databaseFormat;
+	private final Locale locale;
 
-	static {
-		GEO_FORMAT = NumberFormat.getInstance(Locale.ENGLISH);
-		GEO_FORMAT.setMinimumIntegerDigits(INTEGER_DIGITS_COUNT);
-		GEO_FORMAT.setMaximumFractionDigits(INTEGER_DIGITS_COUNT);
-		GEO_FORMAT.setMaximumFractionDigits(FRACTION_DIGITS_COUNT);
-		GEO_FORMAT.setMinimumFractionDigits(FRACTION_DIGITS_COUNT);
+	protected CoordinatesFormat(Context context) {
+		this.context = context;
+		this.locale = context.getResources().getConfiguration().locale;
+		this.uiFormat = buildGeoNumberFormat(locale);
+		this.databaseFormat = buildGeoNumberFormat(Locale.UK);
 	}
 
-	/**
-	 * Use this method to present data to user (in Views)
-	 * @param taskCoordinates
-	 * @return
-	 */
-	public static String prettyFormat(TaskCoordinates taskCoordinates) {
-		if (taskCoordinates == null) {
-			return "";
-		}
-
-		return MessageFormat.format(FORMAT_COORDINATES, taskCoordinates.getLatitude(), taskCoordinates.getLongitude());
+	public static CoordinatesFormat getInstance(Context context) {
+		return new CoordinatesFormat(context);
 	}
 
-	/**
-	 * Use this method to save coordinates to database.
-	 * @param taskCoordinates
-	 * @return
-	 */
-	public static String formatForDatabase(TaskCoordinates taskCoordinates) {
+	public String prettyFormatShort(TaskCoordinates taskCoordinates) {
+		return prettyFormatByType(taskCoordinates, context.getString(R.string.location_pick_coordinates_format_short));
+	}
+
+	public String prettyFormatLong(TaskCoordinates taskCoordinates) {
+		return prettyFormatByType(taskCoordinates, context.getString(R.string.location_pick_coordinates_format_long));
+	}
+
+	public String formatSingleCoordinate(double coordinate) {
+		return uiFormat.format(coordinate);
+	}
+
+	public double parseSingleCoordinate(String coordinate) throws ParseException {
+		return uiFormat.parse(coordinate)
+				.doubleValue();
+	}
+
+	public String formatForDatabase(TaskCoordinates taskCoordinates) {
 		if (taskCoordinates == null) {
 			return null;
 		}
-
-		return MessageFormat.format(FORMAT_COORDINATES_SIMPLE,
-				GEO_FORMAT.format(taskCoordinates.getLatitude()),
-				GEO_FORMAT.format(taskCoordinates.getLongitude()));
+		return format(DB_FORMAT,
+				databaseFormat.format(taskCoordinates.getLatitude()),
+				databaseFormat.format(taskCoordinates.getLongitude()));
 	}
 
-	public static NumberFormat getFormatForCoordinate(Locale locale) {
-		NumberFormat format = NumberFormat.getInstance(locale);
-		format.setMaximumFractionDigits(FRACTION_DIGITS_COUNT);
-		return format;
+	public TaskCoordinates parseFromDatabase(String coordinates) throws ParseException {
+		List<String> data = Splitter.on(DB_SPLITTER).limit(2).trimResults().splitToList(coordinates);
+		verifyArgument(data.size() == 2, "The supplied string does not represent a valid database location value: \"{0}\"; expected format is {1}", coordinates, DB_FORMAT);
+		return new TaskCoordinates(
+				databaseFormat.parse(data.get(0)).doubleValue(),
+				databaseFormat.parse(data.get(1)).doubleValue());
+	}
+
+	private static NumberFormat buildGeoNumberFormat(Locale locale) {
+		NumberFormat result = NumberFormat.getInstance(locale);
+		result.setMinimumIntegerDigits(INTEGRAL_DIGITS_COUNT);
+		result.setMaximumFractionDigits(INTEGRAL_DIGITS_COUNT);
+		result.setMaximumFractionDigits(FRACTION_DIGITS_COUNT);
+		result.setMinimumFractionDigits(FRACTION_DIGITS_COUNT);
+		return result;
+	}
+
+	private String prettyFormatByType(TaskCoordinates taskCoordinates, String string) {
+		if (taskCoordinates == null) {
+			return "";
+		}
+		return format(string, taskCoordinates.getLatitude(), taskCoordinates.getLongitude());
 	}
 }

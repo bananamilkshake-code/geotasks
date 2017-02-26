@@ -30,26 +30,31 @@ import android.widget.TextView;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Map;
 
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.MakeTaskActivity;
 import me.jtalk.android.geotasks.source.Event;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.StringValueExtractor;
 
 import static java.text.MessageFormat.format;
-import static me.jtalk.android.geotasks.util.CoordinatesFormat.prettyFormat;
 import static me.jtalk.android.geotasks.util.TimeFormat.formatDateTime;
 
 public class EventElementAdapter extends CursorTreeAdapter {
+
 	private final int INACTIVE_EVENT_COLOUR;
 	private final int ACTIVE_EVENT_COLOUR;
 
+	private final CoordinatesFormat coordinatesFormat;
+
 	public EventElementAdapter(Context context) {
 		super(null, context, true);
-
+		coordinatesFormat = CoordinatesFormat.getInstance(context);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			INACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.inactive_event, context.getTheme());
 			ACTIVE_EVENT_COLOUR = context.getResources().getColor(R.color.active_event, context.getTheme());
@@ -76,7 +81,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindGroupView(View view, Context context, Cursor cursor, boolean isExpanded) {
-		Event event = CursorHelper.extractEvent(cursor);
+		Event event = CursorHelper.extractEvent(cursor, coordinatesFormat);
 		TextView titleView = (TextView) view.findViewById(R.id.item_event_title);
 		titleView.setText(event.getTitle());
 		titleView.setTextColor(getColorFor(event));
@@ -92,7 +97,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 	static {
 		EVENT_VIEW_MAPPING = ImmutableMap.<Integer, StringValueExtractor>builder()
 				.put(R.id.item_event_expanded_description, (event, context) -> event.getDescription())
-				.put(R.id.item_event_expanded_location, (event, context) -> prettyFormat(event.getCoordinates()))
+				.put(R.id.item_event_expanded_location, (event, context) -> CoordinatesFormat.getInstance(context).prettyFormatLong(event.getCoordinates()))
 				.put(R.id.item_event_expanded_start_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_start_time, event.getStartTime(), context))
 				.put(R.id.item_event_expanded_end_time, (event, context) -> getFormattedTimeString(R.string.main_event_element_end_time, event.getEndTime(), context))
 				.build();
@@ -108,7 +113,7 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
-		Event event = CursorHelper.extractEvent(cursor);
+		Event event = CursorHelper.extractEvent(cursor, coordinatesFormat);
 
 		view.setOnClickListener(v -> {
 			Intent intent = new Intent(context, MakeTaskActivity.class);

@@ -34,9 +34,11 @@ import android.widget.Toast;
 import org.acra.ACRA;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.activity.item.EventElementAdapter;
 import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
@@ -47,6 +49,7 @@ import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
@@ -59,10 +62,12 @@ public class MainActivity extends BaseActivity {
 	private MenuItem geoTrackMenuItem;
 
 	private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::showPermissionAlert);
+	private CoordinatesFormat coordinatesFormat;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.coordinatesFormat = CoordinatesFormat.getInstance(this);
 		setContentView(R.layout.activity_main);
 		initCalendar();
 	}
@@ -200,7 +205,7 @@ public class MainActivity extends BaseActivity {
 		});
 
 		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
-			Event event = CursorHelper.extractEvent(eventsAdapter.getGroup(position));
+			Event event = CursorHelper.extractEvent(eventsAdapter.getGroup(position), coordinatesFormat);
 			new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.main_dialog_delete_event_title)
 					.setMessage(MessageFormat.format(getString(R.string.main_dialog_delete_event_text), event.getTitle()))
@@ -238,6 +243,7 @@ public class MainActivity extends BaseActivity {
 				.apply();
 	}
 
+	@SneakyThrows(ParseException.class)
 	private void setupEventsAlarms() {
 		LOG.debug("Setup previous events alarms");
 		EventChangedReceiver eventChangesReceiver = new EventChangedReceiver();
