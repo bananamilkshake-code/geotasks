@@ -347,6 +347,7 @@ public class LocationPickActivity extends Activity {
 				LOG.debug("Received new request");
 				Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
 				TaskCoordinates coordinates = new TaskCoordinates(location);
+				onLocationPick(coordinates);
 				setupCenter(coordinates);
 				context.unregisterReceiver(this);
 			}
@@ -367,8 +368,10 @@ public class LocationPickActivity extends Activity {
 			LOG.debug("Last known location is {0}. Provider is {1}", lastKnownLocation, locationProvider);
 			LOG.debug("Trying to obtain current position");
 			if (lastKnownLocation == null) {
+				onLocationPick(DEFAULT_COORDINATES);
 				setupCenter(DEFAULT_COORDINATES);
 			} else {
+				onLocationPick(new TaskCoordinates(lastKnownLocation));
 				setupCenter(new TaskCoordinates(lastKnownLocation));
 			}
 			locationManager.requestSingleUpdate(criteria,
@@ -381,6 +384,7 @@ public class LocationPickActivity extends Activity {
 					null);
 		} catch (SecurityException exception) {
 			LOG.error("No permission to get current location");
+			onLocationPick(DEFAULT_COORDINATES);
 			setupCenter(DEFAULT_COORDINATES);
 		}
 	}
