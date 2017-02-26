@@ -31,7 +31,8 @@
         </activity>
         <activity
             android:name=".activity.LocationPickActivity"
-            android:label="@string/title_activity_location_pick">
+            android:label="@string/title_activity_location_pick"
+            android:theme="@style/AppTheme.MapView">
         </activity>
         <activity
             android:name=".activity.SettingsActivity"
