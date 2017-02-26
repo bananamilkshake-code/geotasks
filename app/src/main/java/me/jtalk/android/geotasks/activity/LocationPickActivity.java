@@ -33,6 +33,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -172,8 +174,15 @@ public class LocationPickActivity extends Activity {
 	}
 
 	private void initMapView() {
+
 		Bitmap bitmap = AndroidGraphicFactory.convertToBitmap(getDrawable(R.drawable.ic_place_black_48dp));
 		marker = new Marker(null, bitmap, 0, -bitmap.getHeight() / 2);
+
+		// Work around errors in MapView, provoked by Android Studio UI Designer.
+		// This way designer does not see the view and thus cannot trigger it's failing constructor
+		ViewGroup parentView = (ViewGroup) findViewById(R.id.location_pick_parent);
+		View mapView = getLayoutInflater().inflate(R.layout.map_view, parentView, false);
+		parentView.addView(mapView, 0);
 
 		ButterKnife.bind(this);
 
