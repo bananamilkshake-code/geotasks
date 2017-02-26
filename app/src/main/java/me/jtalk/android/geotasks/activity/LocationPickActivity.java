@@ -182,9 +182,7 @@ public class LocationPickActivity extends Activity {
 
 		// Work around errors in MapView, provoked by Android Studio UI Designer.
 		// This way designer does not see the view and thus cannot trigger it's failing constructor
-		ViewGroup parentView = (ViewGroup) findViewById(R.id.location_pick_parent);
-		View mapView = getLayoutInflater().inflate(R.layout.map_view, parentView, false);
-		parentView.addView(mapView, 0);
+		UiUtils.inflateLayoutWithId(this, R.id.location_pick_parent, R.layout.map_view, 0);
 
 		ButterKnife.bind(this);
 
