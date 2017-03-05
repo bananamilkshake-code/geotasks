@@ -3,6 +3,7 @@ package me.jtalk.android.geotasks.application.service;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
 
@@ -31,7 +32,7 @@ public class PermissionAwareRunner {
     public void withPermissionsAsync(Permission permission, Runnable action) {
         List<String> lackingPermissions = validatePermissions(permission, this::loadContextPermission);
         if (lackingPermissions.isEmpty()) {
-            action.run();
+            new Handler().post(action);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestDynamicPermissions(permission, lackingPermissions, action);
         } else {
