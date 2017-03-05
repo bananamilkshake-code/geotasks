@@ -23,7 +23,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,27 +44,22 @@ import me.jtalk.android.geotasks.application.callbacks.TasksLoaderCallbacks;
 import me.jtalk.android.geotasks.application.receiver.EventChangedReceiver;
 import me.jtalk.android.geotasks.application.service.LocationTrackService;
 import me.jtalk.android.geotasks.application.service.Permission;
-import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
 import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
-import me.jtalk.android.geotasks.util.Logger;
 
-public class MainActivity extends BaseActivity {
-
-	private static final Logger LOG = new Logger(MainActivity.class);
+public class MainActivity extends BaseCalendarActivity {
 
 	private static final int LOADER_EVENTS_ID = 0;
 
 	private MenuItem geoTrackMenuItem;
 
-	private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::showPermissionAlert);
 	private CoordinatesFormat coordinatesFormat;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.coordinatesFormat = CoordinatesFormat.getInstance(this);
 		setContentView(R.layout.activity_main);
@@ -78,14 +72,9 @@ public class MainActivity extends BaseActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.geoTrackMenuItem = menu.findItem(R.id.menu_action_enable_geolistening);
 		if (preferences.getBoolean(getString(R.string.pref_is_geolistening_enabled), false)) {
-			permissionAwareRunner.withPermissions(Permission.TRACK_LOCATION, this::enableGeoListening);
+			withPermissionsAsync(Permission.TRACK_CALENDAR_EVENTS_LOCATION, this::enableGeoListening);
 		}
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] values) {
-		permissionAwareRunner.onPermissionUpdate(permissions, values, requestCode);
 	}
 
 	/**
@@ -101,11 +90,11 @@ public class MainActivity extends BaseActivity {
 	public void toggleGeoListeningClick(MenuItem menuItem) {
 		boolean isChecked = menuItem.isChecked();
 		if (isChecked) {
-			LOG.debug("Disabling GeoListening");
+			log.debug("Disabling GeoListening");
 			disableGeoListening();
 		} else {
-			LOG.debug("Enabling GeoListening");
-			permissionAwareRunner.withPermissions(Permission.TRACK_LOCATION, this::enableGeoListening);
+			log.debug("Enabling GeoListening");
+			withPermissionsAsync(Permission.TRACK_CALENDAR_EVENTS_LOCATION, this::enableGeoListening);
 		}
 	}
 
@@ -121,7 +110,8 @@ public class MainActivity extends BaseActivity {
 		return true;
 	}
 
-	private void showPermissionAlert(Permission failedPermission) {
+	@Override
+	protected void onNoPermission(Permission failedPermission) {
 		switch (failedPermission) {
 			case MANAGE_CALENDAR:
 				new AlertDialog.Builder(MainActivity.this)
@@ -145,8 +135,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void initCalendar() {
-		permissionAwareRunner.withPermissions(Permission.MANAGE_CALENDAR, () -> {
-			initEventsSource();
+		withPermissionsAsync(Permission.MANAGE_CALENDAR, () -> {
 			initEventsList();
 		});
 	}
@@ -159,25 +148,28 @@ public class MainActivity extends BaseActivity {
 	 * @throws SecurityException occurs if no calendar is set and
 	 *                           permission to create calendars is not granted.
 	 */
-	private void initEventsSource() throws SecurityException {
+	@Override
+	protected EventsSource initEventsSource() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
 			calendarId = new CalendarsSource(this).add();
 
-			LOG.info("No calendar was defined in settings. Created calendar {0}", calendarId);
+			log.info("No calendar was defined in settings. Created calendar {0}", calendarId);
 
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putLong(getString(R.string.pref_calendar_id), calendarId);
 			editor.apply();
 		}
 
-		setEventsSource(new EventsSource(this, calendarId));
-		setupEventsAlarms();
+		EventsSource eventsSource = new EventsSource(this, calendarId);
+		setupEventsAlarms(eventsSource);
+		return eventsSource;
 	}
 
 	private void initEventsList() {
+
 		CursorTreeAdapter eventsAdapter = new EventElementAdapter(this);
 
 		ExpandableListView eventsList = (ExpandableListView) findViewById(R.id.main_events_list);
@@ -204,32 +196,36 @@ public class MainActivity extends BaseActivity {
 			}
 		});
 
-		eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
-			Event event = CursorHelper.extractEvent(eventsAdapter.getGroup(position), coordinatesFormat);
-			new AlertDialog.Builder(MainActivity.this)
-					.setTitle(R.string.main_dialog_delete_event_title)
-					.setMessage(MessageFormat.format(getString(R.string.main_dialog_delete_event_text), event.getTitle()))
-					.setPositiveButton(R.string.main_dialog_delete_event_yes, (d, w) -> getEventsSource().remove(event.getId()))
-					.setNegativeButton(R.string.main_dialog_delete_event_no, null)
-					.setCancelable(true)
-					.show();
-			return true;
-		});
+		withEventSource(eventsSource -> {
+			eventsList.setOnItemLongClickListener((parent, view, position, id) -> {
+				Event event = CursorHelper.extractEvent(eventsAdapter.getGroup(position), coordinatesFormat);
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle(R.string.main_dialog_delete_event_title)
+						.setMessage(MessageFormat.format(getString(R.string.main_dialog_delete_event_text), event.getTitle()))
+						.setPositiveButton(R.string.main_dialog_delete_event_yes, (d, w) -> eventsSource.remove(event.getId()))
+						.setNegativeButton(R.string.main_dialog_delete_event_no, null)
+						.setCancelable(true)
+						.show();
+				return true;
+			});
 
-		getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
-				new TasksLoaderCallbacks(this, eventsAdapter, getEventsSource().getCalendarId()));
+			getLoaderManager().initLoader(LOADER_EVENTS_ID, null,
+					new TasksLoaderCallbacks(this, eventsAdapter, eventsSource.getCalendarId()));
+		});
 	}
 
 	private void enableGeoListening() throws SecurityException {
-		Intent intent = new Intent(this, LocationTrackService.class);
-		intent.putExtra(LocationTrackService.INTENT_EXTRA_CALENDAR_ID, getEventsSource().getCalendarId());
-		startService(intent);
-		geoTrackMenuItem.setChecked(true);
-		geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
-		PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext())
-				.edit()
-				.putBoolean(getString(R.string.pref_is_geolistening_enabled), true)
-				.apply();
+		withEventSource(eventsSource -> {
+			Intent intent = new Intent(this, LocationTrackService.class);
+			intent.putExtra(LocationTrackService.INTENT_EXTRA_CALENDAR_ID, eventsSource.getCalendarId());
+			startService(intent);
+			geoTrackMenuItem.setChecked(true);
+			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
+			PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext())
+					.edit()
+					.putBoolean(getString(R.string.pref_is_geolistening_enabled), true)
+					.apply();
+		});
 	}
 
 	private void disableGeoListening() throws SecurityException {
@@ -244,13 +240,13 @@ public class MainActivity extends BaseActivity {
 	}
 
 	@SneakyThrows(ParseException.class)
-	private void setupEventsAlarms() {
-		LOG.debug("Setup previous events alarms");
+	private void setupEventsAlarms(EventsSource eventsSource) {
+		log.debug("Setup previous events alarms");
 		EventChangedReceiver eventChangesReceiver = new EventChangedReceiver();
-		List<Event> events = getEventsSource().getActiveTimingEvents(Calendar.getInstance());
+		List<Event> events = eventsSource.getActiveTimingEvents(Calendar.getInstance());
 		for (Event event : events) {
-			eventChangesReceiver.cancelAlarm(this, getEventsSource().getCalendarId(), event.getId());
-			eventChangesReceiver.setupAlarm(this, getEventsSource().getCalendarId(), event.getId());
+			eventChangesReceiver.cancelAlarm(this, eventsSource.getCalendarId(), event.getId());
+			eventChangesReceiver.setupAlarm(this, eventsSource.getCalendarId(), event.getId());
 		}
 		registerReceiver(eventChangesReceiver, new IntentFilter(EventsSource.ACTION_EVENT_CHANGED));
 	}

@@ -21,7 +21,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,8 +44,8 @@ import butterknife.ButterKnife;
 import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.service.Permission;
-import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
+import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
@@ -51,7 +53,7 @@ import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.TextUpdater;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
-public class MakeTaskActivity extends BaseActivity implements Validator.ValidationListener {
+public class MakeTaskActivity extends BaseCalendarActivity implements Validator.ValidationListener {
 	private static final Logger LOG = new Logger(MakeTaskActivity.class);
 
 	public static final String INTENT_EDIT_TASK = "edit";
@@ -83,19 +85,26 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	private boolean isNewEvent;
 	private Event event;
 
-	private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::noPermission);
 	private CoordinatesFormat coordinatesFormat;
 
-	private void noPermission(Permission permission) {
+	@Override
+	protected void onNoPermission(Permission permission) {
 		Toast.makeText(this, R.string.make_task_toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
 	}
 
 	@Override
-	@SneakyThrows(ParseException.class)
+	protected EventsSource initEventsSource() {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
+		EventsSource eventsSource = new EventsSource(this, calendarId);
+		return eventsSource;
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_make_task);
-
 		ButterKnife.bind(this);
 
 		coordinatesFormat = CoordinatesFormat.getInstance(this);
@@ -104,19 +113,21 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 
 		long eventId = getIntent().getLongExtra(INTENT_EDIT_TASK, EventsSource.NO_TASK);
 		isNewEvent = eventId == EventsSource.NO_TASK;
-		if (isNewEvent) {
-			event = Event.createEmpty();
-		} else {
-			LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
-			event = Event.copyOf(getEventsSource().get(eventId));
-			titleText.setText(event.getTitle());
-			descriptionText.setText(event.getDescription());
-			setLocationText();
-			setTimeViews();
-		}
+		withEventSource(eventsSource -> {
+			if (isNewEvent) {
+				event = Event.createEmpty();
+			} else {
+				LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
+				event = Event.copyOf(eventsSource.get(eventId));
+				titleText.setText(event.getTitle());
+				descriptionText.setText(event.getDescription());
+				setLocationText();
+				setTimeViews();
+			}
 
-		titleText.addTextChangedListener(new TextUpdater((value) -> event.setTitle(value)));
-		descriptionText.addTextChangedListener(new TextUpdater((value) -> event.setDescription(value)));
+			titleText.addTextChangedListener(new TextUpdater((value) -> event.setTitle(value)));
+			descriptionText.addTextChangedListener(new TextUpdater((value) -> event.setDescription(value)));
+		});
 	}
 
 
@@ -140,16 +151,11 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] values) {
-		permissionAwareRunner.onPermissionUpdate(permissions, values, requestCode);
-	}
-
-	@Override
 	public void onValidationSucceeded() {
 		if (isNewEvent) {
-			permissionAwareRunner.withPermissions(Permission.MANAGE_CALENDAR, this::addEvent);
+			withPermissionsAsync(Permission.MANAGE_CALENDAR, this::addEvent);
 		} else {
-			permissionAwareRunner.withPermissions(Permission.MANAGE_CALENDAR, this::editEvent);
+			withPermissionsAsync(Permission.MANAGE_CALENDAR, this::editEvent);
 		}
 	}
 
@@ -180,7 +186,7 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	 * @param view
 	 */
 	public void showLocationActivity(View view) {
-		permissionAwareRunner.withPermissions(Permission.PICK_LOCATION, this::openLocationPickActivity);
+		withPermissionsAsync(Permission.PICK_LOCATION, this::openLocationPickActivity);
 	}
 
 	/**
@@ -277,13 +283,17 @@ public class MakeTaskActivity extends BaseActivity implements Validator.Validati
 	}
 
 	private void addEvent() {
-		getEventsSource().add(event);
-		finish();
+		withEventSource(eventsSource -> {
+			eventsSource.add(event);
+			finish();
+		});
 	}
 
 	private void editEvent() {
-		getEventsSource().edit(event);
-		finish();
+		withEventSource(eventsSource -> {
+			eventsSource.edit(event);
+			finish();
+		});
 	}
 
 	private void openLocationPickActivity() {

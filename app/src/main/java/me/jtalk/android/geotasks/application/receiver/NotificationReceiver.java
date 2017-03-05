@@ -71,7 +71,6 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 	private static final long DELAY_MINUTES_15 = 15 * MILLIS_IN_MINUTE;
 
 	@Override
-	@SneakyThrows(ParseException.class)
 	public void onReceive(Context context, Intent intent) {
 		String acton = intent.getAction();
 		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);

@@ -18,16 +18,27 @@
 package me.jtalk.android.geotasks.activity;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 
-import me.jtalk.android.geotasks.application.GeoTasksApplication;
-import me.jtalk.android.geotasks.source.EventsSource;
+import me.jtalk.android.geotasks.application.service.Permission;
+import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
+import me.jtalk.android.geotasks.util.Logger;
 
 public abstract class BaseActivity extends Activity {
-	protected void setEventsSource(EventsSource eventsSource) {
-		((GeoTasksApplication) getApplication()).setEventsSource(eventsSource);
-	}
 
-	protected EventsSource getEventsSource() {
-		return ((GeoTasksApplication) getApplication()).getEventsSource();
-	}
+    protected final Logger log = new Logger(getClass());
+    private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::onNoPermission);
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] values) {
+        permissionAwareRunner.onPermissionUpdate(permissions, values, requestCode);
+    }
+
+    protected void withPermissionsAsync(Permission permission, Runnable action) {
+        permissionAwareRunner.withPermissionsAsync(permission, action);
+    }
+
+    protected void onNoPermission(Permission permission) {
+        log.fatal("An unhandled permission failure for {0}", permission);
+    }
 }

@@ -43,7 +43,6 @@ public class EventChangedReceiver extends BroadcastReceiver {
 		}
 	}
 
-	@SneakyThrows(ParseException.class)
 	public void setupAlarm(Context context, long calendarId, long eventId) {
 		EventsSource eventsSource = new EventsSource(context, calendarId);
 		Event event = eventsSource.get(eventId);

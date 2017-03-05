@@ -28,7 +28,7 @@ public class PermissionAwareRunner {
     private final Consumer<Permission> errorHandler;
     private final EnumMap<Permission, Runnable> pendingActions = new EnumMap<>(Permission.class);
 
-    public void withPermissions(Permission permission, Runnable action) {
+    public void withPermissionsAsync(Permission permission, Runnable action) {
         List<String> lackingPermissions = validatePermissions(permission, this::loadContextPermission);
         if (lackingPermissions.isEmpty()) {
             action.run();

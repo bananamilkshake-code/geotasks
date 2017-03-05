@@ -10,7 +10,7 @@ import me.jtalk.android.geotasks.R;
 import static android.Manifest.permission.*;
 
 public enum Permission {
-    TRACK_LOCATION(R.string.location_service_toast_no_permission_error, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION),
+    TRACK_CALENDAR_EVENTS_LOCATION(R.string.location_service_toast_no_permission_error, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, READ_CALENDAR),
     MANAGE_CALENDAR(R.string.calendar_access_toast_no_permission_error, READ_CALENDAR, WRITE_CALENDAR),
     PICK_LOCATION(R.string.make_task_toast_event_creation_no_permission, ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, ACCESS_WIFI_STATE, ACCESS_NETWORK_STATE, INTERNET),;
 

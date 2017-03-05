@@ -50,4 +50,17 @@ public class Assert {
 			throw new IllegalStateException(message);
 		}
 	}
+
+	public static <T> void verifyNotNull(T object, String format, Object ...args) {
+		if (object == null) {
+			String message = MessageFormat.format(format, args);
+			throw new NullPointerException(message);
+		}
+	}
+
+	public static <T> void verifyNotNull(T object, String message) {
+		if (object == null) {
+			throw new NullPointerException(message);
+		}
+	}
 }

@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
@@ -160,7 +161,7 @@ public class EventsSource implements EventIntentFields {
 	 * @param id id of event to retrieve
 	 * @return retrieved event
 	 */
-	public Event get(long id) throws SecurityException, ParseException {
+	public Event get(long id) throws SecurityException {
 		String selection = CursorHelper.buildProjection(Events._ID);
 		String[] selectionArgs = createSelectionArgs(id, Calendar.getInstance());
 		Cursor cursor = this.context.getContentResolver().query(

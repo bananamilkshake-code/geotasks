@@ -69,6 +69,15 @@ public class Logger {
 		Log.e(tag, format(format, objects), throwable);
 	}
 
+	public void fatal(String format, Object... objects) {
+		Log.wtf(tag, format(format, objects));
+	}
+
+	public void fatal(Throwable throwable, String format, Object... objects) {
+		ACRA.getErrorReporter().handleSilentException(throwable);
+		Log.wtf(tag, format(format, objects), throwable);
+	}
+
 	private String format(String format, Object... objects) {
 		return MessageFormat.format(format, objects);
 	}
