@@ -77,9 +77,7 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 		}
 
 		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
-		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
-			throw new IllegalArgumentException("Calendar id for service is incorrect or not passed");
-		}
+		verifyArgument(calendarId != EventsSource.DEFAULT_CALENDAR, "Calendar id {} is incorrect or not passed", calendarId);
 
 		setupListener(calendarId);
 		createNotification();
