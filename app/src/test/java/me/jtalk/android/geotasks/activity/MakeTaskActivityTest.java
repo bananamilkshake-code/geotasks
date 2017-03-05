@@ -32,11 +32,15 @@ import static org.robolectric.Shadows.shadowOf;
 		sdk = 21,
 		manifest = "src/main/AndroidManifest.xml")
 public class MakeTaskActivityTest {
+
+	private CoordinatesFormat coordinatesFormat;
+
 	private MakeTaskActivity activity;
 
 	@Before
 	public void setUp() {
 		activity = Robolectric.setupActivity(MakeTaskActivity.class);
+		coordinatesFormat = CoordinatesFormat.getInstance(activity);
 	}
 
 	@Test
@@ -63,7 +67,7 @@ public class MakeTaskActivityTest {
 	@Test
 	public void testCoordinatesPickedWithLocationPickedActivity() {
 		TaskCoordinates pickedCoordinates = new TaskCoordinates(12.34, 34.23);
-		String formattedCoordinates = CoordinatesFormat.prettyFormat(pickedCoordinates);
+		String formattedCoordinates = coordinatesFormat.prettyFormatShort(pickedCoordinates);
 
 		Intent intentWithCoordinates = new Intent();
 		intentWithCoordinates.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, pickedCoordinates);
@@ -78,7 +82,7 @@ public class MakeTaskActivityTest {
 	}
 
 	@Test
-	public void testOpenActivityToEditEvent() {
+	public void testOpenActivityToEditEvent() throws Exception {
 		long eventId = 1;
 
 		Intent intent = new Intent();
