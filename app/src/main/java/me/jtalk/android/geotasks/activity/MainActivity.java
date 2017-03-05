@@ -72,7 +72,7 @@ public class MainActivity extends BaseCalendarActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.geoTrackMenuItem = menu.findItem(R.id.menu_action_enable_geolistening);
 		if (preferences.getBoolean(getString(R.string.pref_is_geolistening_enabled), false)) {
-			withPermissionsAsync(Permission.TRACK_CALENDAR_EVENTS_LOCATION, this::enableGeoListening);
+			withPermissionsAsync(Permission.TRACK_LOCATION, this::enableGeoListening);
 		}
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -94,7 +94,7 @@ public class MainActivity extends BaseCalendarActivity {
 			disableGeoListening();
 		} else {
 			log.debug("Enabling GeoListening");
-			withPermissionsAsync(Permission.TRACK_CALENDAR_EVENTS_LOCATION, this::enableGeoListening);
+			withPermissionsAsync(Permission.TRACK_LOCATION, this::enableGeoListening);
 		}
 	}
 
