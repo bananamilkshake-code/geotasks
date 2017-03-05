@@ -18,7 +18,6 @@
 package me.jtalk.android.geotasks.activity;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -77,11 +76,8 @@ public class MainActivity extends BaseCalendarActivity {
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	/**
-	 * This method is called on menu.menu_action_enable_geolistening click.
-	 */
 	public void openAddEventIntent(MenuItem menuItem) {
-		startActivity(new Intent(this, MakeTaskActivity.class));
+		MakeTaskActivity.runNewTask(this);
 	}
 
 	/**
@@ -102,7 +98,7 @@ public class MainActivity extends BaseCalendarActivity {
 	 * This method is called on menu.menu_action_settings click.
 	 */
 	public void openSettingsActivity(MenuItem menuItem) {
-		startActivity(new Intent(this, SettingsActivity.class));
+		SettingsActivity.runSettings(this);
 	}
 
 	public boolean sendReports(MenuItem menuItem) {
@@ -214,9 +210,7 @@ public class MainActivity extends BaseCalendarActivity {
 
 	private void enableGeoListening() throws SecurityException {
 		withEventSource(eventsSource -> {
-			Intent intent = new Intent(this, LocationTrackService.class);
-			intent.putExtra(LocationTrackService.INTENT_EXTRA_CALENDAR_ID, eventsSource.getCalendarId());
-			startService(intent);
+			LocationTrackService.runServiceFor(this, eventsSource.getCalendarId());
 			geoTrackMenuItem.setChecked(true);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
 			updatePreference(R.string.pref_is_geolistening_enabled, true, SharedPreferences.Editor::putBoolean);
@@ -224,8 +218,7 @@ public class MainActivity extends BaseCalendarActivity {
 	}
 
 	private void disableGeoListening() throws SecurityException {
-		Intent intent = new Intent(this, LocationTrackService.class);
-		stopService(intent);
+		LocationTrackService.stopServiceFor(this);
 		geoTrackMenuItem.setChecked(false);
 		geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
 		updatePreference(R.string.pref_is_geolistening_enabled, false, SharedPreferences.Editor::putBoolean);

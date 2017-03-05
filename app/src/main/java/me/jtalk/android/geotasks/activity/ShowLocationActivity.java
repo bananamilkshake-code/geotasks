@@ -17,6 +17,9 @@
  */
 package me.jtalk.android.geotasks.activity;
 
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.GestureDetector;
 
@@ -62,6 +65,14 @@ public class ShowLocationActivity extends BaseActivity {
 	private MapViewContext mapViewContext;
 
 	private Event event;
+
+	public static PendingIntent buildShowCurrentLocation(Context context, long eventId, TaskCoordinates position) {
+		Intent intent = new Intent(context, ShowLocationActivity.class);
+		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_CURRENT_POSITION, position);
+		PendingIntent openLocationIntent = PendingIntent.getActivity(context, ShowLocationActivity.REQUEST_CODE_SHOW_CURRENT, intent, 0);
+		return openLocationIntent;
+	}
 
 	@Override
 	@SneakyThrows(ParseException.class)

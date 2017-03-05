@@ -50,11 +50,12 @@ import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
-import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_CALENDAR_ID;
-import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_EVENT_ID;
 import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
 
 public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener, LocationListener {
+
+	private static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
+	private static final String INTENT_EXTRA_EVENT_ID = "event-id";
 
 	private static final Logger LOG = new Logger(LocationTrackService.class);
 
@@ -62,6 +63,17 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 
 	private LocationManager getLocationManager() {
 		return (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	}
+
+	public static void runServiceFor(Context context, long calendarId) {
+		Intent intent = new Intent(context, LocationTrackService.class);
+		intent.putExtra(INTENT_EXTRA_CALENDAR_ID, calendarId);
+		context.startService(intent);
+	}
+
+	public static void stopServiceFor(Context context) {
+		Intent intent = new Intent(context, LocationTrackService.class);
+		context.stopService(intent);
 	}
 
 	@Nullable

@@ -17,17 +17,23 @@
  */
 package me.jtalk.android.geotasks.activity;
 
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
 import me.jtalk.android.geotasks.R;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends BaseActivity {
+
+	public static void runSettings(Context context) {
+		Intent intent = new Intent(context, SettingsActivity.class);
+		context.startActivity(intent);
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		getFragmentManager()
 				.beginTransaction()
 				.replace(android.R.id.content, new SettingsFragment())
@@ -35,6 +41,7 @@ public class SettingsActivity extends Activity {
 	}
 
 	public static class SettingsFragment extends PreferenceFragment {
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);

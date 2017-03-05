@@ -113,14 +113,11 @@ public class EventElementAdapter extends CursorTreeAdapter {
 
 	@Override
 	protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
+
 		Event event = CursorHelper.extractEvent(cursor, coordinatesFormat);
-
 		view.setOnClickListener(v -> {
-			Intent intent = new Intent(context, MakeTaskActivity.class);
-			intent.putExtra(MakeTaskActivity.INTENT_EDIT_TASK, event.getId());
-			context.startActivity(intent);
+			MakeTaskActivity.runEditTask(context, event.getId());
 		});
-
 		for (Map.Entry<Integer, StringValueExtractor> viewMapping : EVENT_VIEW_MAPPING.entrySet()) {
 			setElementValue(view, viewMapping.getKey(), event, createExtractor(viewMapping.getValue(), context));
 		}

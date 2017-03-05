@@ -19,23 +19,31 @@ package me.jtalk.android.geotasks.application.service;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
-
-import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_CALENDAR_ID;
-import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_EVENT_ID;
 
 public class EventOperationService extends IntentService {
 
-	public static final int INTENT_DISABLE_EVENT = 0;
+	private static final int INTENT_DISABLE_EVENT = 0;
+	private static final String INTENT_EXTRA_CALENDAR_ID = "calendar-id";
+	private static final String INTENT_EXTRA_EVENT_ID = "event-id";
 
 	public static final String INTENT_EXTRA_NOTIFICATION_ID = "notification-id";
 
 	public EventOperationService() {
 		super(EventOperationService.class.getName());
+	}
+
+	public static PendingIntent buildDisableEvent(Context context, long eventId, long calendarId, int notificationId) {
+		final Intent intent = new Intent(context, EventOperationService.class);
+		intent.putExtra(EventOperationService.INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(EventOperationService.INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(EventOperationService.INTENT_EXTRA_NOTIFICATION_ID, notificationId);
+		PendingIntent pendingIntent = PendingIntent.getService(context, EventOperationService.INTENT_DISABLE_EVENT, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		return pendingIntent;
 	}
 
 	@Override

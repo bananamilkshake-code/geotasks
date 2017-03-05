@@ -19,6 +19,7 @@ package me.jtalk.android.geotasks.activity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,14 +45,12 @@ import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
-import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.TextUpdater;
 import me.jtalk.android.geotasks.util.TimeFormat;
 
 public class MakeTaskActivity extends BaseCalendarActivity implements Validator.ValidationListener {
-	private static final Logger LOG = new Logger(MakeTaskActivity.class);
 
-	public static final String INTENT_EDIT_TASK = "edit";
+	private static final String INTENT_EDIT_TASK = "edit";
 
 	@NotEmpty(messageResId = R.string.make_task_error_title_is_empty)
 	@Bind(R.id.make_task_name)
@@ -82,6 +81,17 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 
 	private CoordinatesFormat coordinatesFormat;
 
+	public static void runNewTask(Context context) {
+		Intent intent = new Intent(context, MakeTaskActivity.class);
+		context.startActivity(intent);
+	}
+
+	public static void runEditTask(Context context, long eventId) {
+		Intent intent = new Intent(context, MakeTaskActivity.class);
+		intent.putExtra(MakeTaskActivity.INTENT_EDIT_TASK, eventId);
+		context.startActivity(intent);
+	}
+
 	@Override
 	protected void onNoPermission(Permission permission) {
 		Toast.makeText(this, R.string.make_task_toast_event_creation_no_permission, Toast.LENGTH_LONG).show();
@@ -111,7 +121,7 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 			if (isNewEvent) {
 				event = Event.createEmpty();
 			} else {
-				LOG.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
+				log.debug("MakeTaskActivity has been opened to edit event {0}", eventId);
 				event = Event.copyOf(eventsSource.get(eventId));
 				titleText.setText(event.getTitle());
 				descriptionText.setText(event.getDescription());
@@ -136,7 +146,6 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 		if (resultCode != RESULT_OK) {
 			return;
 		}
-
 		switch (requestCode) {
 			case LocationPickActivity.INTENT_LOCATION_PICK:
 				onLocationResult(data);
@@ -249,7 +258,7 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 		} else if (isEndTimeView(view)) {
 			calendar = event.getEndTime();
 		} else {
-			LOG.warn("Incorrect view to get calendar instance");
+			log.warn("Incorrect view to get calendar instance");
 		}
 
 		if (calendar == null) {
@@ -265,14 +274,14 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 		} else if (isEndTimeView(view)) {
 			event.setEndTime(calendar);
 		} else {
-			LOG.warn("Incorrect view to set date, nothing changed");
+			log.warn("Incorrect view to set date, nothing changed");
 			return;
 		}
 		setTimeViews();
 	}
 
 	private void onLocationResult(Intent data) {
-		event.setCoordinates(data.getParcelableExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES));
+		event.setCoordinates(data.getParcelableExtra(LocationPickActivity.RESULT_EXTRA_COORDINATES));
 		setLocationText();
 	}
 
@@ -291,13 +300,6 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 	}
 
 	private void openLocationPickActivity() {
-		Intent intent = new Intent(this, LocationPickActivity.class);
-		final TaskCoordinates coordinates = event.getCoordinates();
-		if (coordinates != null) {
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_EDIT, true);
-			intent.putExtra(LocationPickActivity.INTENT_EXTRA_COORDINATES, coordinates);
-		}
-
-		startActivityForResult(intent, LocationPickActivity.INTENT_LOCATION_PICK);
+		LocationPickActivity.runPickLocationWithResult(this, event.getCoordinates());
 	}
 }

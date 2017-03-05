@@ -105,12 +105,9 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 	 * @param distance calculated distance to event
 	 */
 	public void onEventIsNear(Context context, long calendarId, Event event, TaskCoordinates currentPosition, double distance) {
-		final int notificationId = getNotificationId(event);
 
-		Intent intent = new Intent(context, ShowLocationActivity.class);
-		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_EVENT_ID, event.getId());
-		intent.putExtra(ShowLocationActivity.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
-		PendingIntent openLocationIntent = PendingIntent.getActivity(context, ShowLocationActivity.SHOW_CURRENT, intent, 0);
+		final int notificationId = getNotificationId(event);
+		PendingIntent openLocationIntent = ShowLocationActivity.buildShowCurrentLocation(context, event.getId(), currentPosition);
 
 		final String title = MessageFormat.format(context.getString(R.string.notification_event_is_near_title_arg_1), event.getTitle());
 		final String contentText = MessageFormat.format(context.getString(R.string.notification_event_is_near_text_arg_1), distance);
@@ -214,11 +211,7 @@ public class NotificationReceiver extends BroadcastReceiver implements EventInte
 	private Notification.Action createDisableAction(Context context, long calendarId, long eventId, int notificationId) {
 		final Icon icon = getDisableActionIcon(context);
 		final String title = context.getString(R.string.notification_action_disable);
-		final Intent intent = new Intent(context, EventOperationService.class);
-		intent.putExtra(EventOperationService.INTENT_EXTRA_CALENDAR_ID, calendarId);
-		intent.putExtra(EventOperationService.INTENT_EXTRA_EVENT_ID, eventId);
-		intent.putExtra(EventOperationService.INTENT_EXTRA_NOTIFICATION_ID, notificationId);
-		PendingIntent pendingIntent = PendingIntent.getService(context, EventOperationService.INTENT_DISABLE_EVENT, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		PendingIntent pendingIntent = EventOperationService.buildDisableEvent(context, eventId, calendarId, notificationId);
 		return new Notification.Action.Builder(icon, title, pendingIntent).build();
 	}
 

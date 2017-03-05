@@ -36,6 +36,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.common.base.Optional;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 
@@ -71,9 +72,10 @@ public class LocationPickActivity extends Activity {
 	private static final byte MAX_ZOOM = 18;
 
 	public static final int INTENT_LOCATION_PICK = 0;
+	private static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
+	private static final String INTENT_EXTRA_EDIT = "extra-is-edit";
 
-	public static final String INTENT_EXTRA_EDIT = "extra-is-edit";
-	public static final String INTENT_EXTRA_COORDINATES = "extra-coordinates";
+	public static final String RESULT_EXTRA_COORDINATES = "extra-coordinates";
 
 	static {
 		Validator.registerAnnotation(DecimalRange.class);
@@ -105,6 +107,15 @@ public class LocationPickActivity extends Activity {
 	private MapViewContext mapViewContext;
 
 	private CoordinatesFormat coordinatesFormat;
+
+	public static void runPickLocationWithResult(Activity source, TaskCoordinates coordinates) {
+		Intent intent = new Intent(source, LocationPickActivity.class);
+		if (coordinates != null) {
+			intent.putExtra(INTENT_EXTRA_EDIT, true);
+			intent.putExtra(INTENT_EXTRA_COORDINATES, coordinates);
+		}
+		source.startActivityForResult(intent, INTENT_LOCATION_PICK);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +156,7 @@ public class LocationPickActivity extends Activity {
 	public void onPickClick(View source) {
 		Intent result = new Intent();
 		if (pickedLocation != null) {
-			result.putExtra(INTENT_EXTRA_COORDINATES, pickedLocation);
+			result.putExtra(RESULT_EXTRA_COORDINATES, pickedLocation);
 		}
 		setResult(RESULT_OK, result);
 		finish();
