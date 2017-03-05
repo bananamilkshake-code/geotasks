@@ -25,7 +25,10 @@ import android.content.Intent;
 import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 
-public class EventOperationService extends IntentService implements EventIntentFields {
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_CALENDAR_ID;
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_EVENT_ID;
+
+public class EventOperationService extends IntentService {
 
 	public static final int INTENT_DISABLE_EVENT = 0;
 

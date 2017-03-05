@@ -6,15 +6,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import java.text.ParseException;
 import java.util.Calendar;
 
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
+
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_CALENDAR_ID;
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_EVENT_ID;
 
 @NoArgsConstructor
 public class EventChangedReceiver extends BroadcastReceiver {
@@ -24,8 +25,8 @@ public class EventChangedReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		int action = intent.getIntExtra(EventsSource.INTENT_EXTRA_ACTION, EventsSource.ACTION_NONE);
-		long calendarId = intent.getLongExtra(EventsSource.INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
-		long eventId = intent.getLongExtra(EventsSource.INTENT_EXTRA_EVENT_ID, EventsSource.NO_TASK);
+		long calendarId = intent.getLongExtra(INTENT_EXTRA_CALENDAR_ID, EventsSource.DEFAULT_CALENDAR);
+		long eventId = intent.getLongExtra(INTENT_EXTRA_EVENT_ID, EventsSource.NO_TASK);
 
 		LOG.debug("EventChangedReceiver received new Intent: action {0}, calendar id {1}, eventId {2}", action, calendarId, eventId);
 
@@ -61,8 +62,8 @@ public class EventChangedReceiver extends BroadcastReceiver {
 
 	private PendingIntent createEventIntent(Context context, long calendarId, long eventId) {
 		Intent intent = new Intent(NotificationReceiver.ACTION_ALARM);
-		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CALENDAR_ID, calendarId);
-		intent.putExtra(NotificationReceiver.INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(INTENT_EXTRA_EVENT_ID, eventId);
 		return PendingIntent.getBroadcast(context, (int)eventId, intent, 0);
 	}
 }

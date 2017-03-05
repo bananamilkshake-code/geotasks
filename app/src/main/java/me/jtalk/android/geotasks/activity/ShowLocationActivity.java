@@ -34,18 +34,17 @@ import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
-import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.MapViewContext;
 
-public class ShowLocationActivity extends BaseActivity implements EventIntentFields {
+public class ShowLocationActivity extends BaseActivity {
 
 	private static final Logger LOG = new Logger(ShowLocationActivity.class);
 
-	public static final int SHOW_CURRENT = 0;
-
-	public static final String INTENT_EXTRA_CURRENT_POSITION = "current-position";
+	private static final int REQUEST_CODE_SHOW_CURRENT = 0;
+	private static final String INTENT_EXTRA_EVENT_ID = "event-id";
+	private static final String INTENT_EXTRA_CURRENT_POSITION = "current-position";
 
 	@Bind(R.id.show_location_map)
 	public MapView mapView;

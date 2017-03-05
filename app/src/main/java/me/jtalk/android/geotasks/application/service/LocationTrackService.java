@@ -47,13 +47,14 @@ import me.jtalk.android.geotasks.application.Settings;
 import me.jtalk.android.geotasks.application.receiver.NotificationReceiver;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
 import me.jtalk.android.geotasks.source.Event;
-import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_CALENDAR_ID;
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_EVENT_ID;
 import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
 
-public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener, EventIntentFields, LocationListener {
+public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener, LocationListener {
 
 	private static final Logger LOG = new Logger(LocationTrackService.class);
 
@@ -144,8 +145,8 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 
 	private Intent createNotificationIntent(long calendarId, long eventId, TaskCoordinates currentPosition, double distance) {
 		Intent intent = new Intent(NotificationReceiver.ACTION_LOCATION);
-		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CALENDAR_ID, calendarId);
-		intent.putExtra(NotificationReceiver.INTENT_EXTRA_EVENT_ID, eventId);
+		intent.putExtra(INTENT_EXTRA_CALENDAR_ID, calendarId);
+		intent.putExtra(INTENT_EXTRA_EVENT_ID, eventId);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_CURRENT_POSITION, currentPosition);
 		intent.putExtra(NotificationReceiver.INTENT_EXTRA_DISTANCE, distance);
 		return intent;

@@ -29,25 +29,24 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
-import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Reminders;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
 import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
-import static java.lang.String.format;
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_CALENDAR_ID;
+import static me.jtalk.android.geotasks.source.EventIntentFields.INTENT_EXTRA_EVENT_ID;
 
-public class EventsSource implements EventIntentFields {
+public class EventsSource {
 	public static final Logger LOG = new Logger(EventsSource.class);
 
 	/**
