@@ -18,16 +18,24 @@
 package me.jtalk.android.geotasks.activity;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 
 import me.jtalk.android.geotasks.application.service.Permission;
 import me.jtalk.android.geotasks.application.service.PermissionAwareRunner;
 import me.jtalk.android.geotasks.util.Logger;
+import me.jtalk.android.geotasks.util.TriConsumer;
+
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public abstract class BaseActivity extends Activity {
 
     protected final Logger log = new Logger(getClass());
     private final PermissionAwareRunner permissionAwareRunner = new PermissionAwareRunner(this, this::onNoPermission);
+    private final Supplier<SharedPreferences> sharedPreferences = Suppliers.memoize(() -> getDefaultSharedPreferences(getApplicationContext()));
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] values) {
@@ -40,5 +48,15 @@ public abstract class BaseActivity extends Activity {
 
     protected void onNoPermission(Permission permission) {
         log.fatal("An unhandled permission failure for {0}", permission);
+    }
+
+    protected <T> void updatePreference(int nameId, T newValue, TriConsumer<SharedPreferences.Editor, String, T> assigner) {
+        SharedPreferences.Editor editor = getSharedPreferences().edit();
+        assigner.consume(editor, getString(nameId), newValue);
+        editor.apply();
+    }
+
+    protected SharedPreferences getSharedPreferences() {
+        return sharedPreferences.get();
     }
 }

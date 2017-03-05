@@ -135,9 +135,7 @@ public class MainActivity extends BaseCalendarActivity {
 	}
 
 	private void initCalendar() {
-		withPermissionsAsync(Permission.MANAGE_CALENDAR, () -> {
-			initEventsList();
-		});
+		withPermissionsAsync(Permission.MANAGE_CALENDAR, this::initEventsList);
 	}
 
 	/**
@@ -221,10 +219,7 @@ public class MainActivity extends BaseCalendarActivity {
 			startService(intent);
 			geoTrackMenuItem.setChecked(true);
 			geoTrackMenuItem.setIcon(R.drawable.ic_gps_fixed_white_48dp);
-			PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext())
-					.edit()
-					.putBoolean(getString(R.string.pref_is_geolistening_enabled), true)
-					.apply();
+			updatePreference(R.string.pref_is_geolistening_enabled, true, SharedPreferences.Editor::putBoolean);
 		});
 	}
 
@@ -233,10 +228,7 @@ public class MainActivity extends BaseCalendarActivity {
 		stopService(intent);
 		geoTrackMenuItem.setChecked(false);
 		geoTrackMenuItem.setIcon(R.drawable.ic_gps_off_white_48dp);
-		PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext())
-				.edit()
-				.putBoolean(getString(R.string.pref_is_geolistening_enabled), false)
-				.apply();
+		updatePreference(R.string.pref_is_geolistening_enabled, false, SharedPreferences.Editor::putBoolean);
 	}
 
 	@SneakyThrows(ParseException.class)

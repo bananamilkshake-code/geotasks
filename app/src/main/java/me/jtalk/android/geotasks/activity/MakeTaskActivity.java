@@ -21,9 +21,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,17 +33,14 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import lombok.SneakyThrows;
 import me.jtalk.android.geotasks.R;
 import me.jtalk.android.geotasks.application.service.Permission;
 import me.jtalk.android.geotasks.location.TaskCoordinates;
-import me.jtalk.android.geotasks.source.CalendarsSource;
 import me.jtalk.android.geotasks.source.Event;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.CoordinatesFormat;
@@ -94,8 +89,7 @@ public class MakeTaskActivity extends BaseCalendarActivity implements Validator.
 
 	@Override
 	protected EventsSource initEventsSource() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
+		long calendarId = getSharedPreferences().getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		EventsSource eventsSource = new EventsSource(this, calendarId);
 		return eventsSource;
 	}

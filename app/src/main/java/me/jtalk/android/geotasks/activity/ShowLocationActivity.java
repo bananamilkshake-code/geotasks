@@ -17,10 +17,7 @@
  */
 package me.jtalk.android.geotasks.activity;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.GestureDetector;
 
 import org.mapsforge.core.graphics.Bitmap;
@@ -42,7 +39,7 @@ import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 import me.jtalk.android.geotasks.util.MapViewContext;
 
-public class ShowLocationActivity extends Activity implements EventIntentFields {
+public class ShowLocationActivity extends BaseActivity implements EventIntentFields {
 
 	private static final Logger LOG = new Logger(ShowLocationActivity.class);
 
@@ -128,8 +125,7 @@ public class ShowLocationActivity extends Activity implements EventIntentFields 
 	}
 
 	private Event retrieveEvent(long id) throws ParseException {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		long calendarId = settings.getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
+		long calendarId = getSharedPreferences().getLong(getString(R.string.pref_calendar_id), EventsSource.DEFAULT_CALENDAR);
 		if (calendarId == EventsSource.DEFAULT_CALENDAR) {
 			throw new IllegalStateException("No calendar is created for application");
 		}
