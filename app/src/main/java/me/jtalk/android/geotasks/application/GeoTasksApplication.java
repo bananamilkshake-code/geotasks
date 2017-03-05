@@ -59,7 +59,7 @@ public class GeoTasksApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		AndroidGraphicFactory.createInstance(this);
 
 		ACRA.init(this);

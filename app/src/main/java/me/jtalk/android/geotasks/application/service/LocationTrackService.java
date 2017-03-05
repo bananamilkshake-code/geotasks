@@ -51,6 +51,8 @@ import me.jtalk.android.geotasks.source.EventIntentFields;
 import me.jtalk.android.geotasks.source.EventsSource;
 import me.jtalk.android.geotasks.util.Logger;
 
+import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
+
 public class LocationTrackService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener, EventIntentFields, LocationListener {
 
 	private static final Logger LOG = new Logger(LocationTrackService.class);
@@ -176,7 +178,6 @@ public class LocationTrackService extends Service implements SharedPreferences.O
 
 	private void setupListener(long calendarId) throws SecurityException {
 		getLocationManager().removeUpdates(this);
-
 		eventsSource = new EventsSource(this, calendarId);
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

@@ -19,18 +19,15 @@ package me.jtalk.android.geotasks.application.callbacks;
 
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.widget.CursorTreeAdapter;
 
 import java.util.Calendar;
 
 import lombok.AllArgsConstructor;
 import me.jtalk.android.geotasks.source.EventsSource;
-import me.jtalk.android.geotasks.util.CursorHelper;
 import me.jtalk.android.geotasks.util.Logger;
 
 /**
