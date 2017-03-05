@@ -19,6 +19,7 @@ import me.jtalk.android.geotasks.util.Logger;
 
 import static me.jtalk.android.geotasks.util.ArrayHelper.arrayOf;
 import static me.jtalk.android.geotasks.util.Assert.verifyArgument;
+import static me.jtalk.android.geotasks.util.Assert.verifyState;
 
 @RequiredArgsConstructor
 public class PermissionAwareRunner {
@@ -74,9 +75,7 @@ public class PermissionAwareRunner {
 
     @TargetApi(23)
     private void requestDynamicPermissions(Permission permission, List<String> lackingPermissions, Runnable action) {
-        if (pendingActions.containsKey(permission)) {
-            LOG.error("Permission requested while another request in progress for {0}", permission.name());
-        }
+        verifyState(!pendingActions.containsKey(permission), "Permission requested while another request in progress for {0}", permission.name());
         try {
             pendingActions.put(permission, action);
             parent.requestPermissions(arrayOf(lackingPermissions, String[]::new), permission.ordinal());
